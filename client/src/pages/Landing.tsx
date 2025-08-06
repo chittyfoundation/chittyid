@@ -42,7 +42,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <Badge className="inline-flex items-center bg-green-100 text-green-600 mb-6" data-testid="badge-trusted">
+              <Badge className="inline-flex items-center bg-blue-100 text-blue-600 mb-6" data-testid="badge-trusted">
                 <CheckCircle className="mr-2 h-4 w-4" />
                 Trusted by 10,000+ businesses
               </Badge>
@@ -73,7 +73,7 @@ export default function Landing() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="font-semibold text-slate-900" data-testid="text-chittyid-title">Your ChittyID</h3>
-                      <Badge variant="secondary" className="bg-green-100 text-green-600" data-testid="badge-verified">
+                      <Badge variant="secondary" className="bg-blue-100 text-blue-600" data-testid="badge-verified">
                         Verified
                       </Badge>
                     </div>
@@ -83,24 +83,24 @@ export default function Landing() {
                         <span className="text-sm text-slate-600" data-testid="text-trust-score-label">Trust Score</span>
                         <div className="flex items-center space-x-2">
                           <Progress value={85} className="w-20" data-testid="progress-trust-score" />
-                          <span className="text-sm font-semibold text-green-600" data-testid="text-trust-score-value">847</span>
+                          <span className="text-sm font-semibold text-blue-600" data-testid="text-trust-score-value">847</span>
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4 pt-2">
                         <div className="flex items-center space-x-2">
-                          <IdCard className="text-green-600 h-4 w-4" />
+                          <IdCard className="text-blue-600 h-4 w-4" />
                           <span className="text-sm text-slate-600" data-testid="text-id-verified">ID Verified</span>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Home className="text-green-600 h-4 w-4" />
+                          <Home className="text-orange-600 h-4 w-4" />
                           <span className="text-sm text-slate-600" data-testid="text-address-confirmed">Address Confirmed</span>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Phone className="text-green-600 h-4 w-4" />
+                          <Phone className="text-red-600 h-4 w-4" />
                           <span className="text-sm text-slate-600" data-testid="text-phone-verified">Phone Verified</span>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Mail className="text-green-600 h-4 w-4" />
+                          <Mail className="text-yellow-600 h-4 w-4" />
                           <span className="text-sm text-slate-600" data-testid="text-email-confirmed">Email Confirmed</span>
                         </div>
                       </div>
@@ -116,7 +116,7 @@ export default function Landing() {
                   </Card>
                   <Card data-testid="card-success-rate">
                     <CardContent className="p-4">
-                      <div className="text-2xl font-bold text-green-600 mb-1" data-testid="text-success-rate">100%</div>
+                      <div className="text-2xl font-bold text-blue-600 mb-1" data-testid="text-success-rate">100%</div>
                       <div className="text-xs text-slate-600" data-testid="text-success-label">Success Rate</div>
                     </CardContent>
                   </Card>
@@ -217,26 +217,26 @@ export default function Landing() {
                 <CardContent className="p-6">
                   <div className="text-center mb-6">
                     <h4 className="font-semibold text-slate-900 mb-2" data-testid="text-with-chittyid">With ChittyID</h4>
-                    <div className="text-sm text-green-600" data-testid="text-verify-once">Verify once, use everywhere</div>
+                    <div className="text-sm text-blue-600" data-testid="text-verify-once">Verify once, use everywhere</div>
                   </div>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg" data-testid="solution-share">
+                    <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg" data-testid="solution-share">
                       <span className="text-sm text-slate-900">Share ChittyID</span>
-                      <CheckCircle className="text-green-600 h-4 w-4" />
+                      <CheckCircle className="text-blue-600 h-4 w-4" />
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg" data-testid="solution-instant">
+                    <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg" data-testid="solution-instant">
                       <span className="text-sm text-slate-900">Instant Verification</span>
-                      <svg className="text-green-600 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                      <svg className="text-orange-600 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
                       </svg>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg" data-testid="solution-score">
+                    <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg" data-testid="solution-score">
                       <span className="text-sm text-slate-900">Trust Score: 847</span>
-                      <Star className="text-green-600 h-4 w-4" />
+                      <Star className="text-yellow-600 h-4 w-4" />
                     </div>
                   </div>
-                  <div className="mt-6 p-3 bg-green-100 rounded-lg text-center" data-testid="instant-approval">
-                    <div className="text-lg font-semibold text-green-600">Instant Approval</div>
+                  <div className="mt-6 p-3 bg-blue-100 rounded-lg text-center" data-testid="instant-approval">
+                    <div className="text-lg font-semibold text-blue-600">Instant Approval</div>
                     <div className="text-sm text-slate-600">No waiting, no paperwork</div>
                   </div>
                 </CardContent>
@@ -246,8 +246,8 @@ export default function Landing() {
               <h3 className="text-2xl font-bold text-slate-900 mb-6" data-testid="text-solution-title">The ChittyID Solution</h3>
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
-                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                    <CheckCircle className="text-green-600 h-4 w-4" />
+                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                    <CheckCircle className="text-blue-600 h-4 w-4" />
                   </div>
                   <div>
                     <h4 className="font-semibold text-slate-900 mb-2" data-testid="text-verify-once-title">Verify Once, Use Everywhere</h4>
@@ -255,8 +255,8 @@ export default function Landing() {
                   </div>
                 </div>
                 <div className="flex items-start space-x-4">
-                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                    <svg className="text-green-600 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                  <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                    <svg className="text-orange-600 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
                     </svg>
                   </div>
@@ -266,8 +266,8 @@ export default function Landing() {
                   </div>
                 </div>
                 <div className="flex items-start space-x-4">
-                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                    <Shield className="text-green-600 h-4 w-4" />
+                  <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                    <Shield className="text-red-600 h-4 w-4" />
                   </div>
                   <div>
                     <h4 className="font-semibold text-slate-900 mb-2" data-testid="text-security-title">Bank-Grade Security</h4>
@@ -334,9 +334,9 @@ export default function Landing() {
             </div>
 
             {/* For Businesses */}
-            <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl p-8" data-testid="card-for-businesses">
+            <div className="bg-gradient-to-br from-orange-50 to-blue-50 rounded-2xl p-8" data-testid="card-for-businesses">
               <div className="flex items-center space-x-3 mb-6">
-                <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-orange-600 rounded-xl flex items-center justify-center">
                   <Building className="text-white h-6 w-6" />
                 </div>
                 <h3 className="text-2xl font-bold text-slate-900" data-testid="text-for-businesses">For Businesses</h3>
@@ -345,7 +345,7 @@ export default function Landing() {
                 <Card data-testid="card-reduce-costs">
                   <CardContent className="p-4">
                     <div className="flex items-center space-x-3 mb-3">
-                      <DollarSign className="text-green-600 h-5 w-5" />
+                      <DollarSign className="text-orange-600 h-5 w-5" />
                       <h4 className="font-semibold text-slate-900">Reduce Costs</h4>
                     </div>
                     <p className="text-slate-600 text-sm">Save $50-200 per verification. No more expensive background check services.</p>
@@ -354,7 +354,7 @@ export default function Landing() {
                 <Card data-testid="card-instant-onboarding">
                   <CardContent className="p-4">
                     <div className="flex items-center space-x-3 mb-3">
-                      <svg className="text-green-600 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                      <svg className="text-orange-600 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8Z"/>
                       </svg>
                       <h4 className="font-semibold text-slate-900">Instant Onboarding</h4>
@@ -365,14 +365,14 @@ export default function Landing() {
                 <Card data-testid="card-fraud-prevention">
                   <CardContent className="p-4">
                     <div className="flex items-center space-x-3 mb-3">
-                      <Shield className="text-green-600 h-5 w-5" />
+                      <Shield className="text-red-600 h-5 w-5" />
                       <h4 className="font-semibold text-slate-900">Fraud Prevention</h4>
                     </div>
                     <p className="text-slate-600 text-sm">Eliminate fake identities with blockchain-verified credentials.</p>
                   </CardContent>
                 </Card>
               </div>
-              <Button className="w-full mt-6 bg-green-600 hover:bg-green-700" onClick={() => window.location.href = '/api/login'} data-testid="button-join-network">
+              <Button className="w-full mt-6 bg-orange-600 hover:bg-orange-700" onClick={() => window.location.href = '/api/login'} data-testid="button-join-network">
                 Join the Network
               </Button>
             </div>

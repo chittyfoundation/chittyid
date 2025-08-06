@@ -228,7 +228,7 @@ export function VerificationSteps({ hasChittyId, verifications, onAddVerificatio
       type: 'phone' as const,
       title: 'Phone Verification',
       description: 'Verify your phone number',
-      icon: <Phone className="h-6 w-6 text-green-600" />,
+      icon: <Phone className="h-6 w-6 text-red-600" />,
       points: '+50 Trust Points'
     },
     {
@@ -256,7 +256,7 @@ export function VerificationSteps({ hasChittyId, verifications, onAddVerificatio
     if (!status) return null;
     
     const configs = {
-      verified: { color: 'bg-green-100 text-green-600', icon: <CheckCircle className="h-3 w-3" /> },
+      verified: { color: 'bg-blue-100 text-blue-600', icon: <CheckCircle className="h-3 w-3" /> },
       pending: { color: 'bg-yellow-100 text-yellow-600', icon: <Clock className="h-3 w-3" /> },
       rejected: { color: 'bg-red-100 text-red-600', icon: <AlertTriangle className="h-3 w-3" /> },
     };
@@ -289,7 +289,7 @@ export function VerificationSteps({ hasChittyId, verifications, onAddVerificatio
               return (
                 <div key={verificationType.type} className="relative" data-testid={`verification-type-${verificationType.type}`}>
                   {isVerified ? (
-                    <Card className="border-green-200 bg-green-50">
+                    <Card className="border-blue-200 bg-blue-50">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center space-x-2">
@@ -299,7 +299,7 @@ export function VerificationSteps({ hasChittyId, verifications, onAddVerificatio
                           {getStatusBadge(status)}
                         </div>
                         <p className="text-sm text-slate-600">{verificationType.description}</p>
-                        <div className="text-xs text-green-600 mt-2">{verificationType.points} Earned</div>
+                        <div className="text-xs text-blue-600 mt-2">{verificationType.points} Earned</div>
                       </CardContent>
                     </Card>
                   ) : (

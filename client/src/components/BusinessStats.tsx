@@ -53,7 +53,7 @@ export function BusinessStats() {
         <Card data-testid="card-network-growth">
           <CardContent className="p-6">
             <div className="flex items-center space-x-2">
-              <TrendingUp className="h-8 w-8 text-green-600" />
+              <TrendingUp className="h-8 w-8 text-blue-600" />
               <div>
                 <div className="text-2xl font-bold text-slate-900">+24%</div>
                 <div className="text-sm text-slate-600">Network Growth</div>
