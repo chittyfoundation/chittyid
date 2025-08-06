@@ -26,12 +26,13 @@ export function BusinessStats() {
     );
   }
 
-  const totalBusinesses = businesses?.length || 0;
-  const industryBreakdown = businesses?.reduce((acc: Record<string, number>, business: any) => {
+  const businessesArray = Array.isArray(businesses) ? businesses : [];
+  const totalBusinesses = businessesArray.length;
+  const industryBreakdown = businessesArray.reduce((acc: Record<string, number>, business: any) => {
     const industry = business.industry || 'Other';
     acc[industry] = (acc[industry] || 0) + 1;
     return acc;
-  }, {}) || {};
+  }, {});
 
   return (
     <div className="space-y-6">
@@ -99,8 +100,8 @@ export function BusinessStats() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {businesses?.length > 0 ? (
-              businesses.map((business: any, index: number) => (
+            {businessesArray.length > 0 ? (
+              businessesArray.map((business: any, index: number) => (
                 <div key={business.id} className="flex items-center justify-between p-4 border border-slate-200 rounded-lg" data-testid={`business-${index}`}>
                   <div className="flex items-center space-x-4">
                     <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center">
@@ -141,7 +142,7 @@ export function BusinessStats() {
             <div className="grid md:grid-cols-3 gap-4">
               {Object.entries(industryBreakdown).map(([industry, count], index) => (
                 <div key={industry} className="text-center p-4 border border-slate-200 rounded-lg" data-testid={`industry-${index}`}>
-                  <div className="text-2xl font-bold text-slate-900" data-testid={`industry-count-${index}`}>{count}</div>
+                  <div className="text-2xl font-bold text-slate-900" data-testid={`industry-count-${index}`}>{String(count)}</div>
                   <div className="text-sm text-slate-600" data-testid={`industry-name-${index}`}>{industry}</div>
                 </div>
               ))}

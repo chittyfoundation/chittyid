@@ -39,8 +39,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "User already has a ChittyID" });
       }
 
+      // Generate a unique ChittyID code
+      const chittyIdCode = `CH-${new Date().getFullYear()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      
       const chittyId = await storage.createChittyId({
         userId,
+        chittyIdCode,
         trustScore: 100, // Starting trust score
         trustLevel: 'L0',
         verificationStatus: 'pending',
@@ -100,8 +104,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.updateVerificationStatus(verification.id, 'verified', new Date());
         
         // Update trust score
-        const newTrustScore = chittyId.trustScore + 50;
-        let newTrustLevel = chittyId.trustLevel;
+        const currentTrustScore = chittyId.trustScore || 0;
+        const newTrustScore = currentTrustScore + 50;
+        let newTrustLevel = chittyId.trustLevel || 'L0';
         if (newTrustScore >= 200 && newTrustLevel === 'L0') newTrustLevel = 'L1';
         if (newTrustScore >= 500 && newTrustLevel === 'L1') newTrustLevel = 'L2';
         
@@ -189,7 +194,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       // Check if ChittyID meets business trust threshold
-      const approved = chittyId.trustScore >= business.trustThreshold && 
+      const chittyTrustScore = chittyId.trustScore || 0;
+      const businessThreshold = business.trustThreshold || 500;
+      const approved = chittyTrustScore >= businessThreshold && 
                       chittyId.verificationStatus === 'verified';
 
       const responseData = {

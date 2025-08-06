@@ -111,10 +111,10 @@ export default function Home() {
     );
   }
 
-  const hasChittyId = user?.chittyId;
-  const trustScore = stats?.trustScore || 0;
-  const trustLevel = stats?.trustLevel || 'L0';
-  const verificationStatus = stats?.verificationStatus || 'pending';
+  const hasChittyId = (user as any)?.chittyId;
+  const trustScore = (stats as any)?.trustScore || 0;
+  const trustLevel = (stats as any)?.trustLevel || 'L0';
+  const verificationStatus = (stats as any)?.verificationStatus || 'pending';
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -130,7 +130,7 @@ export default function Home() {
             </div>
             <div className="flex items-center space-x-4">
               <div className="text-sm text-slate-600" data-testid="text-welcome">
-                Welcome, {user?.firstName || user?.email}
+                Welcome, {(user as any)?.firstName || (user as any)?.email}
               </div>
               <Button 
                 variant="outline" 
@@ -203,11 +203,10 @@ export default function Home() {
               <div className="grid lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
                   <TrustScoreCard
-                    chittyIdCode={user.chittyId.chittyIdCode}
+                    chittyIdCode={(user as any)?.chittyId?.chittyIdCode || 'Not Generated'}
                     trustScore={trustScore}
                     trustLevel={trustLevel}
                     verificationStatus={verificationStatus}
-                    data-testid="trust-score-card"
                   />
                   
                   <Card data-testid="card-quick-actions">
@@ -236,7 +235,7 @@ export default function Home() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        {verifications?.map((verification: any, index: number) => (
+                        {Array.isArray(verifications) ? verifications.map((verification: any, index: number) => (
                           <div key={verification.id} className="flex items-center justify-between" data-testid={`verification-${index}`}>
                             <div>
                               <div className="font-medium capitalize">
@@ -260,8 +259,8 @@ export default function Home() {
                               {verification.status}
                             </Badge>
                           </div>
-                        ))}
-                        {(!verifications || verifications.length === 0) && (
+                        )) : null}
+                        {(!Array.isArray(verifications) || verifications.length === 0) && (
                           <div className="text-center text-slate-500 py-4" data-testid="no-verifications">
                             No verifications yet
                           </div>
@@ -278,11 +277,11 @@ export default function Home() {
                       <div className="space-y-4">
                         <div className="flex justify-between">
                           <span className="text-slate-600">Business Partners</span>
-                          <span className="font-semibold" data-testid="text-business-partners">{stats?.businessPartners || 0}</span>
+                          <span className="font-semibold" data-testid="text-business-partners">{(stats as any)?.businessPartners || 0}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-slate-600">Verifications</span>
-                          <span className="font-semibold" data-testid="text-verification-count">{stats?.verificationCount || 0}</span>
+                          <span className="font-semibold" data-testid="text-verification-count">{(stats as any)?.verificationCount || 0}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-slate-600">Trust Level</span>
@@ -300,7 +299,7 @@ export default function Home() {
         {activeTab === 'verification' && (
           <VerificationSteps
             hasChittyId={hasChittyId}
-            verifications={verifications || []}
+            verifications={Array.isArray(verifications) ? verifications : []}
             onAddVerification={(type, metadata) => addVerificationMutation.mutate({ verificationType: type, metadata })}
             isAddingVerification={addVerificationMutation.isPending}
             data-testid="verification-steps"
