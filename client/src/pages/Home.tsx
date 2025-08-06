@@ -243,7 +243,7 @@ export default function Home() {
                           <div className="text-white/80 text-xs">Logic • Data • Facts</div>
                         </div>
 
-                        {/* Practical - Green */}
+                        {/* Practical - Orange */}
                         <div className="text-center p-4 rounded-lg brain-practical-bg rainbow-cascade">
                           <CheckCircle className="h-6 w-6 mx-auto mb-2 text-white" />
                           <div className="text-white font-semibold text-sm">PRACTICAL</div>
