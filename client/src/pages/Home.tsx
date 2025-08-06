@@ -228,49 +228,49 @@ export default function Home() {
                     </CardContent>
                   </Card>
                   
-                  {/* Herrmann Whole Brain Thinking Elements */}
-                  <Card className="dark-card rainbow-cascade" data-testid="card-brain-thinking">
-                    <CardHeader className="brain-experimental-bg">
-                      <CardTitle className="text-white">Whole Brain Thinking Spectrum</CardTitle>
-                      <p className="text-sm text-white/80">Based on Herrmann Brain Dominance - each color represents a thinking style</p>
+                  {/* Algorithmic Rainbow Spectrum */}
+                  <Card className="dark-card" data-testid="card-brain-thinking">
+                    <CardHeader className="rainbow-cascade">
+                      <CardTitle className="text-white">Algorithmic Color Spectrum</CardTitle>
+                      <p className="text-sm text-white/80">Dynamic colors shift based on trust algorithms and verification patterns</p>
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         {/* Analytical - Blue */}
-                        <div className="text-center p-4 rounded-lg brain-analytical-bg rainbow-cascade">
+                        <div className="text-center p-4 rounded-lg rainbow-cascade-slow">
                           <Shield className="h-6 w-6 mx-auto mb-2 text-white" />
                           <div className="text-white font-semibold text-sm">ANALYTICAL</div>
                           <div className="text-white/80 text-xs">Logic • Data • Facts</div>
                         </div>
 
                         {/* Practical - Orange */}
-                        <div className="text-center p-4 rounded-lg brain-practical-bg rainbow-cascade">
+                        <div className="text-center p-4 rounded-lg rainbow-cascade">
                           <CheckCircle className="h-6 w-6 mx-auto mb-2 text-white" />
                           <div className="text-white font-semibold text-sm">PRACTICAL</div>
                           <div className="text-white/80 text-xs">Process • Planning • Order</div>
                         </div>
 
                         {/* Interpersonal - Red */}
-                        <div className="text-center p-4 rounded-lg brain-interpersonal-bg rainbow-cascade">
+                        <div className="text-center p-4 rounded-lg rainbow-cascade-fast">
                           <Share2 className="h-6 w-6 mx-auto mb-2 text-white" />
                           <div className="text-white font-semibold text-sm">INTERPERSONAL</div>
                           <div className="text-white/80 text-xs">People • Emotion • Team</div>
                         </div>
 
                         {/* Experimental - Yellow */}
-                        <div className="text-center p-4 rounded-lg brain-experimental-bg rainbow-cascade">
+                        <div className="text-center p-4 rounded-lg rainbow-cascade">
                           <Star className="h-6 w-6 mx-auto mb-2 text-white" />
                           <div className="text-white font-semibold text-sm">EXPERIMENTAL</div>
                           <div className="text-white/80 text-xs">Vision • Creative • Future</div>
                         </div>
                       </div>
                       
-                      <div className="mt-6 p-4 bg-white/5 rounded-lg border border-white/10">
-                        <div className="text-sm dark-text mb-2 font-medium">Your Brain Rainbow Evolution</div>
-                        <div className="text-xs dark-muted">
-                          As you build connections, time, and outcomes, more thinking styles cascade into your identity. 
-                          Each verification, network connection, and success adds depth to your whole brain profile, 
-                          creating a dynamic psychological fingerprint that evolves with your trust journey.
+                      <div className="mt-6 p-4 rainbow-cascade-slow rounded-lg opacity-90">
+                        <div className="text-sm text-white mb-2 font-medium">Algorithmic Color Evolution</div>
+                        <div className="text-xs text-white/80">
+                          Colors shift dynamically using hue-rotate algorithms based on your trust metrics. 
+                          Each verification unlocks new color frequencies, creating an ever-evolving spectrum 
+                          that represents your growing digital identity and neural network connections.
                         </div>
                       </div>
                     </CardContent>

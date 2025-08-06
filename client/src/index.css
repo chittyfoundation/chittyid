@@ -126,14 +126,74 @@
 }
 
 @keyframes rainbow-cascade {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% { 
+    background-position: 0% 50%;
+    filter: hue-rotate(0deg) brightness(1);
+  }
+  25% { 
+    background-position: 50% 0%;
+    filter: hue-rotate(90deg) brightness(1.1);
+  }
+  50% { 
+    background-position: 100% 50%;
+    filter: hue-rotate(180deg) brightness(1.2);
+  }
+  75% { 
+    background-position: 50% 100%;
+    filter: hue-rotate(270deg) brightness(1.1);
+  }
+  100% { 
+    background-position: 0% 50%;
+    filter: hue-rotate(360deg) brightness(1);
+  }
+}
+
+@keyframes color-shift {
+  0% { filter: hue-rotate(0deg) saturate(1) brightness(1); }
+  20% { filter: hue-rotate(72deg) saturate(1.2) brightness(1.1); }
+  40% { filter: hue-rotate(144deg) saturate(1.3) brightness(1.2); }
+  60% { filter: hue-rotate(216deg) saturate(1.2) brightness(1.1); }
+  80% { filter: hue-rotate(288deg) saturate(1.1) brightness(1.05); }
+  100% { filter: hue-rotate(360deg) saturate(1) brightness(1); }
 }
 
 .rainbow-cascade {
-  background-size: 300% 300%;
-  animation: rainbow-cascade 6s ease-in-out infinite;
+  background: linear-gradient(45deg, 
+    hsl(220, 85%, 60%), 
+    hsl(25, 85%, 60%), 
+    hsl(0, 80%, 60%), 
+    hsl(45, 90%, 65%), 
+    hsl(280, 70%, 60%),
+    hsl(220, 85%, 60%)
+  );
+  background-size: 400% 400%;
+  animation: rainbow-cascade 8s ease-in-out infinite, color-shift 12s linear infinite;
+}
+
+.rainbow-cascade-fast {
+  background: linear-gradient(135deg, 
+    hsl(240, 100%, 70%), 
+    hsl(30, 100%, 65%), 
+    hsl(15, 100%, 65%), 
+    hsl(60, 100%, 70%), 
+    hsl(300, 80%, 70%),
+    hsl(240, 100%, 70%)
+  );
+  background-size: 600% 600%;
+  animation: rainbow-cascade 4s ease-in-out infinite, color-shift 6s linear infinite;
+}
+
+.rainbow-cascade-slow {
+  background: linear-gradient(90deg, 
+    hsl(200, 70%, 50%), 
+    hsl(35, 70%, 55%), 
+    hsl(10, 70%, 55%), 
+    hsl(50, 80%, 60%), 
+    hsl(270, 60%, 55%),
+    hsl(200, 70%, 50%)
+  );
+  background-size: 500% 500%;
+  animation: rainbow-cascade 12s ease-in-out infinite, color-shift 18s linear infinite;
 }
 
 /* Text rainbow gradients */
