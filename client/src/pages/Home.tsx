@@ -231,8 +231,8 @@ export default function Home() {
                   {/* Algorithmic Rainbow Spectrum */}
                   <Card className="dark-card" data-testid="card-brain-thinking">
                     <CardHeader className="rainbow-cascade">
-                      <CardTitle className="text-white">Algorithmic Color Spectrum</CardTitle>
-                      <p className="text-sm text-white/80">Dynamic colors shift based on trust algorithms and verification patterns</p>
+                      <CardTitle className="text-white">Clear Algorithmic Spectrum</CardTitle>
+                      <p className="text-sm text-white/80">Transparent color algorithms shift dynamically based on trust verification</p>
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -266,11 +266,11 @@ export default function Home() {
                       </div>
                       
                       <div className="mt-6 p-4 rainbow-cascade-slow rounded-lg opacity-90">
-                        <div className="text-sm text-white mb-2 font-medium">Algorithmic Color Evolution</div>
+                        <div className="text-sm text-white mb-2 font-medium">Clear Color Evolution</div>
                         <div className="text-xs text-white/80">
-                          Colors shift dynamically using hue-rotate algorithms based on your trust metrics. 
-                          Each verification unlocks new color frequencies, creating an ever-evolving spectrum 
-                          that represents your growing digital identity and neural network connections.
+                          Colors shift transparently using clear algorithms based on your trust metrics. 
+                          Each verification unlocks new frequencies, creating a clear, evolving spectrum 
+                          that represents your growing digital identity with complete transparency.
                         </div>
                       </div>
                     </CardContent>
