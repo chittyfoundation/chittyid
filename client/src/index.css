@@ -24,16 +24,21 @@
   --ring: hsl(142, 76%, 36%);
   --radius: 0.5rem;
   
-  /* Custom ChittyID green-teal colors */
-  --chitty-primary: hsl(142, 76%, 36%);
-  --chitty-primary-dark: hsl(142, 76%, 30%);
-  --chitty-secondary: hsl(160, 84%, 39%);
-  --chitty-accent: hsl(180, 84%, 45%);
-  --chitty-blue: hsl(200, 85%, 50%);
-  --chitty-green: hsl(142, 76%, 36%);
-  --chitty-teal: hsl(170, 76%, 42%);
-  --chitty-gray: hsl(142, 16%, 47%);
-  --chitty-dark: hsl(142, 47%, 11%);
+  /* ChittyID Dynamic Rainbow Colors - Change with Trust Level */
+  --chitty-l0-primary: hsl(0, 0%, 60%); /* Gray - No trust */
+  --chitty-l1-primary: hsl(210, 100%, 50%); /* Blue - Basic trust */
+  --chitty-l2-primary: hsl(142, 76%, 36%); /* Green - Growing trust */
+  --chitty-l3-primary: hsl(45, 100%, 50%); /* Yellow - Good trust */
+  --chitty-l4-primary: hsl(30, 100%, 50%); /* Orange - High trust */
+  --chitty-l5-primary: hsl(320, 100%, 50%); /* Purple - Ultimate trust */
+  
+  /* Dynamic rainbow gradients */
+  --rainbow-l0: linear-gradient(135deg, hsl(0, 0%, 60%), hsl(0, 0%, 40%));
+  --rainbow-l1: linear-gradient(135deg, hsl(210, 100%, 50%), hsl(190, 100%, 50%));
+  --rainbow-l2: linear-gradient(135deg, hsl(142, 76%, 36%), hsl(160, 84%, 39%));
+  --rainbow-l3: linear-gradient(135deg, hsl(45, 100%, 50%), hsl(120, 60%, 45%));
+  --rainbow-l4: linear-gradient(135deg, hsl(30, 100%, 50%), hsl(340, 100%, 50%));
+  --rainbow-l5: linear-gradient(135deg, hsl(320, 100%, 50%), hsl(260, 100%, 50%), hsl(200, 100%, 50%), hsl(120, 60%, 45%));
 }
 
 .dark {
@@ -70,16 +75,92 @@
 }
 
 /* Custom utility classes for ChittyID styling */
+/* Dynamic Rainbow Classes */
 .chitty-gradient {
-  background: linear-gradient(135deg, var(--chitty-primary), var(--chitty-secondary));
+  background: var(--rainbow-l2); /* Default to L2 green */
 }
 
-.chitty-gradient-accent {
-  background: linear-gradient(135deg, var(--chitty-teal), var(--chitty-blue));
+.chitty-gradient-l0 {
+  background: var(--rainbow-l0);
+}
+
+.chitty-gradient-l1 {
+  background: var(--rainbow-l1);
+}
+
+.chitty-gradient-l2 {
+  background: var(--rainbow-l2);
+}
+
+.chitty-gradient-l3 {
+  background: var(--rainbow-l3);
+}
+
+.chitty-gradient-l4 {
+  background: var(--rainbow-l4);
+}
+
+.chitty-gradient-l5 {
+  background: var(--rainbow-l5);
+  animation: rainbow-pulse 3s ease-in-out infinite;
 }
 
 .chitty-gradient-soft {
   background: linear-gradient(135deg, hsl(142, 76%, 95%), hsl(160, 84%, 95%));
+}
+
+@keyframes rainbow-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Text rainbow gradients */
+.rainbow-text-l0 {
+  background: var(--rainbow-l0);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.rainbow-text-l1 {
+  background: var(--rainbow-l1);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.rainbow-text-l2 {
+  background: var(--rainbow-l2);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.rainbow-text-l3 {
+  background: var(--rainbow-l3);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.rainbow-text-l4 {
+  background: var(--rainbow-l4);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.rainbow-text-l5 {
+  background: var(--rainbow-l5);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: rainbow-shimmer 2s ease-in-out infinite;
+}
+
+@keyframes rainbow-shimmer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
 }
 
 .chitty-card-hover {

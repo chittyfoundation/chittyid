@@ -38,16 +38,40 @@ export function TrustScoreCard({ chittyIdCode, trustScore, trustLevel, verificat
       case 'L0': return 'bg-slate-100 text-slate-600';
       case 'L1': return 'bg-blue-100 text-blue-600';
       case 'L2': return 'bg-green-100 text-green-600';
-      case 'L3': return 'bg-purple-100 text-purple-600';
+      case 'L3': return 'bg-yellow-100 text-yellow-600';
       case 'L4': return 'bg-orange-100 text-orange-600';
-      case 'L5': return 'bg-red-100 text-red-600';
+      case 'L5': return 'bg-purple-100 text-purple-600';
       default: return 'bg-slate-100 text-slate-600';
+    }
+  };
+
+  const getRainbowGradientClass = (level: string) => {
+    switch (level) {
+      case 'L0': return 'chitty-gradient-l0';
+      case 'L1': return 'chitty-gradient-l1';
+      case 'L2': return 'chitty-gradient-l2';
+      case 'L3': return 'chitty-gradient-l3';
+      case 'L4': return 'chitty-gradient-l4';
+      case 'L5': return 'chitty-gradient-l5';
+      default: return 'chitty-gradient-l0';
+    }
+  };
+
+  const getRainbowTextClass = (level: string) => {
+    switch (level) {
+      case 'L0': return 'rainbow-text-l0';
+      case 'L1': return 'rainbow-text-l1';
+      case 'L2': return 'rainbow-text-l2';
+      case 'L3': return 'rainbow-text-l3';
+      case 'L4': return 'rainbow-text-l4';
+      case 'L5': return 'rainbow-text-l5';
+      default: return 'rainbow-text-l0';
     }
   };
 
   return (
     <Card className="overflow-hidden" data-testid="trust-score-card">
-      <CardHeader className="chitty-gradient-soft">
+      <CardHeader className={getRainbowGradientClass(trustLevel)}>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center space-x-2">
             <Shield className="h-5 w-5 text-green-600" />
@@ -67,7 +91,7 @@ export function TrustScoreCard({ chittyIdCode, trustScore, trustLevel, verificat
           {/* ChittyID Code */}
           <div>
             <div className="text-sm text-slate-600 mb-1">ChittyID Code</div>
-            <div className="text-2xl font-mono bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent font-bold" data-testid="text-chittyid-code">
+            <div className={`text-2xl font-mono font-bold ${getRainbowTextClass(trustLevel)}`} data-testid="text-chittyid-code">
               {chittyIdCode}
             </div>
           </div>

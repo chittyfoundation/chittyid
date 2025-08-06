@@ -102,7 +102,7 @@ export default function Home() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50" data-testid="loading-screen">
         <div className="text-center">
-          <div className="w-8 h-8 chitty-gradient rounded-lg flex items-center justify-center mx-auto mb-4">
+          <div className="w-8 h-8 chitty-gradient-l2 rounded-lg flex items-center justify-center mx-auto mb-4">
             <Shield className="text-white h-5 w-5" />
           </div>
           <div className="text-slate-600">Loading your ChittyID...</div>
@@ -123,7 +123,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 chitty-gradient rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 chitty-gradient-l2 rounded-lg flex items-center justify-center">
                 <Shield className="text-white text-sm" />
               </div>
               <span className="text-xl font-bold text-slate-900" data-testid="text-logo">ChittyID</span>
