@@ -102,7 +102,7 @@ export default function Home() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50" data-testid="loading-screen">
         <div className="text-center">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <div className="w-8 h-8 chitty-gradient rounded-lg flex items-center justify-center mx-auto mb-4">
             <Shield className="text-white h-5 w-5" />
           </div>
           <div className="text-slate-600">Loading your ChittyID...</div>
@@ -123,7 +123,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 chitty-gradient rounded-lg flex items-center justify-center">
                 <Shield className="text-white text-sm" />
               </div>
               <span className="text-xl font-bold text-slate-900" data-testid="text-logo">ChittyID</span>
@@ -160,7 +160,7 @@ export default function Home() {
                 onClick={() => setActiveTab(key as any)}
                 className={`flex items-center space-x-2 pb-3 px-1 border-b-2 transition-colors ${
                   activeTab === key
-                    ? 'border-blue-600 text-blue-600'
+                    ? 'border-purple-600 text-purple-600'
                     : 'border-transparent text-slate-600 hover:text-slate-900'
                 }`}
                 data-testid={`tab-${key}`}
@@ -180,7 +180,7 @@ export default function Home() {
               <Card data-testid="card-create-chittyid">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
-                    <Shield className="h-5 w-5 text-blue-600" />
+                    <Shield className="h-5 w-5 text-purple-600" />
                     <span>Create Your ChittyID</span>
                   </CardTitle>
                 </CardHeader>

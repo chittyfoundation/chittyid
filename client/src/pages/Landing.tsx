@@ -13,7 +13,7 @@ export default function Landing() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-8">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 chitty-gradient rounded-lg flex items-center justify-center">
                   <Shield className="text-white text-sm" />
                 </div>
                 <span className="text-xl font-bold text-slate-900">ChittyID</span>
@@ -42,13 +42,13 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <Badge className="inline-flex items-center bg-blue-100 text-blue-600 mb-6" data-testid="badge-trusted">
+              <Badge className="inline-flex items-center bg-purple-100 text-purple-600 mb-6" data-testid="badge-trusted">
                 <CheckCircle className="mr-2 h-4 w-4" />
                 Trusted by 10,000+ businesses
               </Badge>
               <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-6 leading-tight" data-testid="text-hero-title">
                 One Identity,<br />
-                <span className="text-blue-600">Trusted Everywhere</span>
+                <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Trusted Everywhere</span>
               </h1>
               <p className="text-xl text-slate-600 mb-8 leading-relaxed" data-testid="text-hero-description">
                 Stop proving who you are over and over. Get verified once with ChittyID and instantly access apartments, bank accounts, and services across our trusted network.
@@ -68,7 +68,7 @@ export default function Landing() {
             </div>
             <div className="relative">
               {/* Trust Score Visualization */}
-              <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-8">
+              <div className="chitty-gradient-soft rounded-2xl p-8">
                 <Card className="mb-6" data-testid="card-chittyid-demo">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-4">
@@ -77,7 +77,7 @@ export default function Landing() {
                         Verified
                       </Badge>
                     </div>
-                    <div className="text-2xl font-mono text-blue-600 mb-4" data-testid="text-chittyid-code">CH-2024-VER-1234-A</div>
+                    <div className="text-2xl font-mono bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4" data-testid="text-chittyid-code">CH-2024-VER-1234-A</div>
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-slate-600" data-testid="text-trust-score-label">Trust Score</span>

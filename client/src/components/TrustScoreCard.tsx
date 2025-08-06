@@ -47,10 +47,10 @@ export function TrustScoreCard({ chittyIdCode, trustScore, trustLevel, verificat
 
   return (
     <Card className="overflow-hidden" data-testid="trust-score-card">
-      <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50">
+      <CardHeader className="chitty-gradient-soft">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center space-x-2">
-            <Shield className="h-5 w-5 text-blue-600" />
+            <Shield className="h-5 w-5 text-purple-600" />
             <span>Your ChittyID</span>
           </CardTitle>
           <Badge 
@@ -67,7 +67,7 @@ export function TrustScoreCard({ chittyIdCode, trustScore, trustLevel, verificat
           {/* ChittyID Code */}
           <div>
             <div className="text-sm text-slate-600 mb-1">ChittyID Code</div>
-            <div className="text-2xl font-mono text-blue-600 font-bold" data-testid="text-chittyid-code">
+            <div className="text-2xl font-mono bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent font-bold" data-testid="text-chittyid-code">
               {chittyIdCode}
             </div>
           </div>
