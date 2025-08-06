@@ -70,8 +70,8 @@ export function TrustScoreCard({ chittyIdCode, trustScore, trustLevel, verificat
   };
 
   return (
-    <Card className="overflow-hidden" data-testid="trust-score-card">
-      <CardHeader className={getRainbowGradientClass(trustLevel)}>
+    <Card className="overflow-hidden dark-card rainbow-cascade" data-testid="trust-score-card">
+      <CardHeader className={`${getRainbowGradientClass(trustLevel)} rainbow-cascade`}>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center space-x-2">
             <Shield className="h-5 w-5 identity-element" />

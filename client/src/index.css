@@ -24,33 +24,32 @@
   --ring: hsl(142, 76%, 36%);
   --radius: 0.5rem;
   
-  /* ChittyID Component-Specific Colors */
-  --chitty-trust: hsl(220, 70%, 50%); /* Blue - Trust */
-  --chitty-verify: hsl(142, 70%, 45%); /* Green - Verification */
-  --chitty-asset: hsl(280, 70%, 55%); /* Purple - Assets */
-  --chitty-score: hsl(45, 85%, 55%); /* Gold - Score */
-  --chitty-network: hsl(195, 75%, 50%); /* Cyan - Network */
-  --chitty-security: hsl(0, 70%, 55%); /* Red - Security */
-  --chitty-identity: hsl(300, 65%, 50%); /* Magenta - Identity */
-  --chitty-connection: hsl(160, 70%, 45%); /* Teal - Connections */
+  /* Herrmann Whole Brain Thinking Color System */
+  --brain-blue: hsl(220, 85%, 60%); /* Analytical - Logic, Data, Facts */
+  --brain-green: hsl(140, 70%, 50%); /* Practical - Process, Organization, Planning */
+  --brain-red: hsl(0, 80%, 60%); /* Interpersonal - Emotion, People, Communication */
+  --brain-yellow: hsl(45, 90%, 65%); /* Experimental - Creative, Vision, Innovation */
   
-  /* Component gradients */
-  --trust-gradient: linear-gradient(135deg, hsl(220, 70%, 50%), hsl(240, 70%, 60%));
-  --verify-gradient: linear-gradient(135deg, hsl(142, 70%, 45%), hsl(120, 70%, 50%));
-  --asset-gradient: linear-gradient(135deg, hsl(280, 70%, 55%), hsl(260, 70%, 60%));
-  --score-gradient: linear-gradient(135deg, hsl(45, 85%, 55%), hsl(60, 80%, 60%));
-  --network-gradient: linear-gradient(135deg, hsl(195, 75%, 50%), hsl(180, 70%, 55%));
-  --security-gradient: linear-gradient(135deg, hsl(0, 70%, 55%), hsl(15, 70%, 60%));
-  --identity-gradient: linear-gradient(135deg, hsl(300, 65%, 50%), hsl(320, 65%, 55%));
-  --connection-gradient: linear-gradient(135deg, hsl(160, 70%, 45%), hsl(140, 70%, 50%));
+  /* Enhanced depth and dark theme */
+  --dark-bg: hsl(222, 30%, 6%);
+  --dark-card: hsl(222, 25%, 9%);
+  --dark-border: hsl(222, 20%, 15%);
+  --dark-text: hsl(222, 15%, 85%);
+  --dark-muted: hsl(222, 10%, 60%);
   
-  /* Trust level combinations */
-  --rainbow-l0: var(--trust-gradient); /* Gray - Start with trust */
-  --rainbow-l1: linear-gradient(135deg, var(--chitty-trust), var(--chitty-verify)); /* Trust + Verify */
-  --rainbow-l2: linear-gradient(135deg, var(--chitty-trust), var(--chitty-verify), var(--chitty-score)); /* + Score */
-  --rainbow-l3: linear-gradient(135deg, var(--chitty-trust), var(--chitty-verify), var(--chitty-score), var(--chitty-network)); /* + Network */
-  --rainbow-l4: linear-gradient(135deg, var(--chitty-trust), var(--chitty-verify), var(--chitty-score), var(--chitty-network), var(--chitty-asset)); /* + Assets */
-  --rainbow-l5: linear-gradient(135deg, var(--chitty-trust), var(--chitty-verify), var(--chitty-score), var(--chitty-network), var(--chitty-asset), var(--chitty-security), var(--chitty-identity), var(--chitty-connection)); /* Full spectrum */
+  /* Whole Brain gradients with depth */
+  --brain-blue-gradient: linear-gradient(135deg, var(--brain-blue), hsl(240, 85%, 50%));
+  --brain-green-gradient: linear-gradient(135deg, var(--brain-green), hsl(120, 70%, 40%));
+  --brain-red-gradient: linear-gradient(135deg, var(--brain-red), hsl(15, 80%, 50%));
+  --brain-yellow-gradient: linear-gradient(135deg, var(--brain-yellow), hsl(60, 90%, 55%));
+  
+  /* Whole Brain cascade levels */
+  --rainbow-l0: hsl(222, 15%, 25%); /* Dark neutral */
+  --rainbow-l1: var(--brain-blue-gradient); /* Analytical thinking */
+  --rainbow-l2: linear-gradient(135deg, var(--brain-blue), var(--brain-green)); /* Analytical + Practical */
+  --rainbow-l3: linear-gradient(135deg, var(--brain-blue), var(--brain-green), var(--brain-red)); /* + Interpersonal */
+  --rainbow-l4: linear-gradient(135deg, var(--brain-blue), var(--brain-green), var(--brain-red), var(--brain-yellow)); /* + Experimental */
+  --rainbow-l5: linear-gradient(45deg, var(--brain-blue), var(--brain-green), var(--brain-red), var(--brain-yellow), var(--brain-blue)); /* Full whole brain cascade */
 }
 
 .dark {
@@ -122,8 +121,19 @@
 }
 
 @keyframes rainbow-pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.02); opacity: 1; }
+}
+
+@keyframes rainbow-cascade {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.rainbow-cascade {
+  background-size: 300% 300%;
+  animation: rainbow-cascade 6s ease-in-out infinite;
 }
 
 /* Text rainbow gradients */
@@ -175,69 +185,57 @@
   50% { opacity: 0.8; }
 }
 
-/* Component-specific classes */
-.trust-element {
-  color: var(--chitty-trust);
+/* Whole Brain Thinking classes */
+.brain-analytical {
+  color: var(--brain-blue);
 }
 
-.trust-bg {
-  background: var(--trust-gradient);
+.brain-analytical-bg {
+  background: var(--brain-blue-gradient);
 }
 
-.verify-element {
-  color: var(--chitty-verify);
+.brain-practical {
+  color: var(--brain-green);
 }
 
-.verify-bg {
-  background: var(--verify-gradient);
+.brain-practical-bg {
+  background: var(--brain-green-gradient);
 }
 
-.asset-element {
-  color: var(--chitty-asset);
+.brain-interpersonal {
+  color: var(--brain-red);
 }
 
-.asset-bg {
-  background: var(--asset-gradient);
+.brain-interpersonal-bg {
+  background: var(--brain-red-gradient);
 }
 
-.score-element {
-  color: var(--chitty-score);
+.brain-experimental {
+  color: var(--brain-yellow);
 }
 
-.score-bg {
-  background: var(--score-gradient);
+.brain-experimental-bg {
+  background: var(--brain-yellow-gradient);
 }
 
-.network-element {
-  color: var(--chitty-network);
+/* Dark theme with depth */
+.dark-page {
+  background: var(--dark-bg);
+  min-height: 100vh;
 }
 
-.network-bg {
-  background: var(--network-gradient);
+.dark-card {
+  background: var(--dark-card);
+  border: 1px solid var(--dark-border);
+  color: var(--dark-text);
 }
 
-.security-element {
-  color: var(--chitty-security);
+.dark-text {
+  color: var(--dark-text);
 }
 
-.security-bg {
-  background: var(--security-gradient);
-}
-
-.identity-element {
-  color: var(--chitty-identity);
-}
-
-.identity-bg {
-  background: var(--identity-gradient);
-}
-
-.connection-element {
-  color: var(--chitty-connection);
-}
-
-.connection-bg {
-  background: var(--connection-gradient);
+.dark-muted {
+  color: var(--dark-muted);
 }
 
 .chitty-card-hover {

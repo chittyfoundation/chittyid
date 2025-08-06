@@ -117,19 +117,19 @@ export default function Home() {
   const verificationStatus = (stats as any)?.verificationStatus || 'pending';
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="dark-page">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-slate-200">
+      <header className="bg-black/50 backdrop-blur-sm border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 chitty-gradient-l2 rounded-lg flex items-center justify-center">
                 <Shield className="text-white text-sm" />
               </div>
-              <span className="text-xl font-bold text-slate-900" data-testid="text-logo">ChittyID</span>
+              <span className="text-xl font-bold dark-text" data-testid="text-logo">ChittyID</span>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="text-sm text-slate-600" data-testid="text-welcome">
+              <div className="text-sm dark-muted" data-testid="text-welcome">
                 Welcome, {(user as any)?.firstName || (user as any)?.email}
               </div>
               <Button 
@@ -149,11 +149,11 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Navigation Tabs */}
         <div className="mb-8">
-          <div className="flex space-x-8 border-b border-slate-200">
+          <div className="flex space-x-8 border-b border-white/20">
             {[
-              { key: 'overview', label: 'Overview', icon: Shield, colorClass: 'identity-element' },
-              { key: 'verification', label: 'Verification', icon: CheckCircle, colorClass: 'verify-element' },
-              { key: 'business', label: 'Business Network', icon: Share2, colorClass: 'network-element' },
+              { key: 'overview', label: 'Overview', icon: Shield, colorClass: 'brain-analytical' },
+              { key: 'verification', label: 'Verification', icon: CheckCircle, colorClass: 'brain-practical' },
+              { key: 'business', label: 'Business Network', icon: Share2, colorClass: 'brain-interpersonal' },
             ].map(({ key, label, icon: Icon, colorClass }) => (
               <button
                 key={key}
@@ -161,7 +161,7 @@ export default function Home() {
                 className={`flex items-center space-x-2 pb-3 px-1 border-b-2 transition-colors ${
                   activeTab === key
                     ? `border-current ${colorClass}`
-                    : 'border-transparent text-slate-600 hover:text-slate-900'
+                    : 'border-transparent dark-muted hover:dark-text'
                 }`}
                 data-testid={`tab-${key}`}
               >
@@ -177,20 +177,21 @@ export default function Home() {
           <div className="space-y-8">
             {!hasChittyId ? (
               /* Create ChittyID */
-              <Card data-testid="card-create-chittyid">
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Shield className="h-5 w-5 identity-element" />
+              <Card className="dark-card" data-testid="card-create-chittyid">
+                <CardHeader className="brain-analytical-bg rainbow-cascade">
+                  <CardTitle className="flex items-center space-x-2 text-white">
+                    <Shield className="h-5 w-5" />
                     <span>Create Your ChittyID</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-slate-600 mb-6">
+                  <p className="dark-muted mb-6">
                     Start your verification journey by creating your unique ChittyID. This will be your trusted identity across our entire network.
                   </p>
                   <Button 
                     onClick={() => createChittyIdMutation.mutate()}
                     disabled={createChittyIdMutation.isPending}
+                    className="brain-analytical-bg"
                     data-testid="button-create-chittyid"
                   >
                     <Plus className="h-4 w-4 mr-2" />
@@ -209,17 +210,17 @@ export default function Home() {
                     verificationStatus={verificationStatus}
                   />
                   
-                  <Card data-testid="card-quick-actions">
-                    <CardHeader>
-                      <CardTitle>Quick Actions</CardTitle>
+                  <Card className="dark-card" data-testid="card-quick-actions">
+                    <CardHeader className="brain-experimental-bg rainbow-cascade">
+                      <CardTitle className="text-white">Quick Actions</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-2 gap-4">
-                        <Button variant="outline" className="h-20 flex-col network-element border-current" data-testid="button-share-chittyid">
+                        <Button variant="outline" className="h-20 flex-col brain-interpersonal border-current dark-card" data-testid="button-share-chittyid">
                           <Share2 className="h-6 w-6 mb-2" />
                           Share ChittyID
                         </Button>
-                        <Button variant="outline" className="h-20 flex-col identity-element border-current" data-testid="button-qr-code">
+                        <Button variant="outline" className="h-20 flex-col brain-analytical border-current dark-card" data-testid="button-qr-code">
                           <QrCode className="h-6 w-6 mb-2" />
                           QR Code
                         </Button>
@@ -227,72 +228,53 @@ export default function Home() {
                     </CardContent>
                   </Card>
                   
-                  {/* Component Color Showcase */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Trust Element */}
-                    <Card data-testid="card-trust-element">
-                      <CardHeader className="trust-bg">
-                        <CardTitle className="flex items-center space-x-2 text-white">
-                          <Shield className="h-5 w-5" />
-                          <span>Trust</span>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="pt-4">
-                        <div className="flex justify-between items-center">
-                          <span className="trust-element font-semibold">Trust Building</span>
-                          <span className="text-slate-600">85%</span>
+                  {/* Herrmann Whole Brain Thinking Elements */}
+                  <Card className="dark-card rainbow-cascade" data-testid="card-brain-thinking">
+                    <CardHeader className="brain-experimental-bg">
+                      <CardTitle className="text-white">Whole Brain Thinking Spectrum</CardTitle>
+                      <p className="text-sm text-white/80">Based on Herrmann Brain Dominance - each color represents a thinking style</p>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {/* Analytical - Blue */}
+                        <div className="text-center p-4 rounded-lg brain-analytical-bg rainbow-cascade">
+                          <Shield className="h-6 w-6 mx-auto mb-2 text-white" />
+                          <div className="text-white font-semibold text-sm">ANALYTICAL</div>
+                          <div className="text-white/80 text-xs">Logic • Data • Facts</div>
                         </div>
-                      </CardContent>
-                    </Card>
 
-                    {/* Verify Element */}
-                    <Card data-testid="card-verify-element">
-                      <CardHeader className="verify-bg">
-                        <CardTitle className="flex items-center space-x-2 text-white">
-                          <CheckCircle className="h-5 w-5" />
-                          <span>Verify</span>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="pt-4">
-                        <div className="flex justify-between items-center">
-                          <span className="verify-element font-semibold">Verifications</span>
-                          <span className="text-slate-600">3/5</span>
+                        {/* Practical - Green */}
+                        <div className="text-center p-4 rounded-lg brain-practical-bg rainbow-cascade">
+                          <CheckCircle className="h-6 w-6 mx-auto mb-2 text-white" />
+                          <div className="text-white font-semibold text-sm">PRACTICAL</div>
+                          <div className="text-white/80 text-xs">Process • Planning • Order</div>
                         </div>
-                      </CardContent>
-                    </Card>
 
-                    {/* Asset Element */}
-                    <Card data-testid="card-asset-element">
-                      <CardHeader className="asset-bg">
-                        <CardTitle className="flex items-center space-x-2 text-white">
-                          <CreditCard className="h-5 w-5" />
-                          <span>Assets</span>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="pt-4">
-                        <div className="flex justify-between items-center">
-                          <span className="asset-element font-semibold">Asset Value</span>
-                          <span className="text-slate-600">$245K</span>
+                        {/* Interpersonal - Red */}
+                        <div className="text-center p-4 rounded-lg brain-interpersonal-bg rainbow-cascade">
+                          <Share2 className="h-6 w-6 mx-auto mb-2 text-white" />
+                          <div className="text-white font-semibold text-sm">INTERPERSONAL</div>
+                          <div className="text-white/80 text-xs">People • Emotion • Team</div>
                         </div>
-                      </CardContent>
-                    </Card>
 
-                    {/* Score Element */}
-                    <Card data-testid="card-score-element">
-                      <CardHeader className="score-bg">
-                        <CardTitle className="flex items-center space-x-2 text-white">
-                          <Star className="h-5 w-5" />
-                          <span>Score</span>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="pt-4">
-                        <div className="flex justify-between items-center">
-                          <span className="score-element font-semibold">Credit Score</span>
-                          <span className="text-slate-600">742</span>
+                        {/* Experimental - Yellow */}
+                        <div className="text-center p-4 rounded-lg brain-experimental-bg rainbow-cascade">
+                          <Star className="h-6 w-6 mx-auto mb-2 text-white" />
+                          <div className="text-white font-semibold text-sm">EXPERIMENTAL</div>
+                          <div className="text-white/80 text-xs">Vision • Creative • Future</div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  </div>
+                      </div>
+                      
+                      <div className="mt-6 p-4 bg-white/5 rounded-lg border border-white/10">
+                        <div className="text-sm dark-text mb-2 font-medium">Your Brain Rainbow Evolution</div>
+                        <div className="text-xs dark-muted">
+                          As you build connections, time, and outcomes, more thinking styles cascade into your identity. 
+                          Each verification, network connection, and success adds depth to your whole brain profile, 
+                          creating a dynamic psychological fingerprint that evolves with your trust journey.
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
 
                 <div className="space-y-6">

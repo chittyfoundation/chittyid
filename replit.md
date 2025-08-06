@@ -9,6 +9,7 @@ The platform implements a sophisticated trust level system (L0-L5) with progress
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Psychology-based color system: Each ChittyID component uses colors that psychologically represent their function (blue for trust/stability, green for growth/verification, purple for wealth/assets, gold for achievement/scores, etc.)
 
 ## System Architecture
 
