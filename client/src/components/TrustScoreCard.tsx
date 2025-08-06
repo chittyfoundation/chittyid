@@ -37,9 +37,9 @@ export function TrustScoreCard({ chittyIdCode, trustScore, trustLevel, verificat
     switch (level) {
       case 'L0': return 'bg-slate-100 text-slate-600';
       case 'L1': return 'bg-blue-100 text-blue-600';
-      case 'L2': return 'bg-green-100 text-green-600';
-      case 'L3': return 'bg-yellow-100 text-yellow-600';
-      case 'L4': return 'bg-orange-100 text-orange-600';
+      case 'L2': return 'bg-orange-100 text-orange-600';
+      case 'L3': return 'bg-red-100 text-red-600';
+      case 'L4': return 'bg-yellow-100 text-yellow-600';
       case 'L5': return 'bg-purple-100 text-purple-600';
       default: return 'bg-slate-100 text-slate-600';
     }

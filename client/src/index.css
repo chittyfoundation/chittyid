@@ -13,15 +13,15 @@
   --card-foreground: hsl(222, 84%, 4.9%);
   --border: hsl(214.3, 31.8%, 91.4%);
   --input: hsl(214.3, 31.8%, 91.4%);
-  --primary: hsl(142, 76%, 36%);
+  --primary: hsl(220, 85%, 60%);
   --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(142, 40%, 96%);
-  --secondary-foreground: hsl(142, 47.4%, 11.2%);
-  --accent: hsl(142, 40%, 96%);
+  --secondary: hsl(220, 40%, 96%);
+  --secondary-foreground: hsl(220, 47.4%, 11.2%);
+  --accent: hsl(25, 40%, 96%);
   --accent-foreground: hsl(142, 47.4%, 11.2%);
   --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(0, 0%, 100%);
-  --ring: hsl(142, 76%, 36%);
+  --ring: hsl(220, 85%, 60%);
   --radius: 0.5rem;
   
   /* Herrmann Whole Brain Thinking Color System */
@@ -63,7 +63,7 @@
   --card-foreground: hsl(210, 40%, 98%);
   --border: hsl(217.2, 32.6%, 17.5%);
   --input: hsl(217.2, 32.6%, 17.5%);
-  --primary: hsl(142, 76%, 36%);
+  --primary: hsl(220, 85%, 60%);
   --primary-foreground: hsl(0, 0%, 100%);
   --secondary: hsl(217.2, 32.6%, 17.5%);
   --secondary-foreground: hsl(210, 40%, 98%);
@@ -71,7 +71,7 @@
   --accent-foreground: hsl(210, 40%, 98%);
   --destructive: hsl(0, 62.8%, 30.6%);
   --destructive-foreground: hsl(210, 40%, 98%);
-  --ring: hsl(142, 76%, 36%);
+  --ring: hsl(220, 85%, 60%);
   --radius: 0.5rem;
 }
 
@@ -164,6 +164,7 @@
     hsl(0, 80%, 60%), 
     hsl(45, 90%, 65%), 
     hsl(280, 70%, 60%),
+    hsl(320, 75%, 65%),
     hsl(220, 85%, 60%)
   );
   background-size: 400% 400%;
@@ -177,6 +178,7 @@
     hsl(15, 100%, 65%), 
     hsl(60, 100%, 70%), 
     hsl(300, 80%, 70%),
+    hsl(330, 90%, 75%),
     hsl(240, 100%, 70%)
   );
   background-size: 600% 600%;
@@ -190,6 +192,7 @@
     hsl(10, 70%, 55%), 
     hsl(50, 80%, 60%), 
     hsl(270, 60%, 55%),
+    hsl(310, 65%, 60%),
     hsl(200, 70%, 50%)
   );
   background-size: 500% 500%;
@@ -323,7 +326,7 @@
 
 /* Verification status indicators */
 .verification-status-verified {
-  background: linear-gradient(90deg, hsl(142, 76%, 36%) 0%, hsl(142, 76%, 46%) 100%);
+  background: linear-gradient(90deg, hsl(220, 85%, 60%) 0%, hsl(220, 85%, 70%) 100%);
 }
 
 .verification-status-pending {
