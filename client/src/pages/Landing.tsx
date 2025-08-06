@@ -48,7 +48,7 @@ export default function Landing() {
               </Badge>
               <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-6 leading-tight" data-testid="text-hero-title">
                 One Identity,<br />
-                <span className="rainbow-text-l3">Trusted Everywhere</span>
+                <span className="trust-element">Trusted Everywhere</span>
               </h1>
               <p className="text-xl text-slate-600 mb-8 leading-relaxed" data-testid="text-hero-description">
                 Stop proving who you are over and over. Get verified once with ChittyID and instantly access apartments, bank accounts, and services across our trusted network.
@@ -77,7 +77,7 @@ export default function Landing() {
                         Verified
                       </Badge>
                     </div>
-                    <div className="text-2xl font-mono rainbow-text-l4 mb-4" data-testid="text-chittyid-code">CH-2024-VER-1234-A</div>
+                    <div className="text-2xl font-mono identity-element mb-4" data-testid="text-chittyid-code">CH-2024-VER-1234-A</div>
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-slate-600" data-testid="text-trust-score-label">Trust Score</span>

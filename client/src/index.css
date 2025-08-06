@@ -24,21 +24,33 @@
   --ring: hsl(142, 76%, 36%);
   --radius: 0.5rem;
   
-  /* ChittyID Dynamic Rainbow Colors - Change with Trust Level */
-  --chitty-l0-primary: hsl(0, 0%, 60%); /* Gray - No trust */
-  --chitty-l1-primary: hsl(210, 100%, 50%); /* Blue - Basic trust */
-  --chitty-l2-primary: hsl(142, 76%, 36%); /* Green - Growing trust */
-  --chitty-l3-primary: hsl(45, 100%, 50%); /* Yellow - Good trust */
-  --chitty-l4-primary: hsl(30, 100%, 50%); /* Orange - High trust */
-  --chitty-l5-primary: hsl(320, 100%, 50%); /* Purple - Ultimate trust */
+  /* ChittyID Component-Specific Colors */
+  --chitty-trust: hsl(220, 70%, 50%); /* Blue - Trust */
+  --chitty-verify: hsl(142, 70%, 45%); /* Green - Verification */
+  --chitty-asset: hsl(280, 70%, 55%); /* Purple - Assets */
+  --chitty-score: hsl(45, 85%, 55%); /* Gold - Score */
+  --chitty-network: hsl(195, 75%, 50%); /* Cyan - Network */
+  --chitty-security: hsl(0, 70%, 55%); /* Red - Security */
+  --chitty-identity: hsl(300, 65%, 50%); /* Magenta - Identity */
+  --chitty-connection: hsl(160, 70%, 45%); /* Teal - Connections */
   
-  /* Dynamic rainbow gradients */
-  --rainbow-l0: linear-gradient(135deg, hsl(0, 0%, 60%), hsl(0, 0%, 40%));
-  --rainbow-l1: linear-gradient(135deg, hsl(210, 100%, 50%), hsl(190, 100%, 50%));
-  --rainbow-l2: linear-gradient(135deg, hsl(142, 76%, 36%), hsl(160, 84%, 39%));
-  --rainbow-l3: linear-gradient(135deg, hsl(45, 100%, 50%), hsl(120, 60%, 45%));
-  --rainbow-l4: linear-gradient(135deg, hsl(30, 100%, 50%), hsl(340, 100%, 50%));
-  --rainbow-l5: linear-gradient(135deg, hsl(320, 100%, 50%), hsl(260, 100%, 50%), hsl(200, 100%, 50%), hsl(120, 60%, 45%));
+  /* Component gradients */
+  --trust-gradient: linear-gradient(135deg, hsl(220, 70%, 50%), hsl(240, 70%, 60%));
+  --verify-gradient: linear-gradient(135deg, hsl(142, 70%, 45%), hsl(120, 70%, 50%));
+  --asset-gradient: linear-gradient(135deg, hsl(280, 70%, 55%), hsl(260, 70%, 60%));
+  --score-gradient: linear-gradient(135deg, hsl(45, 85%, 55%), hsl(60, 80%, 60%));
+  --network-gradient: linear-gradient(135deg, hsl(195, 75%, 50%), hsl(180, 70%, 55%));
+  --security-gradient: linear-gradient(135deg, hsl(0, 70%, 55%), hsl(15, 70%, 60%));
+  --identity-gradient: linear-gradient(135deg, hsl(300, 65%, 50%), hsl(320, 65%, 55%));
+  --connection-gradient: linear-gradient(135deg, hsl(160, 70%, 45%), hsl(140, 70%, 50%));
+  
+  /* Trust level combinations */
+  --rainbow-l0: var(--trust-gradient); /* Gray - Start with trust */
+  --rainbow-l1: linear-gradient(135deg, var(--chitty-trust), var(--chitty-verify)); /* Trust + Verify */
+  --rainbow-l2: linear-gradient(135deg, var(--chitty-trust), var(--chitty-verify), var(--chitty-score)); /* + Score */
+  --rainbow-l3: linear-gradient(135deg, var(--chitty-trust), var(--chitty-verify), var(--chitty-score), var(--chitty-network)); /* + Network */
+  --rainbow-l4: linear-gradient(135deg, var(--chitty-trust), var(--chitty-verify), var(--chitty-score), var(--chitty-network), var(--chitty-asset)); /* + Assets */
+  --rainbow-l5: linear-gradient(135deg, var(--chitty-trust), var(--chitty-verify), var(--chitty-score), var(--chitty-network), var(--chitty-asset), var(--chitty-security), var(--chitty-identity), var(--chitty-connection)); /* Full spectrum */
 }
 
 .dark {
@@ -161,6 +173,71 @@
 @keyframes rainbow-shimmer {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.8; }
+}
+
+/* Component-specific classes */
+.trust-element {
+  color: var(--chitty-trust);
+}
+
+.trust-bg {
+  background: var(--trust-gradient);
+}
+
+.verify-element {
+  color: var(--chitty-verify);
+}
+
+.verify-bg {
+  background: var(--verify-gradient);
+}
+
+.asset-element {
+  color: var(--chitty-asset);
+}
+
+.asset-bg {
+  background: var(--asset-gradient);
+}
+
+.score-element {
+  color: var(--chitty-score);
+}
+
+.score-bg {
+  background: var(--score-gradient);
+}
+
+.network-element {
+  color: var(--chitty-network);
+}
+
+.network-bg {
+  background: var(--network-gradient);
+}
+
+.security-element {
+  color: var(--chitty-security);
+}
+
+.security-bg {
+  background: var(--security-gradient);
+}
+
+.identity-element {
+  color: var(--chitty-identity);
+}
+
+.identity-bg {
+  background: var(--identity-gradient);
+}
+
+.connection-element {
+  color: var(--chitty-connection);
+}
+
+.connection-bg {
+  background: var(--connection-gradient);
 }
 
 .chitty-card-hover {

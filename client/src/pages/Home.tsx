@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { TrustScoreCard } from "@/components/TrustScoreCard";
 import { VerificationSteps } from "@/components/VerificationSteps";
 import { BusinessStats } from "@/components/BusinessStats";
-import { Shield, Plus, CheckCircle, Clock, AlertCircle, QrCode, Share2, LogOut } from "lucide-react";
+import { Shield, Plus, CheckCircle, Clock, AlertCircle, QrCode, Share2, LogOut, Star, Lock, CreditCard } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -151,16 +151,16 @@ export default function Home() {
         <div className="mb-8">
           <div className="flex space-x-8 border-b border-slate-200">
             {[
-              { key: 'overview', label: 'Overview', icon: Shield },
-              { key: 'verification', label: 'Verification', icon: CheckCircle },
-              { key: 'business', label: 'Business Network', icon: Share2 },
-            ].map(({ key, label, icon: Icon }) => (
+              { key: 'overview', label: 'Overview', icon: Shield, colorClass: 'identity-element' },
+              { key: 'verification', label: 'Verification', icon: CheckCircle, colorClass: 'verify-element' },
+              { key: 'business', label: 'Business Network', icon: Share2, colorClass: 'network-element' },
+            ].map(({ key, label, icon: Icon, colorClass }) => (
               <button
                 key={key}
                 onClick={() => setActiveTab(key as any)}
                 className={`flex items-center space-x-2 pb-3 px-1 border-b-2 transition-colors ${
                   activeTab === key
-                    ? 'border-green-600 text-green-600'
+                    ? `border-current ${colorClass}`
                     : 'border-transparent text-slate-600 hover:text-slate-900'
                 }`}
                 data-testid={`tab-${key}`}
@@ -180,7 +180,7 @@ export default function Home() {
               <Card data-testid="card-create-chittyid">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
-                    <Shield className="h-5 w-5 text-green-600" />
+                    <Shield className="h-5 w-5 identity-element" />
                     <span>Create Your ChittyID</span>
                   </CardTitle>
                 </CardHeader>
@@ -215,17 +215,84 @@ export default function Home() {
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-2 gap-4">
-                        <Button variant="outline" className="h-20 flex-col" data-testid="button-share-chittyid">
+                        <Button variant="outline" className="h-20 flex-col network-element border-current" data-testid="button-share-chittyid">
                           <Share2 className="h-6 w-6 mb-2" />
                           Share ChittyID
                         </Button>
-                        <Button variant="outline" className="h-20 flex-col" data-testid="button-qr-code">
+                        <Button variant="outline" className="h-20 flex-col identity-element border-current" data-testid="button-qr-code">
                           <QrCode className="h-6 w-6 mb-2" />
                           QR Code
                         </Button>
                       </div>
                     </CardContent>
                   </Card>
+                  
+                  {/* Component Color Showcase */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Trust Element */}
+                    <Card data-testid="card-trust-element">
+                      <CardHeader className="trust-bg">
+                        <CardTitle className="flex items-center space-x-2 text-white">
+                          <Shield className="h-5 w-5" />
+                          <span>Trust</span>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-4">
+                        <div className="flex justify-between items-center">
+                          <span className="trust-element font-semibold">Trust Building</span>
+                          <span className="text-slate-600">85%</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Verify Element */}
+                    <Card data-testid="card-verify-element">
+                      <CardHeader className="verify-bg">
+                        <CardTitle className="flex items-center space-x-2 text-white">
+                          <CheckCircle className="h-5 w-5" />
+                          <span>Verify</span>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-4">
+                        <div className="flex justify-between items-center">
+                          <span className="verify-element font-semibold">Verifications</span>
+                          <span className="text-slate-600">3/5</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Asset Element */}
+                    <Card data-testid="card-asset-element">
+                      <CardHeader className="asset-bg">
+                        <CardTitle className="flex items-center space-x-2 text-white">
+                          <CreditCard className="h-5 w-5" />
+                          <span>Assets</span>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-4">
+                        <div className="flex justify-between items-center">
+                          <span className="asset-element font-semibold">Asset Value</span>
+                          <span className="text-slate-600">$245K</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Score Element */}
+                    <Card data-testid="card-score-element">
+                      <CardHeader className="score-bg">
+                        <CardTitle className="flex items-center space-x-2 text-white">
+                          <Star className="h-5 w-5" />
+                          <span>Score</span>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-4">
+                        <div className="flex justify-between items-center">
+                          <span className="score-element font-semibold">Credit Score</span>
+                          <span className="text-slate-600">742</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
                 </div>
 
                 <div className="space-y-6">

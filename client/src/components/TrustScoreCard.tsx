@@ -74,8 +74,8 @@ export function TrustScoreCard({ chittyIdCode, trustScore, trustLevel, verificat
       <CardHeader className={getRainbowGradientClass(trustLevel)}>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center space-x-2">
-            <Shield className="h-5 w-5 text-green-600" />
-            <span>Your ChittyID</span>
+            <Shield className="h-5 w-5 identity-element" />
+            <span className="text-white">Your ChittyID</span>
           </CardTitle>
           <Badge 
             className={getStatusColor(verificationStatus)}
@@ -99,9 +99,9 @@ export function TrustScoreCard({ chittyIdCode, trustScore, trustLevel, verificat
           {/* Trust Score */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-slate-600">Trust Score</span>
+              <span className="text-sm trust-element font-semibold">Trust Score</span>
               <div className="flex items-center space-x-2">
-                <span className="text-2xl font-bold text-slate-900" data-testid="text-trust-score">{trustScore}</span>
+                <span className="text-2xl font-bold score-element" data-testid="text-trust-score">{trustScore}</span>
                 <span className="text-sm text-slate-500">/ 1000</span>
               </div>
             </div>
@@ -118,9 +118,9 @@ export function TrustScoreCard({ chittyIdCode, trustScore, trustLevel, verificat
 
           {/* Trust Level */}
           <div className="flex items-center justify-between">
-            <span className="text-sm text-slate-600">Trust Level</span>
+            <span className="text-sm trust-element font-semibold">Trust Level</span>
             <Badge 
-              className={getTrustLevelColor(trustLevel)}
+              className={`trust-bg text-white ${getTrustLevelColor(trustLevel)}`}
               data-testid="badge-trust-level"
             >
               {trustLevel}
