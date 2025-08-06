@@ -160,7 +160,7 @@ export default function Home() {
                 onClick={() => setActiveTab(key as any)}
                 className={`flex items-center space-x-2 pb-3 px-1 border-b-2 transition-colors ${
                   activeTab === key
-                    ? 'border-purple-600 text-purple-600'
+                    ? 'border-green-600 text-green-600'
                     : 'border-transparent text-slate-600 hover:text-slate-900'
                 }`}
                 data-testid={`tab-${key}`}
@@ -180,7 +180,7 @@ export default function Home() {
               <Card data-testid="card-create-chittyid">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
-                    <Shield className="h-5 w-5 text-purple-600" />
+                    <Shield className="h-5 w-5 text-green-600" />
                     <span>Create Your ChittyID</span>
                   </CardTitle>
                 </CardHeader>

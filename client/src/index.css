@@ -13,27 +13,27 @@
   --card-foreground: hsl(222, 84%, 4.9%);
   --border: hsl(214.3, 31.8%, 91.4%);
   --input: hsl(214.3, 31.8%, 91.4%);
-  --primary: hsl(270, 95%, 65%);
+  --primary: hsl(142, 76%, 36%);
   --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(270, 40%, 96%);
-  --secondary-foreground: hsl(270, 47.4%, 11.2%);
-  --accent: hsl(270, 40%, 96%);
-  --accent-foreground: hsl(270, 47.4%, 11.2%);
+  --secondary: hsl(142, 40%, 96%);
+  --secondary-foreground: hsl(142, 47.4%, 11.2%);
+  --accent: hsl(142, 40%, 96%);
+  --accent-foreground: hsl(142, 47.4%, 11.2%);
   --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(0, 0%, 100%);
-  --ring: hsl(270, 95%, 65%);
+  --ring: hsl(142, 76%, 36%);
   --radius: 0.5rem;
   
-  /* Custom ChittyID purplish-blue colors */
-  --chitty-primary: hsl(270, 95%, 65%);
-  --chitty-primary-dark: hsl(270, 95%, 55%);
-  --chitty-secondary: hsl(250, 85%, 70%);
-  --chitty-accent: hsl(290, 85%, 70%);
-  --chitty-blue: hsl(240, 85%, 65%);
-  --chitty-purple: hsl(280, 85%, 65%);
+  /* Custom ChittyID green-teal colors */
+  --chitty-primary: hsl(142, 76%, 36%);
+  --chitty-primary-dark: hsl(142, 76%, 30%);
+  --chitty-secondary: hsl(160, 84%, 39%);
+  --chitty-accent: hsl(180, 84%, 45%);
+  --chitty-blue: hsl(200, 85%, 50%);
   --chitty-green: hsl(142, 76%, 36%);
-  --chitty-gray: hsl(270, 16%, 47%);
-  --chitty-dark: hsl(270, 47%, 11%);
+  --chitty-teal: hsl(170, 76%, 42%);
+  --chitty-gray: hsl(142, 16%, 47%);
+  --chitty-dark: hsl(142, 47%, 11%);
 }
 
 .dark {
@@ -47,7 +47,7 @@
   --card-foreground: hsl(210, 40%, 98%);
   --border: hsl(217.2, 32.6%, 17.5%);
   --input: hsl(217.2, 32.6%, 17.5%);
-  --primary: hsl(270, 95%, 65%);
+  --primary: hsl(142, 76%, 36%);
   --primary-foreground: hsl(0, 0%, 100%);
   --secondary: hsl(217.2, 32.6%, 17.5%);
   --secondary-foreground: hsl(210, 40%, 98%);
@@ -55,7 +55,7 @@
   --accent-foreground: hsl(210, 40%, 98%);
   --destructive: hsl(0, 62.8%, 30.6%);
   --destructive-foreground: hsl(210, 40%, 98%);
-  --ring: hsl(270, 95%, 65%);
+  --ring: hsl(142, 76%, 36%);
   --radius: 0.5rem;
 }
 
@@ -75,11 +75,11 @@
 }
 
 .chitty-gradient-accent {
-  background: linear-gradient(135deg, var(--chitty-blue), var(--chitty-purple));
+  background: linear-gradient(135deg, var(--chitty-teal), var(--chitty-blue));
 }
 
 .chitty-gradient-soft {
-  background: linear-gradient(135deg, hsl(270, 95%, 95%), hsl(250, 85%, 95%));
+  background: linear-gradient(135deg, hsl(142, 76%, 95%), hsl(160, 84%, 95%));
 }
 
 .chitty-card-hover {
