@@ -2,14 +2,15 @@
 
 ## Overview
 
-ChittyID is a comprehensive identity verification and trust scoring platform built on a modern full-stack architecture. The system provides a universal identity backbone that issues deterministic, privacy-preserving IDs while tracking behavioral patterns across time-scales. It serves as the foundation for a larger ChittyOS ecosystem, enabling users to build trust through progressive verification steps and allowing businesses to integrate identity verification services.
+ChittyID is a comprehensive universal identity verification and trust scoring platform deployed at **id.chitty.cc/get**. The system provides a foundational identity backbone that issues deterministic, privacy-preserving IDs for People, Places, Things, and Events while tracking behavioral patterns across time-scales. It serves as the core infrastructure for the ChittyOS ecosystem, enabling progressive trust building through sophisticated verification workflows and allowing businesses to integrate comprehensive identity verification services.
 
-The platform implements a sophisticated trust level system (L0-L5) with progressive verification requirements, dual immutability architecture for data integrity, and comprehensive audit trails. Users can verify various identity factors (email, phone, ID cards, addresses) to increase their trust scores, while businesses can integrate the platform's verification APIs to streamline their identity verification processes.
+The platform implements an advanced Herrmann Brain Dominance trust scoring system (L0-L5) with algorithmic transparency, universal entity support with prefixes (CP/CL/CT/CE), PostgreSQL-based advanced functions, and comprehensive audit trails. The system supports both traditional ChittyIDs for people and universal ChittyIDs for all entity types, with complete API integration for business partners.
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
 Clear algorithmic color system: ChittyID uses transparent Herrmann Brain Dominance colors with algorithmic rainbow cascading effects. Blue (Analytical), Orange (Practical), Red (Interpersonal), Yellow (Experimental) - completely avoiding green. The system implements clear hue-rotate algorithms that shift colors transparently based on trust levels.
+Deployment preference: id.chitty.cc/get for universal ChittyID access and API endpoints.
 
 ## System Architecture
 
@@ -22,14 +23,27 @@ The server is built with Express.js and TypeScript, following a RESTful API desi
 ### Database Design
 The system uses PostgreSQL with Drizzle ORM for type-safe database operations. The schema implements a comprehensive identity verification system with tables for users, ChittyIDs, verifications, businesses, and verification requests. It includes proper foreign key relationships, enumerated types for status tracking, and indexing for performance. The database supports session storage for authentication and includes audit trail capabilities.
 
-### Identity Management System
-ChittyID implements a structured ID format with built-in checksums and human-readable components. The system uses UUIDv7 for immediate deployment with plans for future Time-First Mod-97 Base32 implementation. The platform features a progressive verification system where users advance through trust levels (L0-L5) by completing various verification steps, each contributing to their overall trust score.
+### Universal Identity Management System
+ChittyID implements a comprehensive universal identity system supporting People, Places, Things, and Events with entity-specific prefixes:
+- CP-YYYY-VER-NNNN-X (ChittyPerson for individuals)
+- CL-YYYY-VER-NNNN-X (ChittyLocation for places)
+- CT-YYYY-VER-NNNN-X (ChittyThing for objects/assets)
+- CE-YYYY-VER-NNNN-X (ChittyEvent for activities)
+
+The system uses advanced Mod-97 checksum validation with collision detection, PostgreSQL-based generation functions, and sophisticated trust scoring algorithms based on Herrmann Brain Dominance model. The platform features progressive verification workflows where entities advance through trust levels (L0-L5) with complete algorithmic transparency.
 
 ### Verification and Trust Scoring
 The platform implements a multi-factor verification system supporting email, phone, ID cards, and address verification. Each verification type contributes specific trust points, and the system tracks verification status through enumerated states. The trust scoring algorithm considers multiple factors and maintains historical verification data for audit purposes.
 
-### Business Integration Layer
-The system provides APIs for businesses to integrate identity verification into their applications. Businesses can register, receive API keys, set trust thresholds, and submit verification requests. The platform tracks all verification requests and provides detailed response data for business analytics and compliance.
+### Advanced Business Integration Layer
+The system provides comprehensive APIs deployed at id.chitty.cc/get for businesses to integrate universal identity verification. Key endpoints include:
+- `/api/universal/create` - Create entities for people, places, things, events
+- `/api/universal/search` - Search across all entity types
+- `/api/business/verify-chitty` - Business verification with API keys
+- `/api/trust/calculate` - Transparent trust score calculation
+- `/api/system/stats` - Real-time universal system statistics
+
+Businesses can register, receive API keys, set trust thresholds, and submit verification requests across all entity types. The platform tracks verification requests with detailed analytics and cross-entity relationship mapping.
 
 ## External Dependencies
 
