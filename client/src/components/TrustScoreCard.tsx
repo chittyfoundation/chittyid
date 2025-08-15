@@ -13,7 +13,7 @@ interface TrustScoreCardProps {
 export function TrustScoreCard({ chittyIdCode, trustScore, trustLevel, verificationStatus }: TrustScoreCardProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'verified': return 'bg-green-100 text-green-600';
+      case 'verified': return 'bg-blue-100 text-blue-600';
       case 'pending': return 'bg-yellow-100 text-yellow-600';
       case 'rejected': return 'bg-red-100 text-red-600';
       default: return 'bg-slate-100 text-slate-600';

@@ -229,7 +229,7 @@ export default function BusinessDashboard() {
                   <div className="text-2xl font-bold text-slate-900">{stats.successRate}%</div>
                   <div className="text-sm text-slate-600">Success Rate</div>
                 </div>
-                <TrendingUp className="h-8 w-8 text-green-600" />
+                <TrendingUp className="h-8 w-8 text-blue-600" />
               </div>
             </CardContent>
           </Card>
@@ -436,7 +436,7 @@ export default function BusinessDashboard() {
                           <TableCell>instant_verify</TableCell>
                           <TableCell>847</TableCell>
                           <TableCell>
-                            <Badge className="bg-green-100 text-green-600">
+                            <Badge className="bg-blue-100 text-blue-600">
                               <CheckCircle className="h-3 w-3 mr-1" />
                               Approved
                             </Badge>
@@ -448,7 +448,7 @@ export default function BusinessDashboard() {
                           <TableCell>background_check</TableCell>
                           <TableCell>623</TableCell>
                           <TableCell>
-                            <Badge className="bg-green-100 text-green-600">
+                            <Badge className="bg-blue-100 text-blue-600">
                               <CheckCircle className="h-3 w-3 mr-1" />
                               Approved
                             </Badge>

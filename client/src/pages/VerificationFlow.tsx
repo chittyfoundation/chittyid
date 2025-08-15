@@ -198,14 +198,14 @@ export default function VerificationFlow() {
 
     if (status === 'verified') {
       return (
-        <Card className="border-green-200 bg-green-50" data-testid="step-completed">
+        <Card className="border-blue-200 bg-blue-50" data-testid="step-completed">
           <CardContent className="p-8 text-center">
-            <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-green-800 mb-2">Verification Complete!</h3>
-            <p className="text-green-700">
+            <CheckCircle className="h-16 w-16 text-blue-600 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-blue-800 mb-2">Verification Complete!</h3>
+            <p className="text-blue-700">
               Your {currentStepData.title.toLowerCase()} has been successfully verified.
             </p>
-            <Badge className="mt-4 bg-green-600 text-white">
+            <Badge className="mt-4 bg-blue-600 text-white">
               +{currentStepData.trustPoints} Trust Points Earned
             </Badge>
           </CardContent>
@@ -482,7 +482,7 @@ export default function VerificationFlow() {
                 onClick={() => setCurrentStep(index)}
                 className={`p-3 rounded-lg text-center transition-all ${
                   isCompleted
-                    ? 'bg-green-100 text-green-700 border-2 border-green-200'
+                    ? 'bg-blue-100 text-blue-700 border-2 border-blue-200'
                     : isCurrent
                     ? 'bg-blue-100 text-blue-700 border-2 border-blue-200'
                     : isPending
@@ -623,19 +623,19 @@ export default function VerificationFlow() {
               <CardContent>
                 <ul className="space-y-3 text-sm text-slate-600">
                   <li className="flex items-start space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <CheckCircle className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
                     <span>Instant approval at partner businesses</span>
                   </li>
                   <li className="flex items-start space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <CheckCircle className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
                     <span>No more repeated document uploads</span>
                   </li>
                   <li className="flex items-start space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <CheckCircle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
                     <span>Higher trust score = better rates</span>
                   </li>
                   <li className="flex items-start space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <CheckCircle className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
                     <span>Priority customer support</span>
                   </li>
                 </ul>

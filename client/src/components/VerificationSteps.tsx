@@ -347,7 +347,7 @@ export function VerificationSteps({ hasChittyId, verifications, onAddVerificatio
                       Added on {new Date(verification.createdAt).toLocaleDateString()}
                     </div>
                     {verification.verifiedAt && (
-                      <div className="text-sm text-green-600">
+                      <div className="text-sm text-blue-600">
                         Verified on {new Date(verification.verifiedAt).toLocaleDateString()}
                       </div>
                     )}

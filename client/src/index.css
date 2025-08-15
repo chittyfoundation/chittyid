@@ -88,7 +88,7 @@
 /* Custom utility classes for ChittyID styling */
 /* Dynamic Rainbow Classes */
 .chitty-gradient {
-  background: var(--rainbow-l2); /* Default to L2 green */
+  background: var(--rainbow-l2); /* Default to L2 blue+orange */
 }
 
 .chitty-gradient-l0 {
@@ -117,7 +117,7 @@
 }
 
 .chitty-gradient-soft {
-  background: linear-gradient(135deg, hsl(142, 76%, 95%), hsl(160, 84%, 95%));
+  background: linear-gradient(135deg, hsl(220, 76%, 95%), hsl(25, 84%, 95%));
 }
 
 @keyframes rainbow-pulse {

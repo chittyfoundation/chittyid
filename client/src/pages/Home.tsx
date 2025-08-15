@@ -296,7 +296,7 @@ export default function Home() {
                             </div>
                             <Badge
                               variant={verification.status === 'verified' ? 'default' : 'secondary'}
-                              className={verification.status === 'verified' ? 'bg-green-100 text-green-600' : ''}
+                              className={verification.status === 'verified' ? 'bg-blue-100 text-blue-600' : ''}
                             >
                               {verification.status === 'verified' ? (
                                 <CheckCircle className="h-3 w-3 mr-1" />
