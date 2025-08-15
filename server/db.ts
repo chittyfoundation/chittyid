@@ -5,12 +5,22 @@ import * as schema from "@shared/schema";
 
 neonConfig.webSocketConstructor = ws;
 
-const dbUrl = process.env.CHITTYID_DB_URL || process.env.DATABASE_URL;
+let dbUrl = process.env.CHITTYID_DB_URL || process.env.DATABASE_URL;
 
 if (!dbUrl) {
   throw new Error(
     "CHITTYID_DB_URL or DATABASE_URL must be set. Did you forget to provision a database?",
   );
+}
+
+// Decode URL-encoded database URL if needed
+if (dbUrl.includes('%20')) {
+  dbUrl = decodeURIComponent(dbUrl);
+}
+
+// Clean up any psql command wrapper
+if (dbUrl.startsWith("psql '") && dbUrl.endsWith("'")) {
+  dbUrl = dbUrl.slice(6, -1);
 }
 
 export const pool = new Pool({ connectionString: dbUrl });

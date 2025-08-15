@@ -71,7 +71,7 @@ export default function UniversalQuickStart() {
       return response.json();
     },
     onSuccess: (data: any, variables: any) => {
-      setCompletedSteps(prev => new Set([...prev, variables.entity_type]));
+      setCompletedSteps(prev => new Set([...Array.from(prev), variables.entity_type]));
       toast({
         title: "ChittyID Created!",
         description: `${data.chitty_id_code} generated successfully`,
@@ -197,7 +197,7 @@ export default function UniversalQuickStart() {
         })}
       </div>
 
-      {universalStats && (
+      {universalStats && Object.keys(universalStats).length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
@@ -209,25 +209,25 @@ export default function UniversalQuickStart() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div>
                 <div className="text-2xl font-bold text-blue-600" data-testid="stat-people">
-                  {universalStats.people?.total || 0}
+                  {(universalStats as any)?.people?.total || 0}
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">People</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-orange-600" data-testid="stat-places">
-                  {universalStats.places?.total || 0}
+                  {(universalStats as any)?.places?.total || 0}
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">Places</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-red-600" data-testid="stat-things">
-                  {universalStats.things?.total || 0}
+                  {(universalStats as any)?.things?.total || 0}
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">Things</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-yellow-600" data-testid="stat-events">
-                  {universalStats.events?.total || 0}
+                  {(universalStats as any)?.events?.total || 0}
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">Events</div>
               </div>
@@ -239,7 +239,7 @@ export default function UniversalQuickStart() {
                   Total Universal Entities
                 </div>
                 <div className="text-xl font-bold" data-testid="stat-total">
-                  {universalStats.total_universal_entities || 0}
+                  {(universalStats as any)?.total_universal_entities || 0}
                 </div>
               </div>
             </div>
