@@ -9,7 +9,9 @@ import { Separator } from "@/components/ui/separator";
 import { TrustScoreCard } from "@/components/TrustScoreCard";
 import { VerificationSteps } from "@/components/VerificationSteps";
 import { BusinessStats } from "@/components/BusinessStats";
-import { Shield, Plus, CheckCircle, Clock, AlertCircle, QrCode, Share2, LogOut, Star, Lock, CreditCard } from "lucide-react";
+import UniversalEntityCreator from "@/components/UniversalEntityCreator";
+import UniversalQuickStart from "@/components/UniversalQuickStart";
+import { Shield, Plus, CheckCircle, Clock, AlertCircle, QrCode, Share2, LogOut, Star, Lock, CreditCard, Users, MapPin, Package, Calendar } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -18,7 +20,7 @@ export default function Home() {
   const { user, isLoading } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<'overview' | 'verification' | 'business'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'verification' | 'business' | 'universal'>('overview');
 
   // Get user stats and ChittyID
   const { data: stats } = useQuery({
@@ -153,6 +155,7 @@ export default function Home() {
             {[
               { key: 'overview', label: 'Overview', icon: Shield, colorClass: 'brain-analytical', href: '/' },
               { key: 'verification', label: 'Verification', icon: CheckCircle, colorClass: 'brain-practical', href: '/verification' },
+              { key: 'universal', label: 'Universal IDs', icon: Users, colorClass: 'brain-experimental', href: '#universal' },
               { key: 'business', label: 'Business Network', icon: Share2, colorClass: 'brain-interpersonal', href: '/business' },
             ].map(({ key, label, icon: Icon, colorClass, href }) => (
               <a
@@ -164,6 +167,8 @@ export default function Home() {
                     setActiveTab('overview');
                   } else if (href === '/verification') {
                     window.location.href = '/verification';
+                  } else if (href === '#universal') {
+                    setActiveTab('universal');
                   } else if (href === '/business') {
                     window.location.href = '/business';
                   }
@@ -363,6 +368,14 @@ export default function Home() {
             isAddingVerification={addVerificationMutation.isPending}
             data-testid="verification-steps"
           />
+        )}
+
+        {activeTab === 'universal' && (
+          <div className="space-y-8">
+            {/* Check if user has created any universal entities, show quickstart if none */}
+            <UniversalQuickStart />
+            <UniversalEntityCreator />
+          </div>
         )}
 
         {activeTab === 'business' && (
