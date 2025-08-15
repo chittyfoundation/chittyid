@@ -19,9 +19,14 @@ import { db } from "./db";
 import { eq, and, desc } from "drizzle-orm";
 
 export interface IStorage {
-  // User operations (required for Replit Auth)
+  // User operations (required for ChittyAuth)
   getUser(id: string): Promise<User | undefined>;
+  getUserById(id: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(userData: { email: string; password: string; firstName?: string; lastName?: string }): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
+  verifyChittyId(chittyId: string): Promise<boolean>;
+  updateUserVerification(userId: string, isVerified: boolean): Promise<void>;
   
   // ChittyID operations
   getChittyIdByUserId(userId: string): Promise<ChittyId | undefined>;
@@ -46,10 +51,51 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  // User operations (required for Replit Auth)
+  // User operations (required for ChittyAuth)
   async getUser(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
+  }
+
+  async getUserById(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async createUser(userData: { email: string; password: string; firstName?: string; lastName?: string }): Promise<User> {
+    const userId = `chitty_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    
+    // Generate ChittyID for the user
+    const chittyIdCode = `CP-${new Date().getFullYear()}-VER-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Math.floor(Math.random() * 10)}`;
+    
+    const [newUser] = await db.insert(users).values({
+      id: userId,
+      email: userData.email,
+      password: userData.password,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      chittyId: chittyIdCode,
+      trustScore: 100,
+      isVerified: false,
+    }).returning();
+    
+    return newUser;
+  }
+
+  async verifyChittyId(chittyId: string): Promise<boolean> {
+    const [existing] = await db.select().from(users).where(eq(users.chittyId, chittyId));
+    return !!existing;
+  }
+
+  async updateUserVerification(userId: string, isVerified: boolean): Promise<void> {
+    await db.update(users)
+      .set({ isVerified })
+      .where(eq(users.id, userId));
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {

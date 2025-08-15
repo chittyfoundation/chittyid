@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import ChittyAuth from "@/components/ChittyAuth";
 import { Shield, CheckCircle, Clock, DollarSign, Users, Star, Phone, Mail, Home, IdCard, Building, Briefcase, University, GraduationCap, Car, ShoppingCart } from "lucide-react";
 
 export default function Landing() {
@@ -26,10 +27,10 @@ export default function Landing() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" onClick={() => window.location.href = '/api/login'} data-testid="button-signin">
+              <Button variant="ghost" onClick={() => window.location.href = '#auth'} data-testid="button-signin">
                 Sign In
               </Button>
-              <Button onClick={() => window.location.href = '/api/login'} data-testid="button-get-verified">
+              <Button onClick={() => window.location.href = '#auth'} data-testid="button-get-verified">
                 Get Verified
               </Button>
             </div>
@@ -511,6 +512,13 @@ export default function Landing() {
           </div>
         </div>
       </footer>
+
+      {/* ChittyAuth Section */}
+      <section id="auth" className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+          <ChittyAuth />
+        </div>
+      </section>
     </div>
   );
 }

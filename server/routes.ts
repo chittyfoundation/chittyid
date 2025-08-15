@@ -1,37 +1,20 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupChittyAuth, requireAuth, optionalAuth } from "./chittyAuth";
 import { insertVerificationSchema, insertBusinessSchema, insertVerificationRequestSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
-  await setupAuth(app);
+  setupChittyAuth(app);
 
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      
-      // Also get the user's ChittyID if it exists
-      let chittyId = null;
-      if (user) {
-        chittyId = await storage.getChittyIdByUserId(user.id);
-      }
-      
-      res.json({ ...user, chittyId });
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
-  });
+  // ChittyAuth handles the auth routes internally
 
   // ChittyID routes
-  app.post('/api/chittyid/create', isAuthenticated, async (req: any, res) => {
+  app.post('/api/chittyid/create', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Check if user already has a ChittyID
       const existingChittyId = await storage.getChittyIdByUserId(userId);
@@ -83,9 +66,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Verification routes
-  app.post('/api/verifications', isAuthenticated, async (req: any, res) => {
+  app.post('/api/verifications', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const chittyId = await storage.getChittyIdByUserId(userId);
       
       if (!chittyId) {
@@ -227,9 +210,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Advanced verification processing
-  app.post('/api/verifications/process-advanced', isAuthenticated, async (req: any, res) => {
+  app.post('/api/verifications/process-advanced', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const chittyId = await storage.getChittyIdByUserId(userId);
       
       if (!chittyId) {
@@ -313,10 +296,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Universal ChittyID endpoints for People, Places, Things, Events
-  app.post('/api/universal/create', isAuthenticated, async (req: any, res) => {
+  app.post('/api/universal/create', requireAuth, async (req: any, res) => {
     try {
       const { entity_type, name, description, attributes, is_public } = req.body;
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       if (!entity_type || !name) {
         return res.status(400).json({ message: "entity_type and name are required" });
@@ -423,9 +406,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/verifications', isAuthenticated, async (req: any, res) => {
+  app.get('/api/verifications', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const chittyId = await storage.getChittyIdByUserId(userId);
       
       if (!chittyId) {
@@ -458,7 +441,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/businesses', isAuthenticated, async (req: any, res) => {
+  app.post('/api/businesses', requireAuth, async (req: any, res) => {
     try {
       const validatedData = insertBusinessSchema.parse(req.body);
       const business = await storage.createBusiness(validatedData);
@@ -524,9 +507,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Dashboard stats
-  app.get('/api/stats', isAuthenticated, async (req: any, res) => {
+  app.get('/api/stats', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const chittyId = await storage.getChittyIdByUserId(userId);
       
       const stats = {
