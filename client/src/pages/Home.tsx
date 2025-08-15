@@ -151,13 +151,23 @@ export default function Home() {
         <div className="mb-8">
           <div className="flex space-x-8 border-b border-white/20">
             {[
-              { key: 'overview', label: 'Overview', icon: Shield, colorClass: 'brain-analytical' },
-              { key: 'verification', label: 'Verification', icon: CheckCircle, colorClass: 'brain-practical' },
-              { key: 'business', label: 'Business Network', icon: Share2, colorClass: 'brain-interpersonal' },
-            ].map(({ key, label, icon: Icon, colorClass }) => (
-              <button
+              { key: 'overview', label: 'Overview', icon: Shield, colorClass: 'brain-analytical', href: '/' },
+              { key: 'verification', label: 'Verification', icon: CheckCircle, colorClass: 'brain-practical', href: '/verification' },
+              { key: 'business', label: 'Business Network', icon: Share2, colorClass: 'brain-interpersonal', href: '/business' },
+            ].map(({ key, label, icon: Icon, colorClass, href }) => (
+              <a
                 key={key}
-                onClick={() => setActiveTab(key as any)}
+                href={href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (href === '/') {
+                    setActiveTab('overview');
+                  } else if (href === '/verification') {
+                    window.location.href = '/verification';
+                  } else if (href === '/business') {
+                    window.location.href = '/business';
+                  }
+                }}
                 className={`flex items-center space-x-2 pb-3 px-1 border-b-2 transition-colors ${
                   activeTab === key
                     ? `border-current ${colorClass}`
@@ -167,7 +177,7 @@ export default function Home() {
               >
                 <Icon className="h-4 w-4" />
                 <span className="font-medium">{label}</span>
-              </button>
+              </a>
             ))}
           </div>
         </div>

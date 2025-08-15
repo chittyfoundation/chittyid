@@ -19,10 +19,10 @@ export default function Landing() {
                 <span className="text-xl font-bold text-slate-900">ChittyID</span>
               </div>
               <div className="hidden md:flex space-x-6">
-                <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors" data-testid="nav-individuals">For Individuals</a>
-                <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors" data-testid="nav-businesses">For Businesses</a>
-                <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors" data-testid="nav-developers">Developers</a>
-                <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors" data-testid="nav-security">Security</a>
+                <a href="/individuals" className="text-slate-600 hover:text-slate-900 transition-colors" data-testid="nav-individuals">For Individuals</a>
+                <a href="/businesses" className="text-slate-600 hover:text-slate-900 transition-colors" data-testid="nav-businesses">For Businesses</a>
+                <a href="/developers" className="text-slate-600 hover:text-slate-900 transition-colors" data-testid="nav-developers">Developers</a>
+                <a href="/security" className="text-slate-600 hover:text-slate-900 transition-colors" data-testid="nav-security">Security</a>
               </div>
             </div>
             <div className="flex items-center space-x-4">

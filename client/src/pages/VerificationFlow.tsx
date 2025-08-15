@@ -443,8 +443,15 @@ export default function VerificationFlow() {
               </div>
               <span className="text-xl font-bold text-slate-900" data-testid="text-verification-logo">ChittyID Verification</span>
             </div>
-            <div className="text-sm text-slate-600" data-testid="text-current-trust-score">
-              Trust Score: {stats?.trustScore || 0}
+            <div className="flex items-center space-x-6">
+              <nav className="flex items-center space-x-4">
+                <a href="/" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">Overview</a>
+                <span className="text-sm text-blue-600 font-medium">Verification</span>
+                <a href="/business" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">Business</a>
+              </nav>
+              <div className="text-sm text-slate-600" data-testid="text-current-trust-score">
+                Trust Score: {stats?.trustScore || 0}
+              </div>
             </div>
           </div>
         </div>

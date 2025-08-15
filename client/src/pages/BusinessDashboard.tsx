@@ -190,17 +190,22 @@ export default function BusinessDashboard() {
               </div>
               <span className="text-xl font-bold text-slate-900" data-testid="text-business-logo">ChittyID Business</span>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
+              <nav className="flex items-center space-x-4">
+                <a href="/" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">Overview</a>
+                <a href="/verification" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">Verification</a>
+                <span className="text-sm text-blue-600 font-medium">Business</span>
+              </nav>
               <span className="text-sm text-slate-600" data-testid="text-business-welcome">
                 Welcome, {user?.firstName || user?.email}
               </span>
               <Button 
-                onClick={() => window.location.href = '/'}
+                onClick={() => window.location.href = '/api/logout'}
                 variant="outline"
                 size="sm"
-                data-testid="button-back-home"
+                data-testid="button-logout"
               >
-                Back to ChittyID
+                Logout
               </Button>
             </div>
           </div>
