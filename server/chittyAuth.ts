@@ -51,9 +51,9 @@ function getSessionConfig(config: ChittyAuthConfig) {
   const pgStore = connectPg(session);
   const sessionStore = new pgStore({
     conString: config.dbUrl,
-    createTableIfMissing: false,
-    ttl: config.sessionTtl,
-    tableName: "sessions",
+    createTableIfMissing: true,
+    ttl: config.sessionTtl / 1000, // convert to seconds
+    tableName: "session",
   });
 
   return session({
@@ -91,9 +91,14 @@ export function setupChittyAuth(app: Express) {
       }
 
       // Check if user already exists
-      const existingUser = await storage.getUserByEmail(email);
-      if (existingUser) {
-        return res.status(400).json({ message: "User already exists" });
+      try {
+        const existingUser = await storage.getUserByEmail(email);
+        if (existingUser) {
+          return res.status(400).json({ message: "User already exists" });
+        }
+      } catch (dbError) {
+        console.error("Database error checking user:", dbError);
+        return res.status(500).json({ message: "Database connection error" });
       }
 
       // Hash password
