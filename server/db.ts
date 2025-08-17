@@ -5,11 +5,11 @@ import * as schema from "@shared/schema";
 
 neonConfig.webSocketConstructor = ws;
 
-let dbUrl = process.env.DATABASE_URL;
+let dbUrl = process.env.CHITTYID_NEON_DB_URL || process.env.DATABASE_URL;
 
 if (!dbUrl) {
   throw new Error(
-    "CHITTYID_DB_URL or DATABASE_URL must be set. Did you forget to provision a database?",
+    "CHITTYID_NEON_DB_URL or DATABASE_URL must be set. Did you forget to provision a database?",
   );
 }
 
