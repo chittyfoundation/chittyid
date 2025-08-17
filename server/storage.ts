@@ -24,6 +24,7 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserById(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
+  getUserByChittyId(chittyId: string): Promise<User | undefined>;
   createUser(userData: { email: string; password: string; firstName?: string; lastName?: string }): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
   verifyChittyId(chittyId: string): Promise<boolean>;
@@ -71,6 +72,18 @@ export class DatabaseStorage implements IStorage {
       return user;
     } catch (error) {
       console.error('Database error in getUserByEmail:', error);
+      throw error;
+    }
+  }
+
+  async getUserByChittyId(chittyId: string): Promise<User | undefined> {
+    try {
+      console.log(`Querying user by ChittyID: ${chittyId}`);
+      const [user] = await db.select().from(users).where(eq(users.chittyId, chittyId));
+      console.log(`Found user:`, user ? `${user.email} (ChittyID: ${user.chittyId})` : 'null');
+      return user;
+    } catch (error) {
+      console.error('Database error in getUserByChittyId:', error);
       throw error;
     }
   }

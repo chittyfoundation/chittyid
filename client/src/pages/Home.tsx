@@ -12,6 +12,7 @@ import { VerificationSteps } from "@/components/VerificationSteps";
 import { BusinessStats } from "@/components/BusinessStats";
 import UniversalEntityCreator from "@/components/UniversalEntityCreator";
 import UniversalQuickStart from "@/components/UniversalQuickStart";
+import ChittyIdDisplay from "@/components/ChittyIdDisplay";
 import { Shield, Plus, CheckCircle, Clock, AlertCircle, QrCode, Share2, LogOut, Star, Lock, CreditCard, Users, MapPin, Package, Calendar } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -228,14 +229,26 @@ export default function Home() {
               </Card>
             ) : (
               /* ChittyID Dashboard */
-              <div className="grid lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-6">
-                  <TrustScoreCard
-                    chittyIdCode={(user as any)?.chittyId?.chittyIdCode || 'Not Generated'}
-                    trustScore={trustScore}
-                    trustLevel={trustLevel}
-                    verificationStatus={verificationStatus}
-                  />
+              <div className="space-y-6">
+                {/* ChittyID Display Card */}
+                <ChittyIdDisplay
+                  chittyId={user?.chittyId || 'Not Generated'}
+                  trustScore={user?.trustScore || 100}
+                  trustLevel={trustLevel}
+                  isVerified={user?.isVerified || false}
+                  firstName={user?.firstName}
+                  lastName={user?.lastName}
+                  email={user?.email}
+                />
+                
+                <div className="grid lg:grid-cols-3 gap-6">
+                  <div className="lg:col-span-2 space-y-6">
+                    <TrustScoreCard
+                      chittyIdCode={(user as any)?.chittyId?.chittyIdCode || 'Not Generated'}
+                      trustScore={trustScore}
+                      trustLevel={trustLevel}
+                      verificationStatus={verificationStatus}
+                    />
                   
                   <Card className="dark-card" data-testid="card-quick-actions">
                     <CardHeader className="brain-experimental-bg rainbow-cascade">
@@ -366,6 +379,7 @@ export default function Home() {
                       </div>
                     </CardContent>
                   </Card>
+                  </div>
                 </div>
               </div>
             )}

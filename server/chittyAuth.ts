@@ -74,14 +74,14 @@ export function setupChittyAuth(app: Express) {
   const config: ChittyAuthConfig = {
     sessionSecret: process.env.SESSION_SECRET || "chittyid-secret-key",
     sessionTtl: 7 * 24 * 60 * 60 * 1000, // 1 week
-    dbUrl: process.env.CHITTYID_DB_URL || process.env.DATABASE_URL!,
+    dbUrl: process.env.CHITTYID_NEON_DB_URL || process.env.DATABASE_URL!,
   };
 
   // Set up session middleware
   app.set("trust proxy", 1);
   app.use(getSessionConfig(config));
 
-  // Registration endpoint
+  // Registration endpoint - Creates user with ChittyID as primary identity
   app.post("/api/auth/register", async (req, res) => {
     try {
       const { email, password, firstName, lastName } = req.body;
@@ -94,7 +94,10 @@ export function setupChittyAuth(app: Express) {
       try {
         const existingUser = await storage.getUserByEmail(email);
         if (existingUser) {
-          return res.status(400).json({ message: "User already exists" });
+          return res.status(400).json({ 
+            message: "User already exists",
+            chittyId: existingUser.chittyId // Return existing ChittyID
+          });
         }
       } catch (dbError) {
         console.error("Database error checking user:", dbError);
@@ -104,7 +107,7 @@ export function setupChittyAuth(app: Express) {
       // Hash password
       const hashedPassword = await hashPassword(password);
 
-      // Create user with ChittyID
+      // Create user with ChittyID from mothership
       const user = await storage.createUser({
         email,
         password: hashedPassword,
@@ -112,8 +115,9 @@ export function setupChittyAuth(app: Express) {
         lastName,
       });
 
-      // Set session
+      // Set session with ChittyID
       (req.session as any).userId = user.id;
+      (req.session as any).chittyId = user.chittyId;
       (req.session as any).user = user;
 
       res.status(201).json({
@@ -125,25 +129,42 @@ export function setupChittyAuth(app: Express) {
           lastName: user.lastName,
           trustScore: user.trustScore,
           isVerified: user.isVerified,
-        }
+        },
+        message: `ChittyID ${user.chittyId} created successfully`
       });
     } catch (error) {
       console.error("Registration error:", error);
+      // Check if error is from ChittyID service
+      if (error.message?.includes('mothership')) {
+        return res.status(503).json({ 
+          message: "ChittyID service temporarily unavailable. Please try again later.",
+          error: error.message 
+        });
+      }
       res.status(500).json({ message: "Registration failed" });
     }
   });
 
-  // Login endpoint
+  // Login endpoint - Supports both email and ChittyID login
   app.post("/api/auth/login", async (req, res) => {
     try {
-      const { email, password } = req.body;
+      const { identifier, password, useChittyId } = req.body;
 
-      if (!email || !password) {
-        return res.status(400).json({ message: "Email and password are required" });
+      if (!identifier || !password) {
+        return res.status(400).json({ message: "Identifier and password are required" });
       }
 
-      // Find user by email
-      const user = await storage.getUserByEmail(email);
+      let user;
+      
+      if (useChittyId) {
+        // Login with ChittyID
+        const users = await storage.getUserByChittyId(identifier);
+        user = users;
+      } else {
+        // Login with email
+        user = await storage.getUserByEmail(identifier);
+      }
+
       if (!user) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
@@ -154,8 +175,9 @@ export function setupChittyAuth(app: Express) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      // Set session
+      // Set session with ChittyID
       (req.session as any).userId = user.id;
+      (req.session as any).chittyId = user.chittyId;
       (req.session as any).user = user;
 
       res.json({
@@ -167,7 +189,8 @@ export function setupChittyAuth(app: Express) {
           lastName: user.lastName,
           trustScore: user.trustScore,
           isVerified: user.isVerified,
-        }
+        },
+        message: `Logged in with ChittyID: ${user.chittyId}`
       });
     } catch (error) {
       console.error("Login error:", error);
@@ -240,6 +263,53 @@ export function setupChittyAuth(app: Express) {
     } catch (error) {
       console.error("ChittyID verification error:", error);
       res.status(500).json({ message: "Verification failed" });
+    }
+  });
+
+  // ChittyID lookup endpoint - Get user info by ChittyID
+  app.get("/api/auth/chittyid/:chittyId", async (req, res) => {
+    try {
+      const { chittyId } = req.params;
+      
+      const user = await storage.getUserByChittyId(chittyId);
+      if (!user) {
+        return res.status(404).json({ message: "ChittyID not found" });
+      }
+
+      // Return public info only
+      res.json({
+        chittyId: user.chittyId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        trustScore: user.trustScore,
+        isVerified: user.isVerified,
+        createdAt: user.createdAt
+      });
+    } catch (error) {
+      console.error("ChittyID lookup error:", error);
+      res.status(500).json({ message: "Lookup failed" });
+    }
+  });
+
+  // ChittyID validation endpoint - Check if ChittyID format is valid
+  app.post("/api/auth/validate-chittyid", async (req, res) => {
+    try {
+      const { chittyId } = req.body;
+      
+      if (!chittyId) {
+        return res.status(400).json({ message: "ChittyID is required" });
+      }
+
+      const isValid = await storage.verifyChittyId(chittyId);
+      
+      res.json({ 
+        chittyId,
+        valid: isValid,
+        format: isValid ? "Valid ChittyID format" : "Invalid ChittyID format"
+      });
+    } catch (error) {
+      console.error("ChittyID validation error:", error);
+      res.status(500).json({ message: "Validation failed" });
     }
   });
 }

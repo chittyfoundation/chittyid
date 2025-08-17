@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Shield, User, Mail, Lock, LogIn, UserPlus, Loader2 } from 'lucide-react';
+import { Shield, User, Mail, Lock, LogIn, UserPlus, Loader2, CreditCard, ToggleLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
+import { Switch } from '@/components/ui/switch';
 
 interface AuthFormData {
   email: string;
@@ -24,20 +25,25 @@ export default function ChittyAuth() {
     firstName: '', 
     lastName: '' 
   });
+  const [useChittyIdLogin, setUseChittyIdLogin] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const loginMutation = useMutation({
     mutationFn: async (data: AuthFormData) => {
-      const response = await apiRequest('POST', '/api/auth/login', data);
+      const response = await apiRequest('POST', '/api/auth/login', {
+        identifier: data.email,
+        password: data.password,
+        useChittyId: useChittyIdLogin
+      });
       return response.json();
     },
     onSuccess: (data) => {
       queryClient.setQueryData(['/api/auth/user'], data);
       toast({
         title: "Welcome back!",
-        description: `Logged in as ${data.user.email}`,
+        description: `Logged in with ChittyID: ${data.user.chittyId}`,
       });
     },
     onError: (error: any) => {
@@ -130,18 +136,33 @@ export default function ChittyAuth() {
 
               <TabsContent value="login" className="mt-6">
                 <form onSubmit={handleLogin} className="space-y-4">
+                  <div className="flex items-center space-x-2 mb-4 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+                    <Switch
+                      id="chitty-id-mode"
+                      checked={useChittyIdLogin}
+                      onCheckedChange={setUseChittyIdLogin}
+                    />
+                    <Label htmlFor="chitty-id-mode" className="flex items-center gap-2 cursor-pointer">
+                      <CreditCard className="h-4 w-4" />
+                      Use ChittyID Login
+                    </Label>
+                  </div>
+                  
                   <div className="space-y-2">
-                    <Label htmlFor="login-email" className="flex items-center gap-2">
-                      <Mail className="h-4 w-4" />
-                      Email
+                    <Label htmlFor="login-identifier" className="flex items-center gap-2">
+                      {useChittyIdLogin ? (
+                        <><CreditCard className="h-4 w-4" /> ChittyID</>
+                      ) : (
+                        <><Mail className="h-4 w-4" /> Email</>
+                      )}
                     </Label>
                     <Input
-                      id="login-email"
-                      type="email"
-                      placeholder="your@email.com"
+                      id="login-identifier"
+                      type={useChittyIdLogin ? "text" : "email"}
+                      placeholder={useChittyIdLogin ? "CP-2025-XXX-XXXX-X" : "your@email.com"}
                       value={loginForm.email}
                       onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
-                      data-testid="input-login-email"
+                      data-testid="input-login-identifier"
                     />
                   </div>
 
