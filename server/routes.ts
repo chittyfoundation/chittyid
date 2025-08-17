@@ -12,6 +12,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ChittyAuth handles the auth routes internally
 
+  // ChittyID mothership status endpoint
+  app.get('/api/chittyid/mothership/status', async (req, res) => {
+    try {
+      const isOnline = await chittyIdService.checkMothershipStatus();
+      res.json({ 
+        mothership: 'id.chitty.cc',
+        online: isOnline,
+        message: isOnline ? 'ChittyID mothership is online and ready' : 'ChittyID mothership is offline. Please wait for central server to come online.'
+      });
+    } catch (error) {
+      console.error("Error checking mothership status:", error);
+      res.status(500).json({ message: "Failed to check mothership status" });
+    }
+  });
+
   // ChittyID routes
   app.post('/api/chittyid/create', requireAuth, async (req: any, res) => {
     try {
@@ -21,6 +36,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const existingChittyId = await storage.getChittyIdByUserId(userId);
       if (existingChittyId) {
         return res.status(400).json({ message: "User already has a ChittyID" });
+      }
+
+      // Check mothership status first
+      const mothershipOnline = await chittyIdService.checkMothershipStatus();
+      if (!mothershipOnline) {
+        return res.status(503).json({ 
+          message: "ChittyID generation requires connection to mothership server at id.chitty.cc. Please wait for the central server to come online.",
+          mothership: 'id.chitty.cc',
+          online: false
+        });
       }
 
       // Generate ChittyID through mothership service
@@ -42,7 +67,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(chittyId);
     } catch (error) {
       console.error("Error creating ChittyID:", error);
-      res.status(500).json({ message: "Failed to create ChittyID" });
+      if (error.message.includes('mothership')) {
+        res.status(503).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: "Failed to create ChittyID" });
+      }
     }
   });
 

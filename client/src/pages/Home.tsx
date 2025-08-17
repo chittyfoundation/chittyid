@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { TrustScoreCard } from "@/components/TrustScoreCard";
+import { MothershipStatus } from "@/components/MothershipStatus";
 import { VerificationSteps } from "@/components/VerificationSteps";
 import { BusinessStats } from "@/components/BusinessStats";
 import UniversalEntityCreator from "@/components/UniversalEntityCreator";
@@ -46,7 +47,7 @@ export default function Home() {
         description: "Your ChittyID has been successfully created!",
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       if (isUnauthorizedError(error)) {
         toast({
           title: "Unauthorized",
@@ -58,6 +59,17 @@ export default function Home() {
         }, 500);
         return;
       }
+      
+      // Handle mothership connection errors
+      if (error.message?.includes('mothership') || error.message?.includes('central server')) {
+        toast({
+          title: "ChittyID Mothership Offline",
+          description: "ChittyID generation requires connection to the central server at id.chitty.cc. Please wait for the server to come online.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       toast({
         title: "Error",
         description: "Failed to create ChittyID. Please try again.",

@@ -59,8 +59,29 @@ class ChittyIdService {
       return data.chittyId || data.displayFormat;
       
     } catch (error) {
-      console.warn('⚠️ Failed to connect to ChittyID mothership, using structured fallback generation:', error.message);
-      return this.generateStructuredFallbackId(domain, type);
+      console.error('❌ ChittyID mothership unavailable:', error.message);
+      throw new Error('ChittyID generation requires connection to mothership server at id.chitty.cc. Please try again when the central server is online.');
+    }
+  }
+
+  async checkMothershipStatus(): Promise<boolean> {
+    try {
+      console.log(`🔍 Checking ChittyID mothership status...`);
+      
+      const response = await fetch(`${this.mothershipUrl}/api/health`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`
+        }
+      });
+
+      const isOnline = response.ok;
+      console.log(`🌐 ChittyID mothership status: ${isOnline ? 'ONLINE' : 'OFFLINE'}`);
+      return isOnline;
+      
+    } catch (error) {
+      console.log(`🔴 ChittyID mothership OFFLINE: ${error.message}`);
+      return false;
     }
   }
 

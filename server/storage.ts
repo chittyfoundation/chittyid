@@ -168,13 +168,9 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     
-    // Sync with mothership if userId exists
+    // Sync with mothership if userId exists - this is required for authentic ChittyIDs
     if (data.userId) {
-      try {
-        await chittyIdService.syncUserWithMothership(data.userId, chittyIdCode, data);
-      } catch (error) {
-        console.warn('Failed to sync with mothership:', error);
-      }
+      await chittyIdService.syncUserWithMothership(data.userId, chittyIdCode, data);
     }
     
     return chittyId;
