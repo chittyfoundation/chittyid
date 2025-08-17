@@ -27,10 +27,10 @@ export default function Landing() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" onClick={() => window.location.href = '#auth'} data-testid="button-signin">
+              <Button variant="ghost" onClick={() => document.getElementById('auth')?.scrollIntoView({ behavior: 'smooth' })} data-testid="button-signin">
                 Sign In
               </Button>
-              <Button onClick={() => window.location.href = '#auth'} data-testid="button-get-verified">
+              <Button onClick={() => document.getElementById('auth')?.scrollIntoView({ behavior: 'smooth' })} data-testid="button-get-verified">
                 Get Verified
               </Button>
             </div>
@@ -55,7 +55,7 @@ export default function Landing() {
                 Stop proving who you are over and over. Get verified once with ChittyID and instantly access apartments, bank accounts, and services across our trusted network.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" onClick={() => window.location.href = '/api/login'} data-testid="button-start-verification">
+                <Button size="lg" onClick={() => document.getElementById('auth')?.scrollIntoView({ behavior: 'smooth' })} data-testid="button-start-verification">
                   <CheckCircle className="mr-2 h-5 w-5" />
                   Start Verification
                 </Button>
@@ -404,6 +404,21 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Authentication Section */}
+      <section id="auth" className="py-20 bg-gradient-to-br from-blue-50 to-slate-100">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8 mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6" data-testid="text-auth-title">
+            Get Your Universal ChittyID
+          </h2>
+          <p className="text-xl text-slate-600 mb-8" data-testid="text-auth-description">
+            Join the ChittyOS ecosystem with your secure, verified digital identity
+          </p>
+        </div>
+        <div className="max-w-md mx-auto">
+          <ChittyAuth />
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 bg-blue-600">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
@@ -417,7 +432,7 @@ export default function Landing() {
             <Button 
               size="lg" 
               variant="secondary" 
-              onClick={() => window.location.href = '/api/login'} 
+              onClick={() => document.getElementById('auth')?.scrollIntoView({ behavior: 'smooth' })} 
               data-testid="button-get-verified-now"
             >
               <CheckCircle className="mr-2 h-5 w-5" />
@@ -427,7 +442,7 @@ export default function Landing() {
               size="lg" 
               variant="outline" 
               className="border-blue-200 text-white hover:bg-blue-700" 
-              onClick={() => window.location.href = '/api/login'}
+              onClick={() => document.getElementById('auth')?.scrollIntoView({ behavior: 'smooth' })}
               data-testid="button-add-business"
             >
               <Building className="mr-2 h-5 w-5" />

@@ -17,6 +17,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc } from "drizzle-orm";
+import { chittyIdService } from "./chittyIdService";
 
 export interface IStorage {
   // User operations (required for ChittyAuth)
@@ -77,8 +78,12 @@ export class DatabaseStorage implements IStorage {
   async createUser(userData: { email: string; password: string; firstName?: string; lastName?: string }): Promise<User> {
     const userId = `chitty_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     
-    // Generate ChittyID for the user
-    const chittyIdCode = `CP-${new Date().getFullYear()}-VER-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Math.floor(Math.random() * 10)}`;
+    // Generate ChittyID through mothership connection with proper identity service call
+    const chittyIdCode = await chittyIdService.generateChittyId('identity', 'person', {
+      email: userData.email,
+      firstName: userData.firstName,
+      lastName: userData.lastName
+    });
     
     const [newUser] = await db.insert(users).values({
       id: userId,
@@ -91,12 +96,21 @@ export class DatabaseStorage implements IStorage {
       isVerified: false,
     }).returning();
     
+    // Sync with ChittyID mothership
+    await chittyIdService.syncUserWithMothership(userId, chittyIdCode, userData);
+    
     return newUser;
   }
 
   async verifyChittyId(chittyId: string): Promise<boolean> {
+    // First check local database
     const [existing] = await db.select().from(users).where(eq(users.chittyId, chittyId));
-    return !!existing;
+    if (existing) {
+      return true;
+    }
+    
+    // If not found locally, validate with ChittyID mothership
+    return await chittyIdService.validateChittyId(chittyId);
   }
 
   async updateUserVerification(userId: string, isVerified: boolean): Promise<void> {
