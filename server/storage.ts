@@ -152,13 +152,31 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createChittyId(data: InsertChittyId): Promise<ChittyId> {
+    // Generate ChittyID through mothership service if userId is provided
+    let chittyIdCode: string;
+    if (data.chittyIdCode) {
+      chittyIdCode = data.chittyIdCode;
+    } else {
+      chittyIdCode = await this.generateChittyIdCode();
+    }
+    
     const [chittyId] = await db
       .insert(chittyIds)
       .values({
         ...data,
-        chittyIdCode: this.generateChittyIdCode(),
+        chittyIdCode,
       })
       .returning();
+    
+    // Sync with mothership if userId exists
+    if (data.userId) {
+      try {
+        await chittyIdService.syncUserWithMothership(data.userId, chittyIdCode, data);
+      } catch (error) {
+        console.warn('Failed to sync with mothership:', error);
+      }
+    }
+    
     return chittyId;
   }
 
@@ -264,11 +282,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Helper methods
-  private generateChittyIdCode(): string {
-    const year = new Date().getFullYear();
-    const randomNum = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
-    const checkDigit = this.calculateCheckDigit(randomNum);
-    return `CH-${year}-VER-${randomNum}-${checkDigit}`;
+  private async generateChittyIdCode(): Promise<string> {
+    // Use mothership service for proper structured ID generation
+    return await chittyIdService.generateChittyId('identity', 'person', {});
   }
 
   private calculateCheckDigit(input: string): string {

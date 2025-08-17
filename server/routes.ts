@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupChittyAuth, requireAuth, optionalAuth } from "./chittyAuth";
+import { chittyIdService } from "./chittyIdService";
 import { insertVerificationSchema, insertBusinessSchema, insertVerificationRequestSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -22,8 +23,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "User already has a ChittyID" });
       }
 
-      // Generate a unique ChittyID code
-      const chittyIdCode = `CH-${new Date().getFullYear()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      // Generate ChittyID through mothership service
+      const chittyIdCode = await chittyIdService.generateChittyId('identity', 'person', {
+        userId,
+        email: req.user.email,
+        firstName: req.user.firstName,
+        lastName: req.user.lastName
+      });
       
       const chittyId = await storage.createChittyId({
         userId,

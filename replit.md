@@ -24,11 +24,21 @@ The server is built with Express.js and TypeScript, following a RESTful API desi
 The system uses PostgreSQL with Drizzle ORM for type-safe database operations. The schema implements a comprehensive identity verification system with tables for users, ChittyIDs, verifications, businesses, and verification requests. It includes proper foreign key relationships, enumerated types for status tracking, and indexing for performance. The database supports session storage for authentication and includes audit trail capabilities.
 
 ### Universal Identity Management System
-ChittyID implements a comprehensive universal identity system supporting People, Places, Things, and Events with entity-specific prefixes:
-- CP-YYYY-VER-NNNN-X (ChittyPerson for individuals)
-- CL-YYYY-VER-NNNN-X (ChittyLocation for places)
-- CT-YYYY-VER-NNNN-X (ChittyThing for objects/assets)
-- CE-YYYY-VER-NNNN-X (ChittyEvent for activities)
+ChittyID implements a comprehensive universal identity system supporting People, Places, Things, and Events with entity-specific prefixes using the structured format `VV-G-LLL-SSSS-T-YM-C-X`:
+- CP-G-LLL-SSSS-T-YM-C-X (ChittyPerson for individuals)
+- CL-G-LLL-SSSS-T-YM-C-X (ChittyLocation for places)
+- CT-G-LLL-SSSS-T-YM-C-X (ChittyThing for objects/assets)
+- CE-G-LLL-SSSS-T-YM-C-X (ChittyEvent for activities)
+
+Where:
+- VV = Vertical (CP/CL/CT/CE)
+- G = Generation (time-based epoch)
+- LLL = Location/Node identifier
+- SSSS = Sequence (time + random)
+- T = Type modifier
+- YM = Year-Month encoding  
+- C = Category
+- X = Mod-97 checksum (2 digits)
 
 The system uses advanced Mod-97 checksum validation with collision detection, PostgreSQL-based generation functions, and sophisticated trust scoring algorithms based on Herrmann Brain Dominance model. The platform features progressive verification workflows where entities advance through trust levels (L0-L5) with complete algorithmic transparency.
 
