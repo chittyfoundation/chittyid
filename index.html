@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChittyID - Official ID Generator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 30px;
+        }
+        .format-spec {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #4299e1;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        select, input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: #4299e1;
+        }
+        button {
+            background: linear-gradient(135deg, #4299e1 0%, #667eea 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #e6fffa;
+            border-radius: 5px;
+            border: 2px solid #38b2ac;
+            display: none;
+        }
+        .chittyid {
+            font-family: 'Courier New', monospace;
+            font-size: 24px;
+            font-weight: bold;
+            color: #2d3748;
+            text-align: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+        }
+        .breakdown {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .api-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #e2e8f0;
+        }
+        .endpoint {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+        }
+        .trust-levels {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .trust-level {
+            text-align: center;
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        .l0 { background: #fed7d7; color: #c53030; }
+        .l1 { background: #feebc8; color: #dd6b20; }
+        .l2 { background: #fefcbf; color: #d69e2e; }
+        .l3 { background: #c6f6d5; color: #38a169; }
+        .l4 { background: #bee3f8; color: #3182ce; }
+        .l5 { background: #e9d8fd; color: #805ad5; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🆔 ChittyID Generator</h1>
+
+        <div class="format-spec">
+            <h3>Format: VV-G-LLL-SSSS-T-YM-C-X</h3>
+            <p><strong>VV:</strong> Version | <strong>G:</strong> Region | <strong>LLL:</strong> Jurisdiction | <strong>SSSS:</strong> Sequential | <strong>T:</strong> Type | <strong>YM:</strong> Year-Month | <strong>C:</strong> Trust | <strong>X:</strong> Checksum</p>
+
+            <div class="trust-levels">
+                <div class="trust-level l0">L0 - Unverified</div>
+                <div class="trust-level l1">L1 - Basic</div>
+                <div class="trust-level l2">L2 - Standard</div>
+                <div class="trust-level l3">L3 - Verified</div>
+                <div class="trust-level l4">L4 - Premium</div>
+                <div class="trust-level l5">L5 - Official</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="region">Geographical Region:</label>
+            <select id="region">
+                <option value="1">1 - North America</option>
+                <option value="2">2 - South America</option>
+                <option value="3">3 - Europe</option>
+                <option value="4">4 - Asia</option>
+                <option value="5">5 - Africa</option>
+                <option value="6">6 - Oceania</option>
+                <option value="7">7 - Antarctica</option>
+                <option value="8">8 - International Waters</option>
+                <option value="9">9 - Digital/Virtual</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="jurisdiction">Legal Jurisdiction (3 letters):</label>
+            <input type="text" id="jurisdiction" placeholder="USA, GBR, CAN, etc." maxlength="3" style="text-transform: uppercase;">
+        </div>
+
+        <div class="form-group">
+            <label for="entityType">Entity Type:</label>
+            <select id="entityType">
+                <option value="P">ChittyPerson</option>
+                <option value="L">ChittyLocation</option>
+                <option value="T">ChittyThing</option>
+                <option value="E">ChittyEvent</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="trustLevel">Trust Level:</label>
+            <select id="trustLevel">
+                <option value="0">L0 - Unverified</option>
+                <option value="1">L1 - Basic</option>
+                <option value="2">L2 - Standard</option>
+                <option value="3">L3 - Verified</option>
+                <option value="4">L4 - Premium</option>
+                <option value="5">L5 - Official</option>
+            </select>
+        </div>
+
+        <button onclick="generateChittyID()">Generate ChittyID</button>
+        <button onclick="validateChittyID()">Validate Existing ID</button>
+
+        <div class="form-group">
+            <label for="validateInput">Validate ChittyID:</label>
+            <input type="text" id="validateInput" placeholder="Enter ChittyID to validate">
+        </div>
+
+        <div id="result" class="result">
+            <div id="chittyid" class="chittyid"></div>
+            <div id="breakdown" class="breakdown"></div>
+        </div>
+
+        <div class="api-section">
+            <h3>API Endpoints</h3>
+            <div class="endpoint">GET /api/generate?region=1&jurisdiction=USA&type=P&trust=3</div>
+            <div class="endpoint">POST /api/validate {"id": "01-1-USA-0001-P-2509-3-7"}</div>
+            <div class="endpoint">GET /api/info/{chittyid}</div>
+        </div>
+    </div>
+
+    <script src="chittyid.js"></script>
+</body>
+</html>

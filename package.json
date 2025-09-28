@@ -1,0 +1,37 @@
+{
+  "name": "chittyid-mothership",
+  "version": "1.0.0",
+  "description": "ChittyID Mothership - Management System for ChittyIDs from id.chitty.cc Service",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "wrangler build",
+    "deploy": "wrangler deploy",
+    "deploy:pages": "wrangler pages deploy dist --project-name=chittyid-mothership",
+    "tail": "wrangler tail",
+    "test": "npm run test:unit && npm run test:integration",
+    "test:unit": "vitest run",
+    "test:integration": "node tests/integration.js",
+    "setup:vectorize": "wrangler vectorize create chittyid-routing --dimensions=384 --metric=cosine",
+    "setup:agents": "echo 'AI Agents configured'",
+    "setup": "npm run setup:vectorize && npm run setup:agents",
+    "chittycheck": "/Users/nb/.claude/projects/-/chittycheck/chittycheck-enhanced.sh",
+    "compliance": "/Users/nb/.claude/projects/-/chittycheck/chittycheck-enhanced.sh --qa",
+    "security": "/Users/nb/.claude/projects/-/chittycheck/chittycheck-enhanced.sh --security"
+  },
+  "dependencies": {
+    "@cloudflare/ai": "^1.0.0",
+    "@cloudflare/workers-types": "^4.20250924.0",
+    "simple-peer": "^9.11.1",
+    "socket.io-client": "^4.5.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "vitest": "^3.2.4",
+    "wrangler": "^4.40.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

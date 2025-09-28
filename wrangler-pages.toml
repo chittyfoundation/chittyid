@@ -1,0 +1,24 @@
+name = "chittyid-mothership"
+compatibility_date = "2025-01-16"
+pages_build_output_dir = "dist"
+
+[env.production]
+route = "id.chitty.cc/*"
+
+[[kv_namespaces]]
+binding = "CHITTY_IDS"
+id = "chittyid-storage"
+
+[[kv_namespaces]]
+binding = "CHITTY_SECRETS"
+id = "chittysecrets-storage"
+
+[[vectorize]]
+binding = "CHITTY_VECTORS"
+index_name = "chittyid-embeddings"
+
+[ai]
+binding = "AI"
+
+[[analytics_engine_datasets]]
+binding = "CHITTY_ANALYTICS"

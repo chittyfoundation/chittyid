@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChittyOS Ecosystem Dashboard</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/react-grid-layout@1.4.4/build/index.js"></script>
+    <script src="https://unpkg.com/framer-motion@10/dist/framer-motion.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/react-grid-layout@1.4.4/css/styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/react-resizable@3.0.5/css/styles.css">
+    <style>
+        .react-grid-item.react-grid-placeholder {
+            background: rgb(59 130 246 / 0.5) !important;
+            border-radius: 1rem;
+            border: 2px dashed rgb(59 130 246);
+        }
+        .react-grid-item:hover {
+            filter: brightness(1.02);
+        }
+        .react-resizable-handle {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 0.5rem 0;
+        }
+        .react-resizable-handle:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="dashboard-root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+        const { motion } = FramerMotion;
+
+        // Simple icons as SVG components
+        const Plus = () => (
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+        );
+
+        const Trash2 = () => (
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+        );
+
+        const Grid = () => (
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg>
+        );
+
+        const RefreshCcw = () => (
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+        );
+
+        const Download = () => (
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+        );
+
+        const Save = () => (
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+            </svg>
+        );
+
+        const ResponsiveGridLayout = ReactGridLayout.WidthProvider(ReactGridLayout.Responsive);
+
+        // Default widgets representing ChittyOS ecosystem
+        const DEFAULT_WIDGETS = [
+            { key: "router", title: "ChittyRouter • AI Orchestration", color: "bg-sky-50", content: "6 agent patterns: case_analysis, document_review, client_communication, court_preparation, evidence_processing, intake_processing. 3 AI models integrated." },
+            { key: "chat", title: "ChittyChat • Project Threads", color: "bg-emerald-50", content: "Real-time collaboration across legal teams with topic-based conversation sync." },
+            { key: "ledger", title: "ChittyLedger • Evidence", color: "bg-amber-50", content: "8-tier evidence classification with immutable audit trails and custody management." },
+            { key: "trust", title: "ChittyTrust • 6D Trust Engine", color: "bg-indigo-50", content: "Source, Temporal, Channel, Outcome, Network, Justice dimensions for identity verification." },
+            { key: "chain", title: "ChittyChain • Blockchain", color: "bg-fuchsia-50", content: "Immutable logging with Durable Objects. Corporate actions and resolutions tracking." },
+            { key: "assets", title: "ChittyAssets • Real Assets", color: "bg-rose-50", content: "AI-powered document verification with blockchain proof and EXIF analysis." },
+            { key: "trace", title: "ChittyTrace • Forensics", color: "bg-lime-50", content: "Financial forensics with Cook County court filing integration." },
+            { key: "id", title: "ChittyID • Identity Management", color: "bg-violet-50", content: "Pipeline: Router → Intake → Trust → Authorization. IDs from id.chitty.cc service." },
+            { key: "verify", title: "ChittyVerify • Verification", color: "bg-teal-50", content: "Document verification with @cf/meta/llama-3.1-8b-instruct and ResNet-50." },
+            { key: "notion", title: "NotionSync • AtomicFacts", color: "bg-purple-50", content: "Hardened sync: ChittyRouter → EvidenceEnvelope → AtomicFacts → Notion DB." },
+            { key: "session", title: "SessionSync • Cross-Service", color: "bg-blue-50", content: "Session state across ChittyOS services with recovery checkpoints." },
+            { key: "ops", title: "ChittyOps • Observability", color: "bg-stone-50", content: "Cloudflare Workers AI Gateway with 30-second CPU optimization." }
+        ];
+
+        const DEFAULT_LAYOUT = DEFAULT_WIDGETS.map((w, i) => ({
+            i: w.key,
+            x: (i % 4) * 3,
+            y: Math.floor(i / 4) * 4,
+            w: 3,
+            h: 4,
+            minW: 2,
+            minH: 3,
+        }));
+
+        const LS_KEY = "chitty-dashboard-v3";
+
+        function Panel({ id, title, color, content, onRemove, onTitle }) {
+            return (
+                <motion.div
+                    layout
+                    className={`h-full w-full ${color} rounded-2xl shadow-sm border border-black/5 flex flex-col`}
+                >
+                    <div className="cursor-move select-none px-3 py-2 flex items-center justify-between border-b border-black/10 bg-white/60 rounded-t-2xl">
+                        <input
+                            className="bg-transparent font-semibold text-sm focus:outline-none w-full"
+                            defaultValue={title}
+                            onBlur={(e) => onTitle?.(id, e.target.value)}
+                        />
+                        <button
+                            onClick={() => onRemove?.(id)}
+                            className="ml-2 p-1 rounded hover:bg-black/5"
+                            title="Remove"
+                        >
+                            <Trash2 />
+                        </button>
+                    </div>
+                    <div className="p-3 text-sm text-black/80 overflow-auto">
+                        {content}
+                    </div>
+                </motion.div>
+            );
+        }
+
+        function ChittyDashboard() {
+            const [widgets, setWidgets] = useState(DEFAULT_WIDGETS);
+            const [layouts, setLayouts] = useState({ lg: DEFAULT_LAYOUT });
+
+            // Load from localStorage
+            useEffect(() => {
+                try {
+                    const raw = localStorage.getItem(LS_KEY);
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (parsed.layouts && parsed.widgets) {
+                            setLayouts(parsed.layouts);
+                            setWidgets(parsed.widgets);
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Failed to load dashboard state');
+                }
+            }, []);
+
+            // Persist to localStorage
+            const persist = (nextLayouts = layouts, nextWidgets = widgets) => {
+                localStorage.setItem(LS_KEY, JSON.stringify({ layouts: nextLayouts, widgets: nextWidgets }));
+            };
+
+            const widgetMap = useMemo(() => new Map(widgets.map(w => [w.key, w])), [widgets]);
+
+            const onLayoutChange = (_cur, all) => {
+                const next = { lg: all };
+                setLayouts(next);
+                persist(next, widgets);
+            };
+
+            const removeWidget = (key) => {
+                const nextWidgets = widgets.filter(w => w.key !== key);
+                const nextLayout = (layouts.lg || []).filter(l => l.i !== key);
+                const next = { lg: nextLayout };
+                setWidgets(nextWidgets);
+                setLayouts(next);
+                persist(next, nextWidgets);
+            };
+
+            const renameWidget = (key, title) => {
+                const nextWidgets = widgets.map(w => (w.key === key ? { ...w, title } : w));
+                setWidgets(nextWidgets);
+                persist(layouts, nextWidgets);
+            };
+
+            const addWidget = (w) => {
+                const exists = widgets.some(x => x.key === w.key);
+                const key = exists ? `${w.key}-${Date.now().toString(36)}` : w.key;
+                const base = { ...w, key };
+                const nextWidgets = [...widgets, base];
+                const nextLayout = [
+                    ...(layouts.lg || []),
+                    { i: key, x: 0, y: Infinity, w: 3, h: 4, minW: 2, minH: 3 },
+                ];
+                const next = { lg: nextLayout };
+                setWidgets(nextWidgets);
+                setLayouts(next);
+                persist(next, nextWidgets);
+            };
+
+            const exportJSON = () => {
+                const data = JSON.stringify({ layouts, widgets }, null, 2);
+                const blob = new Blob([data], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "chitty-ecosystem-dashboard.json";
+                a.click();
+                URL.revokeObjectURL(url);
+            };
+
+            const resetLayout = () => {
+                setLayouts({ lg: DEFAULT_LAYOUT });
+                setWidgets(DEFAULT_WIDGETS);
+                persist({ lg: DEFAULT_LAYOUT }, DEFAULT_WIDGETS);
+            };
+
+            return (
+                <div className="min-h-screen w-full flex flex-col gap-3 p-4">
+                    {/* Header */}
+                    <div className="flex flex-wrap items-center gap-2">
+                        <div className="text-xl font-bold mr-auto">ChittyOS Ecosystem Dashboard</div>
+                        <div className="text-sm text-gray-600">51+ Active Modules | AI Gateway | Pipeline Orchestration</div>
+                        <button
+                            className="px-3 py-2 rounded-xl bg-black text-white flex items-center gap-2"
+                            onClick={() => addWidget({ key: `note-${Date.now()}`, title: "Note", color: "bg-white", content: "Add your notes here..." })}
+                        >
+                            <Plus /> Add Note
+                        </button>
+                        <button className="px-3 py-2 rounded-xl bg-white border flex items-center gap-2" onClick={resetLayout}>
+                            <RefreshCcw /> Reset
+                        </button>
+                        <button className="px-3 py-2 rounded-xl bg-white border flex items-center gap-2" onClick={exportJSON}>
+                            <Download /> Export
+                        </button>
+                    </div>
+
+                    {/* Widget Catalog */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-2">
+                        {DEFAULT_WIDGETS.map((w) => (
+                            <button
+                                key={w.key}
+                                onClick={() => addWidget(w)}
+                                className="text-left p-3 rounded-xl border bg-white hover:bg-gray-50 transition-colors"
+                            >
+                                <div className="text-sm font-semibold flex items-center gap-2">
+                                    <Grid /> {w.title}
+                                </div>
+                                <div className="text-xs text-gray-600 mt-1">{w.content}</div>
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Dashboard Grid */}
+                    <div className="bg-white rounded-2xl border shadow-inner p-2 min-h-[600px]">
+                        <ResponsiveGridLayout
+                            className="layout"
+                            layouts={layouts}
+                            breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+                            cols={{ lg: 12, md: 10, sm: 8, xs: 6, xxs: 4 }}
+                            rowHeight={28}
+                            onLayoutChange={onLayoutChange}
+                            isBounded
+                            draggableHandle=".cursor-move"
+                        >
+                            {(layouts.lg || []).map((l) => {
+                                const w = widgetMap.get(l.i) || { key: l.i, title: l.i, color: "bg-white", content: "Loading..." };
+                                return (
+                                    <div key={l.i} className="h-full">
+                                        <Panel
+                                            id={w.key}
+                                            title={w.title}
+                                            color={w.color}
+                                            content={w.content}
+                                            onRemove={removeWidget}
+                                            onTitle={renameWidget}
+                                        />
+                                    </div>
+                                );
+                            })}
+                        </ResponsiveGridLayout>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="text-xs text-gray-600 flex items-center gap-3">
+                        <Save /> Auto-saves to localStorage. Drag headers to move. Resize from corners.
+                        <span className="ml-auto">ChittyID Mothership • id.chitty.cc • Powered by ChittyRouter AI Gateway</span>
+                    </div>
+                </div>
+            );
+        }
+
+        // Render the dashboard
+        ReactDOM.render(<ChittyDashboard />, document.getElementById('dashboard-root'));
+    </script>
+</body>
+</html>

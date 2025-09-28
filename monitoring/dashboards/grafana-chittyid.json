@@ -1,0 +1,317 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "ChittyID Mothership - Production Dashboard",
+    "tags": ["chittyos", "identity", "production"],
+    "timezone": "UTC",
+    "refresh": "30s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "Service Health Overview",
+        "type": "stat",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+        "targets": [
+          {
+            "expr": "sum(chitty_service_healthy)",
+            "legendFormat": "Healthy Services",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "steps": [
+                { "color": "red", "value": 0 },
+                { "color": "yellow", "value": 40 },
+                { "color": "green", "value": 50 }
+              ]
+            },
+            "unit": "short"
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Pipeline Success Rate",
+        "type": "stat",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+        "targets": [
+          {
+            "expr": "sum(rate(chitty_pipeline_success_total[5m])) / sum(rate(chitty_pipeline_total[5m])) * 100",
+            "legendFormat": "Success Rate %",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "steps": [
+                { "color": "red", "value": 0 },
+                { "color": "yellow", "value": 95 },
+                { "color": "green", "value": 99 }
+              ]
+            },
+            "unit": "percent",
+            "min": 0,
+            "max": 100
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Request Rate",
+        "type": "graph",
+        "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
+        "targets": [
+          {
+            "expr": "sum(rate(chitty_requests_total[1m]))",
+            "legendFormat": "Total Requests/min",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(rate(chitty_pipeline_total[1m]))",
+            "legendFormat": "Pipeline Requests/min",
+            "refId": "B"
+          },
+          {
+            "expr": "sum(rate(chitty_api_requests_total[1m]))",
+            "legendFormat": "API Requests/min",
+            "refId": "C"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Requests per minute",
+            "min": 0
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Pipeline Stage Performance",
+        "type": "graph",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(chitty_pipeline_stage_duration_seconds_bucket[5m])) by (le, stage))",
+            "legendFormat": "{{stage}} p95",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.50, sum(rate(chitty_pipeline_stage_duration_seconds_bucket[5m])) by (le, stage))",
+            "legendFormat": "{{stage}} p50",
+            "refId": "B"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Duration (seconds)",
+            "min": 0
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Session Sync Health",
+        "type": "stat",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+        "targets": [
+          {
+            "expr": "chitty_session_sync_healthy",
+            "legendFormat": "Synced Services",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(chitty_session_conflicts_total)",
+            "legendFormat": "Total Conflicts",
+            "refId": "B"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "steps": [
+                { "color": "red", "value": 0 },
+                { "color": "yellow", "value": 45 },
+                { "color": "green", "value": 50 }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 6,
+        "title": "Error Rate by Type",
+        "type": "graph",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+        "targets": [
+          {
+            "expr": "sum(rate(chitty_errors_total[5m])) by (error_type)",
+            "legendFormat": "{{error_type}}",
+            "refId": "A"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Errors per minute",
+            "min": 0
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Notion Sync Status",
+        "type": "stat",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
+        "targets": [
+          {
+            "expr": "chitty_notion_dlq_size",
+            "legendFormat": "DLQ Size",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(rate(chitty_notion_sync_success_total[5m]))",
+            "legendFormat": "Sync Rate/min",
+            "refId": "B"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "steps": [
+                { "color": "green", "value": 0 },
+                { "color": "yellow", "value": 50 },
+                { "color": "red", "value": 100 }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 8,
+        "title": "API Response Times",
+        "type": "graph",
+        "gridPos": { "h": 8, "w": 24, "x": 0, "y": 32 },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(chitty_api_duration_seconds_bucket[5m])) by (le, endpoint))",
+            "legendFormat": "{{endpoint}} p95",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.50, sum(rate(chitty_api_duration_seconds_bucket[5m])) by (le, endpoint))",
+            "legendFormat": "{{endpoint}} p50",
+            "refId": "B"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Response Time (seconds)",
+            "min": 0
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "ChittyOS Service Status",
+        "type": "table",
+        "gridPos": { "h": 12, "w": 24, "x": 0, "y": 40 },
+        "targets": [
+          {
+            "expr": "chitty_service_healthy",
+            "legendFormat": "{{service}}",
+            "refId": "A",
+            "format": "table"
+          }
+        ],
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "columns": [
+                { "text": "Service", "value": "service" },
+                { "text": "Status", "value": "Value" },
+                { "text": "Last Check", "value": "Time" }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "Resource Utilization",
+        "type": "graph",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 52 },
+        "targets": [
+          {
+            "expr": "chitty_kv_operations_total",
+            "legendFormat": "KV Operations",
+            "refId": "A"
+          },
+          {
+            "expr": "chitty_d1_queries_total",
+            "legendFormat": "D1 Queries",
+            "refId": "B"
+          },
+          {
+            "expr": "chitty_vectorize_operations_total",
+            "legendFormat": "Vectorize Operations",
+            "refId": "C"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Operations per minute",
+            "min": 0
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "Trust Level Distribution",
+        "type": "piechart",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 52 },
+        "targets": [
+          {
+            "expr": "sum by (trust_level) (chitty_ids_by_trust_level)",
+            "legendFormat": "L{{trust_level}}",
+            "refId": "A"
+          }
+        ]
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "environment",
+          "type": "custom",
+          "options": [
+            { "text": "Production", "value": "prod" },
+            { "text": "Staging", "value": "staging" }
+          ],
+          "current": { "text": "Production", "value": "prod" }
+        }
+      ]
+    },
+    "annotations": {
+      "list": [
+        {
+          "name": "Deployments",
+          "datasource": "prometheus",
+          "expr": "chitty_deployment_event",
+          "titleFormat": "Deployment: {{version}}",
+          "textFormat": "{{description}}"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "name": "chittyid-cli",
+  "version": "2.0.0",
+  "description": "ChittyID CLI - TypeScript Production Implementation for central ID minting and validation",
+  "schemaVersion": 1,
+  "author": "ChittyOS",
+  "license": "MIT",
+  "mcpVersion": "2024-11-05",
+  "capabilities": {
+    "tools": {
+      "chittyid": {
+        "name": "chittyid",
+        "description": "Interact with ChittyID system for identity management",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "command": {
+              "type": "string",
+              "enum": ["gen", "generate", "register", "validate", "soft-mint", "hard-mint"],
+              "description": "Command to execute"
+            },
+            "type": {
+              "type": "string",
+              "description": "Type parameter for gen/register commands (e.g., 'person', 'document')"
+            },
+            "payload": {
+              "type": "string",
+              "description": "JSON payload for register command"
+            },
+            "id": {
+              "type": "string",
+              "description": "ChittyID for validate/mint commands"
+            },
+            "maxGas": {
+              "type": "string",
+              "description": "Maximum gas in wei for hard mint (optional)"
+            }
+          },
+          "required": ["command"],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "runtime": {
+    "executable": "node",
+    "args": ["chitty-cli.ts"],
+    "environment": {
+      "required": [
+        "CHITTY_API_KEY"
+      ],
+      "optional": [
+        "CHITTY_BASE_URL",
+        "CHITTY_STORAGE"
+      ]
+    }
+  },
+  "documentation": {
+    "usage": "Commands:\n  gen <type>                  Generate new ChittyID (canonical service only)\n  register <type> <json>      Register evidence for ChittyID\n  validate <id>               Validate ChittyID format and existence\n  soft-mint <id>              Soft mint (off-chain attestation)\n  hard-mint <id> [maxGas]     Hard mint (on-chain anchoring)",
+    "examples": [
+      {
+        "command": "gen",
+        "type": "person",
+        "description": "Generate a new ChittyID for a person"
+      },
+      {
+        "command": "register",
+        "type": "person",
+        "payload": "{\"name\":\"Kimber\",\"email\":\"kimber@vanguardassociates.com\"}",
+        "description": "Register evidence for a person"
+      },
+      {
+        "command": "validate",
+        "id": "01-1-ABC-1234-P-25-1-82",
+        "description": "Validate a ChittyID"
+      },
+      {
+        "command": "soft-mint",
+        "id": "01-1-ABC-1234-P-25-1-82",
+        "description": "Soft mint a ChittyID (off-chain)"
+      },
+      {
+        "command": "hard-mint",
+        "id": "01-1-ABC-1234-P-25-1-82",
+        "maxGas": "1000000000000000",
+        "description": "Hard mint a ChittyID (on-chain)"
+      }
+    ],
+    "security": {
+      "note": "CRITICAL: This CLI enforces central service minting only. No local ChittyID generation is permitted.",
+      "canonical_service": "https://id.chitty.cc",
+      "endpoints": {
+        "generate": "POST /v1/identity/chitty-id",
+        "register": "POST /v1/evidence/items",
+        "validate": "GET /v1/verify/status"
+      }
+    }
+  },
+  "metadata": {
+    "chittyos": {
+      "service": "chittyid-mothership",
+      "enforcement_level": "MAXIMUM",
+      "pipeline_required": true,
+      "bypassable": false
+    }
+  }
+}

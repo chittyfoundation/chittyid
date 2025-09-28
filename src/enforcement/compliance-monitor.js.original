@@ -1,0 +1,495 @@
+/**
+ * Compliance Monitor for Pipeline Enforcement
+ * Ensures 100% compliance with mandatory pipeline architecture
+ */
+
+export class ComplianceMonitor {
+  constructor(env) {
+    this.env = env;
+    this.complianceRules = {
+      // RULE 1: No ChittyID generation without pipeline
+      mandatoryPipeline: true,
+
+      // RULE 2: All stages must be completed
+      requiredStages: ['router', 'intake', 'trust', 'authorization', 'generation'],
+
+      // RULE 3: Session validation is mandatory
+      sessionRequired: true,
+
+      // RULE 4: Authentication is mandatory
+      authRequired: true,
+
+      // RULE 5: No bypass mechanisms allowed
+      bypassProhibited: true
+    };
+
+    this.violations = new Map();
+    this.alerts = [];
+  }
+
+  /**
+   * Monitor compliance for all requests
+   */
+  async monitor(request, stage, context = {}) {
+    const monitoringId = this.generateMonitoringId();
+    const timestamp = new Date().toISOString();
+
+    try {
+      // Check each compliance rule
+      const violations = await this.checkCompliance(request, stage, context);
+
+      if (violations.length > 0) {
+        await this.recordViolations(monitoringId, violations, request, stage);
+        await this.triggerAlerts(violations, request, stage);
+
+        return {
+          compliant: false,
+          violations,
+          monitoringId,
+          action: 'BLOCK'
+        };
+      }
+
+      // Record successful compliance
+      await this.recordCompliance(monitoringId, request, stage, context);
+
+      return {
+        compliant: true,
+        monitoringId,
+        action: 'ALLOW'
+      };
+
+    } catch (error) {
+      console.error('Compliance monitoring error:', error);
+
+      // Fail secure - block if monitoring fails
+      return {
+        compliant: false,
+        violations: [{
+          rule: 'MONITORING_FAILURE',
+          severity: 'CRITICAL',
+          message: 'Compliance monitoring system failure'
+        }],
+        monitoringId,
+        action: 'BLOCK'
+      };
+    }
+  }
+
+  /**
+   * Check all compliance rules
+   */
+  async checkCompliance(request, stage, context) {
+    const violations = [];
+
+    // RULE 1: Mandatory Pipeline Check
+    if (this.isGenerationRequest(request)) {
+      const pipelineViolation = await this.checkMandatoryPipeline(request, context);
+      if (pipelineViolation) {
+        violations.push(pipelineViolation);
+      }
+    }
+
+    // RULE 2: Stage Completion Check
+    const stageViolation = await this.checkStageCompletion(request, stage, context);
+    if (stageViolation) {
+      violations.push(stageViolation);
+    }
+
+    // RULE 3: Session Validation Check
+    const sessionViolation = await this.checkSessionRequirement(request, context);
+    if (sessionViolation) {
+      violations.push(sessionViolation);
+    }
+
+    // RULE 4: Authentication Check
+    const authViolation = await this.checkAuthRequirement(request, context);
+    if (authViolation) {
+      violations.push(authViolation);
+    }
+
+    // RULE 5: Bypass Detection Check
+    const bypassViolation = await this.checkBypassAttempts(request, context);
+    if (bypassViolation) {
+      violations.push(bypassViolation);
+    }
+
+    return violations;
+  }
+
+  /**
+   * Check if request is for ChittyID generation
+   */
+  isGenerationRequest(request) {
+    const url = new URL(request.url);
+    const path = url.pathname;
+
+    return path.includes('get-chittyid') ||
+           path.includes('generate') ||
+           path.includes('create') ||
+           path.includes('mint');
+  }
+
+  /**
+   * Check mandatory pipeline compliance
+   */
+  async checkMandatoryPipeline(request, context) {
+    if (!this.complianceRules.mandatoryPipeline) {
+      return null;
+    }
+
+    // Check if request has pipeline context
+    const sessionId = request.headers.get('X-Session-ID');
+    const pipelineToken = request.headers.get('X-Pipeline-Token');
+
+    if (!sessionId || !pipelineToken) {
+      return {
+        rule: 'MANDATORY_PIPELINE',
+        severity: 'CRITICAL',
+        message: 'ChittyID generation requires completed pipeline',
+        details: {
+          missingSessionId: !sessionId,
+          missingPipelineToken: !pipelineToken
+        }
+      };
+    }
+
+    // Verify pipeline completion in session
+    const sessionData = await this.env.SESSIONS.get(`session:${sessionId}`);
+    if (!sessionData) {
+      return {
+        rule: 'MANDATORY_PIPELINE',
+        severity: 'CRITICAL',
+        message: 'Invalid or expired session',
+        details: { sessionId }
+      };
+    }
+
+    const session = JSON.parse(sessionData);
+    const completedStages = session.pipeline?.completedStages || [];
+
+    const missingStages = this.complianceRules.requiredStages.filter(
+      stage => !completedStages.includes(stage)
+    );
+
+    if (missingStages.length > 0) {
+      return {
+        rule: 'MANDATORY_PIPELINE',
+        severity: 'CRITICAL',
+        message: 'Pipeline stages incomplete',
+        details: {
+          completed: completedStages,
+          missing: missingStages,
+          required: this.complianceRules.requiredStages
+        }
+      };
+    }
+
+    return null;
+  }
+
+  /**
+   * Check stage completion requirements
+   */
+  async checkStageCompletion(request, stage, context) {
+    // This would check stage-specific requirements
+    // For now, basic validation
+    return null;
+  }
+
+  /**
+   * Check session requirement compliance
+   */
+  async checkSessionRequirement(request, context) {
+    if (!this.complianceRules.sessionRequired) {
+      return null;
+    }
+
+    const sessionId = request.headers.get('X-Session-ID');
+
+    if (!sessionId) {
+      return {
+        rule: 'SESSION_REQUIRED',
+        severity: 'HIGH',
+        message: 'Session ID is required for all ChittyID operations'
+      };
+    }
+
+    // Verify session exists and is valid
+    const sessionData = await this.env.SESSIONS.get(`session:${sessionId}`);
+    if (!sessionData) {
+      return {
+        rule: 'SESSION_REQUIRED',
+        severity: 'HIGH',
+        message: 'Session is invalid or expired',
+        details: { sessionId }
+      };
+    }
+
+    return null;
+  }
+
+  /**
+   * Check authentication requirement compliance
+   */
+  async checkAuthRequirement(request, context) {
+    if (!this.complianceRules.authRequired) {
+      return null;
+    }
+
+    const authHeader = request.headers.get('Authorization');
+
+    if (!authHeader) {
+      return {
+        rule: 'AUTH_REQUIRED',
+        severity: 'HIGH',
+        message: 'Authentication is required for ChittyID operations'
+      };
+    }
+
+    // Basic auth header format check
+    if (!authHeader.startsWith('Bearer ')) {
+      return {
+        rule: 'AUTH_REQUIRED',
+        severity: 'HIGH',
+        message: 'Invalid authentication format',
+        details: { format: 'Bearer token required' }
+      };
+    }
+
+    return null;
+  }
+
+  /**
+   * Check for bypass attempts
+   */
+  async checkBypassAttempts(request, context) {
+    if (!this.complianceRules.bypassProhibited) {
+      return null;
+    }
+
+    // Check for bypass headers
+    const suspiciousHeaders = [
+      'x-bypass-pipeline',
+      'x-skip-auth',
+      'x-admin-override',
+      'x-emergency-access'
+    ];
+
+    for (const [name, value] of request.headers) {
+      if (suspiciousHeaders.includes(name.toLowerCase())) {
+        return {
+          rule: 'BYPASS_PROHIBITED',
+          severity: 'CRITICAL',
+          message: 'Bypass attempts are strictly prohibited',
+          details: {
+            header: name,
+            value: value.substring(0, 50) // Truncate for logging
+          }
+        };
+      }
+    }
+
+    // Check URL for bypass parameters
+    const url = new URL(request.url);
+    const suspiciousParams = ['bypass', 'skip', 'override', 'direct'];
+
+    for (const param of suspiciousParams) {
+      if (url.searchParams.has(param)) {
+        return {
+          rule: 'BYPASS_PROHIBITED',
+          severity: 'CRITICAL',
+          message: 'Bypass parameters are strictly prohibited',
+          details: {
+            parameter: param,
+            value: url.searchParams.get(param)
+          }
+        };
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Record compliance violations
+   */
+  async recordViolations(monitoringId, violations, request, stage) {
+    const violationRecord = {
+      id: monitoringId,
+      timestamp: new Date().toISOString(),
+      url: request.url,
+      method: request.method,
+      stage,
+      violations,
+      severity: this.getMaxSeverity(violations),
+      ip: request.headers.get('CF-Connecting-IP'),
+      userAgent: request.headers.get('User-Agent')
+    };
+
+    // Store violation record
+    await this.env.AUTH_CACHE.put(
+      `compliance:violation:${monitoringId}`,
+      JSON.stringify(violationRecord),
+      { expirationTtl: 86400 * 90 } // Keep for 90 days
+    );
+
+    // Update violation counters
+    for (const violation of violations) {
+      const counterKey = `metrics:violations:${violation.rule}`;
+      const current = await this.env.AUTH_CACHE.get(counterKey);
+      const count = current ? parseInt(current) + 1 : 1;
+
+      await this.env.AUTH_CACHE.put(
+        counterKey,
+        count.toString(),
+        { expirationTtl: 86400 }
+      );
+    }
+  }
+
+  /**
+   * Record successful compliance
+   */
+  async recordCompliance(monitoringId, request, stage, context) {
+    const complianceRecord = {
+      id: monitoringId,
+      timestamp: new Date().toISOString(),
+      url: request.url,
+      method: request.method,
+      stage,
+      status: 'COMPLIANT'
+    };
+
+    // Store compliance record (sampling for performance)
+    if (Math.random() < 0.1) { // Sample 10%
+      await this.env.AUTH_CACHE.put(
+        `compliance:success:${monitoringId}`,
+        JSON.stringify(complianceRecord),
+        { expirationTtl: 86400 * 7 } // Keep for 7 days
+      );
+    }
+
+    // Update compliance counter
+    const counterKey = 'metrics:compliance:success';
+    const current = await this.env.AUTH_CACHE.get(counterKey);
+    const count = current ? parseInt(current) + 1 : 1;
+
+    await this.env.AUTH_CACHE.put(
+      counterKey,
+      count.toString(),
+      { expirationTtl: 86400 }
+    );
+  }
+
+  /**
+   * Trigger alerts for violations
+   */
+  async triggerAlerts(violations, request, stage) {
+    const criticalViolations = violations.filter(v => v.severity === 'CRITICAL');
+
+    if (criticalViolations.length > 0) {
+      const alert = {
+        timestamp: new Date().toISOString(),
+        type: 'COMPLIANCE_VIOLATION',
+        severity: 'CRITICAL',
+        stage,
+        url: request.url,
+        violations: criticalViolations,
+        ip: request.headers.get('CF-Connecting-IP')
+      };
+
+      // Store alert
+      await this.env.AUTH_CACHE.put(
+        `alert:compliance:${Date.now()}`,
+        JSON.stringify(alert),
+        { expirationTtl: 86400 * 30 } // Keep alerts for 30 days
+      );
+
+      console.error('CRITICAL COMPLIANCE VIOLATION:', alert);
+    }
+  }
+
+  /**
+   * Get maximum severity from violations
+   */
+  getMaxSeverity(violations) {
+    const severityLevels = { 'LOW': 1, 'MEDIUM': 2, 'HIGH': 3, 'CRITICAL': 4 };
+    let maxLevel = 0;
+    let maxSeverity = 'LOW';
+
+    for (const violation of violations) {
+      const level = severityLevels[violation.severity] || 1;
+      if (level > maxLevel) {
+        maxLevel = level;
+        maxSeverity = violation.severity;
+      }
+    }
+
+    return maxSeverity;
+  }
+
+  /**
+   * Generate unique monitoring ID
+   */
+  generateMonitoringId() {
+    return `monitor-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  /**
+   * Get compliance statistics
+   */
+  async getComplianceStats() {
+    const stats = {
+      violations: {},
+      totalCompliant: 0,
+      totalViolations: 0
+    };
+
+    // Get violation counts
+    const violationKeys = await this.env.AUTH_CACHE.list({ prefix: 'metrics:violations:' });
+    for (const key of violationKeys.keys) {
+      const rule = key.name.replace('metrics:violations:', '');
+      const count = await this.env.AUTH_CACHE.get(key.name);
+      stats.violations[rule] = parseInt(count) || 0;
+      stats.totalViolations += stats.violations[rule];
+    }
+
+    // Get compliance count
+    const complianceCount = await this.env.AUTH_CACHE.get('metrics:compliance:success');
+    stats.totalCompliant = parseInt(complianceCount) || 0;
+
+    // Calculate compliance rate
+    const total = stats.totalCompliant + stats.totalViolations;
+    stats.complianceRate = total > 0 ? (stats.totalCompliant / total) * 100 : 100;
+
+    return stats;
+  }
+
+  /**
+   * Reset compliance monitoring (admin function)
+   */
+  async resetMonitoring() {
+    // Clear violation counters
+    const violationKeys = await this.env.AUTH_CACHE.list({ prefix: 'metrics:violations:' });
+    for (const key of violationKeys.keys) {
+      await this.env.AUTH_CACHE.delete(key.name);
+    }
+
+    // Clear compliance counter
+    await this.env.AUTH_CACHE.delete('metrics:compliance:success');
+
+    console.log('Compliance monitoring statistics reset');
+  }
+}
+
+/**
+ * Middleware factory for compliance monitoring
+ */
+export function createComplianceMonitor(env) {
+  const monitor = new ComplianceMonitor(env);
+
+  return async (request, stage, context = {}) => {
+    return monitor.monitor(request, stage, context);
+  };
+}

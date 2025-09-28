@@ -1,0 +1,216 @@
+---
+# ChittyID Monitoring Infrastructure Ansible Playbook
+# Deploys and manages monitoring across multiple servers
+
+- name: Deploy ChittyID Monitoring Infrastructure
+  hosts: monitoring_servers
+  become: yes
+  vars:
+    monitoring_path: /opt/chittyid-monitoring
+    monitoring_user: chittymon
+    grafana_domain: grafana.chitty.cc
+    prometheus_domain: prometheus.chitty.cc
+    alertmanager_domain: alerts.chitty.cc
+
+  tasks:
+    - name: Create monitoring user
+      user:
+        name: "{{ monitoring_user }}"
+        shell: /bin/bash
+        groups: docker
+        append: yes
+        create_home: yes
+
+    - name: Install required packages
+      apt:
+        name:
+          - docker.io
+          - docker-compose
+          - python3-pip
+          - git
+          - curl
+          - jq
+          - certbot
+          - nginx
+        state: present
+        update_cache: yes
+
+    - name: Install Python Docker module
+      pip:
+        name:
+          - docker
+          - docker-compose
+
+    - name: Create monitoring directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ monitoring_user }}"
+        group: "{{ monitoring_user }}"
+        mode: '0755'
+      loop:
+        - "{{ monitoring_path }}"
+        - "{{ monitoring_path }}/data"
+        - "{{ monitoring_path }}/data/prometheus"
+        - "{{ monitoring_path }}/data/grafana"
+        - "{{ monitoring_path }}/data/alertmanager"
+        - "{{ monitoring_path }}/data/loki"
+        - "{{ monitoring_path }}/logs"
+        - "{{ monitoring_path }}/backups"
+        - "{{ monitoring_path }}/nginx/ssl"
+
+    - name: Copy monitoring configuration
+      synchronize:
+        src: ../
+        dest: "{{ monitoring_path }}"
+        delete: no
+        recursive: yes
+        owner: no
+        group: no
+        exclude:
+          - data/
+          - logs/
+          - backups/
+          - .git/
+
+    - name: Template environment file
+      template:
+        src: env.j2
+        dest: "{{ monitoring_path }}/.env"
+        owner: "{{ monitoring_user }}"
+        group: "{{ monitoring_user }}"
+        mode: '0600'
+
+    - name: Generate SSL certificates with Let's Encrypt
+      command: |
+        certbot certonly --standalone --non-interactive --agree-tos
+        --email ops@chitty.cc -d {{ item }}
+      args:
+        creates: "/etc/letsencrypt/live/{{ item }}/fullchain.pem"
+      loop:
+        - "{{ grafana_domain }}"
+        - "{{ prometheus_domain }}"
+        - "{{ alertmanager_domain }}"
+      ignore_errors: yes
+
+    - name: Copy SSL certificates
+      copy:
+        src: "/etc/letsencrypt/live/{{ item }}/{{ item.split('.')[-1] }}"
+        dest: "{{ monitoring_path }}/nginx/ssl/{{ item }}.{{ item.split('.')[-1] }}"
+        remote_src: yes
+        owner: "{{ monitoring_user }}"
+        group: "{{ monitoring_user }}"
+      loop:
+        - "{{ grafana_domain }}"
+        - "{{ prometheus_domain }}"
+        - "{{ alertmanager_domain }}"
+      ignore_errors: yes
+
+    - name: Deploy Docker Compose stack
+      docker_compose:
+        project_src: "{{ monitoring_path }}"
+        files:
+          - docker-compose.yml
+          - docker-compose.production.yml
+        state: present
+        pull: yes
+      become_user: "{{ monitoring_user }}"
+
+    - name: Create systemd service
+      template:
+        src: monitoring.service.j2
+        dest: /etc/systemd/system/chittyid-monitoring.service
+        mode: '0644'
+
+    - name: Enable and start monitoring service
+      systemd:
+        name: chittyid-monitoring
+        enabled: yes
+        state: started
+        daemon_reload: yes
+
+    - name: Configure firewall rules
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop:
+        - "22"
+        - "80"
+        - "443"
+        - "9090"  # Prometheus
+        - "3000"  # Grafana
+        - "9093"  # AlertManager
+
+    - name: Setup backup cron job
+      cron:
+        name: "ChittyID monitoring backup"
+        minute: "0"
+        hour: "2"
+        job: "{{ monitoring_path }}/backup.sh"
+        user: "{{ monitoring_user }}"
+
+    - name: Check service health
+      uri:
+        url: "http://localhost:{{ item.port }}/{{ item.path }}"
+        status_code: 200
+        timeout: 30
+      loop:
+        - { port: 3000, path: "api/health" }  # Grafana
+        - { port: 9090, path: "-/healthy" }   # Prometheus
+        - { port: 9093, path: "-/healthy" }   # AlertManager
+      retries: 10
+      delay: 10
+
+    - name: Import Grafana dashboards
+      uri:
+        url: "http://localhost:3000/api/dashboards/db"
+        method: POST
+        user: admin
+        password: "{{ grafana_admin_password }}"
+        body_format: json
+        body: "{{ lookup('file', '../dashboards/grafana-chittyid.json') }}"
+        status_code: 200
+      ignore_errors: yes
+
+- name: Configure monitoring clients
+  hosts: chittyos_services
+  become: yes
+  vars:
+    prometheus_server: prometheus.chitty.cc
+
+  tasks:
+    - name: Install node exporter
+      apt:
+        name: prometheus-node-exporter
+        state: present
+
+    - name: Configure node exporter
+      lineinfile:
+        path: /etc/default/prometheus-node-exporter
+        regexp: '^ARGS='
+        line: 'ARGS="--collector.systemd --collector.processes"'
+
+    - name: Start node exporter
+      systemd:
+        name: prometheus-node-exporter
+        enabled: yes
+        state: started
+
+    - name: Install custom metrics exporter
+      copy:
+        src: chittyid-exporter.py
+        dest: /usr/local/bin/chittyid-exporter
+        mode: '0755'
+
+    - name: Create metrics exporter service
+      template:
+        src: chittyid-exporter.service.j2
+        dest: /etc/systemd/system/chittyid-exporter.service
+
+    - name: Start metrics exporter
+      systemd:
+        name: chittyid-exporter
+        enabled: yes
+        state: started
+        daemon_reload: yes

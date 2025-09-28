@@ -1,0 +1,176 @@
+# Prometheus Configuration for ChittyID Monitoring
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alerts/*.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+scrape_configs:
+  # ChittyID Mothership - Main Service
+  - job_name: 'chittyid-mothership'
+    static_configs:
+      - targets: ['id.chitty.cc:443']
+    scheme: https
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    honor_labels: true
+
+  # ChittyOS Core Services
+  - job_name: 'chittyos-core'
+    static_configs:
+      - targets:
+        - 'core.chitty.cc:443'
+        - 'standard.chitty.cc:443'
+        - 'ops.chitty.cc:443'
+        - 'beacon.chitty.cc:443'
+    scheme: https
+    metrics_path: '/health/metrics'
+    scrape_interval: 30s
+
+  # Identity & Security Services
+  - job_name: 'chittyos-identity'
+    static_configs:
+      - targets:
+        - 'verify.chitty.cc:443'
+        - 'trust.chitty.cc:443'
+        - 'chain.chitty.cc:443'
+        - 'ledger.chitty.cc:443'
+        - 'certify.chitty.cc:443'
+        - 'auth.chitty.cc:443'
+    scheme: https
+    metrics_path: '/api/metrics'
+    scrape_interval: 30s
+
+  # Business Operations
+  - job_name: 'chittyos-business'
+    static_configs:
+      - targets:
+        - 'force.chitty.cc:443'
+        - 'entry.chitty.cc:443'
+        - 'can.chitty.cc:443'
+        - 'chronicle.chitty.cc:443'
+    scheme: https
+    metrics_path: '/metrics'
+    scrape_interval: 45s
+
+  # Legal Technology
+  - job_name: 'chittyos-legal'
+    static_configs:
+      - targets:
+        - 'trace.chitty.cc:443'
+        - 'intel.chitty.cc:443'
+        - 'resolution.chitty.cc:443'
+        - 'evidence.chitty.cc:443'
+        - 'forge.chitty.cc:443'
+        - 'flow.chitty.cc:443'
+    scheme: https
+    metrics_path: '/api/health/metrics'
+    scrape_interval: 60s
+
+  # Support Systems
+  - job_name: 'chittyos-support'
+    static_configs:
+      - targets:
+        - 'assets.chitty.cc:443'
+        - 'monitor.chitty.cc:443'
+        - 'insight.chitty.cc:443'
+        - 'chat.chitty.cc:443'
+        - 'cleaner.chitty.cc:443'
+        - 'formfill.chitty.cc:443'
+        - 'finance.chitty.cc:443'
+        - 'landing.chitty.cc:443'
+        - 'dashboard.chitty.cc:443'
+    scheme: https
+    metrics_path: '/metrics'
+    scrape_interval: 60s
+
+  # AI & Router Services
+  - job_name: 'chittyos-ai'
+    static_configs:
+      - targets:
+        - 'router.chitty.cc:443'
+    scheme: https
+    metrics_path: '/api/metrics'
+    scrape_interval: 30s
+
+  # Integration Services
+  - job_name: 'chittyos-integration'
+    static_configs:
+      - targets:
+        - 'notion.chitty.cc:443'
+        - 'session.chitty.cc:443'
+        - 'topic.chitty.cc:443'
+    scheme: https
+    metrics_path: '/bridge/metrics'
+    scrape_interval: 30s
+
+  # Governance & Compliance
+  - job_name: 'chittyos-governance'
+    static_configs:
+      - targets:
+        - 'gov.chitty.cc:443'
+    scheme: https
+    metrics_path: '/compliance/metrics'
+    scrape_interval: 120s
+
+  # Cloudflare Analytics (via API)
+  - job_name: 'cloudflare-analytics'
+    static_configs:
+      - targets: ['api.cloudflare.com:443']
+    scheme: https
+    metrics_path: '/client/v4/zones/analytics/dashboard'
+    params:
+      since: ['2023-01-01T00:00:00Z']
+      until: ['2023-12-31T23:59:59Z']
+    bearer_token_file: '/etc/prometheus/cloudflare-token'
+    scrape_interval: 300s
+
+# Remote write configuration for long-term storage
+remote_write:
+  - url: "https://prometheus.chitty.cc/api/v1/write"
+    queue_config:
+      max_samples_per_send: 1000
+      max_shards: 200
+      capacity: 2500
+
+# Recording rules for performance
+recording_rules:
+  - name: chittyid_aggregates
+    rules:
+      - record: chitty:request_rate_5m
+        expr: sum(rate(chitty_requests_total[5m]))
+
+      - record: chitty:error_rate_5m
+        expr: sum(rate(chitty_errors_total[5m])) / sum(rate(chitty_requests_total[5m]))
+
+      - record: chitty:pipeline_success_rate_5m
+        expr: sum(rate(chitty_pipeline_success_total[5m])) / sum(rate(chitty_pipeline_total[5m]))
+
+      - record: chitty:response_time_p95_5m
+        expr: histogram_quantile(0.95, sum(rate(chitty_api_duration_seconds_bucket[5m])) by (le))
+
+      - record: chitty:healthy_services
+        expr: sum(chitty_service_healthy)
+
+      - record: chitty:session_sync_success_rate
+        expr: sum(rate(chitty_session_sync_success_total[5m])) / sum(rate(chitty_session_sync_total[5m]))
+
+# Metric relabeling for consistent naming
+metric_relabel_configs:
+  - source_labels: [__name__]
+    regex: 'cloudflare_(.*)'
+    target_label: '__name__'
+    replacement: 'chitty_cf_${1}'
+
+  - source_labels: [job]
+    regex: 'chittyos-(.*)'
+    target_label: 'chitty_service_group'
+    replacement: '${1}'

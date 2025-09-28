@@ -1,0 +1,202 @@
+groups:
+  - name: chittyid-critical
+    rules:
+      - alert: ChittyIDPipelineDown
+        expr: chitty_pipeline_healthy == 0
+        for: 30s
+        labels:
+          severity: critical
+          service: chittyid
+          component: pipeline
+        annotations:
+          summary: "ChittyID pipeline is completely down"
+          description: "The ChittyID pipeline has been unavailable for {{ $for }}. No new IDs can be requested."
+          runbook_url: "https://ops.chitty.cc/runbooks/pipeline-down"
+
+      - alert: ChittyIDServiceUnavailable
+        expr: chitty_service_healthy < 40
+        for: 2m
+        labels:
+          severity: critical
+          service: chittyid
+          component: ecosystem
+        annotations:
+          summary: "Critical number of ChittyOS services are down"
+          description: "Only {{ $value }} out of 51+ services are healthy. System stability at risk."
+          runbook_url: "https://ops.chitty.cc/runbooks/service-cascade-failure"
+
+      - alert: ChittyIDHighErrorRate
+        expr: sum(rate(chitty_errors_total[5m])) / sum(rate(chitty_requests_total[5m])) > 0.1
+        for: 3m
+        labels:
+          severity: critical
+          service: chittyid
+          component: api
+        annotations:
+          summary: "ChittyID error rate is critically high"
+          description: "Error rate is {{ $value | humanizePercentage }}. Threshold: 10%"
+          runbook_url: "https://ops.chitty.cc/runbooks/high-error-rate"
+
+  - name: chittyid-warning
+    rules:
+      - alert: ChittyIDPipelineStageTimeout
+        expr: histogram_quantile(0.95, sum(rate(chitty_pipeline_stage_duration_seconds_bucket[5m])) by (le, stage)) > 10
+        for: 5m
+        labels:
+          severity: warning
+          service: chittyid
+          component: pipeline
+        annotations:
+          summary: "Pipeline stage {{ $labels.stage }} is running slowly"
+          description: "Stage {{ $labels.stage }} p95 latency is {{ $value }}s. Normal threshold: 10s"
+          runbook_url: "https://ops.chitty.cc/runbooks/pipeline-performance"
+
+      - alert: ChittyIDSessionSyncIssues
+        expr: chitty_session_sync_failures > 10
+        for: 5m
+        labels:
+          severity: warning
+          service: chittyid
+          component: session-sync
+        annotations:
+          summary: "Session synchronization experiencing issues"
+          description: "{{ $value }} session sync failures in the last 5 minutes"
+          runbook_url: "https://ops.chitty.cc/runbooks/session-sync"
+
+      - alert: ChittyIDNotionDLQFull
+        expr: chitty_notion_dlq_size > 100
+        for: 10m
+        labels:
+          severity: warning
+          service: chittyid
+          component: notion-sync
+        annotations:
+          summary: "Notion sync DLQ is filling up"
+          description: "{{ $value }} items in Notion DLQ. Threshold: 100 items"
+          runbook_url: "https://ops.chitty.cc/runbooks/notion-dlq"
+
+      - alert: ChittyIDAPIResponseTime
+        expr: histogram_quantile(0.95, sum(rate(chitty_api_duration_seconds_bucket[5m])) by (le)) > 2
+        for: 5m
+        labels:
+          severity: warning
+          service: chittyid
+          component: api
+        annotations:
+          summary: "API response times are elevated"
+          description: "95th percentile response time is {{ $value }}s. Threshold: 2s"
+          runbook_url: "https://ops.chitty.cc/runbooks/api-performance"
+
+      - alert: ChittyIDKVStorageHigh
+        expr: chitty_kv_storage_usage_bytes / chitty_kv_storage_limit_bytes > 0.8
+        for: 15m
+        labels:
+          severity: warning
+          service: chittyid
+          component: storage
+        annotations:
+          summary: "KV storage usage is high"
+          description: "KV storage is {{ $value | humanizePercentage }} full"
+          runbook_url: "https://ops.chitty.cc/runbooks/storage-cleanup"
+
+  - name: chittyid-info
+    rules:
+      - alert: ChittyIDLowTrustRateHigh
+        expr: sum(rate(chitty_ids_low_trust_total[1h])) / sum(rate(chitty_ids_total[1h])) > 0.3
+        for: 30m
+        labels:
+          severity: info
+          service: chittyid
+          component: trust
+        annotations:
+          summary: "High rate of low-trust ChittyID requests"
+          description: "{{ $value | humanizePercentage }} of IDs are low-trust (L0-L1). May indicate abuse."
+          runbook_url: "https://ops.chitty.cc/runbooks/trust-analysis"
+
+      - alert: ChittyIDNewServiceDetected
+        expr: increase(chitty_service_discovery_new_total[1h]) > 0
+        for: 0s
+        labels:
+          severity: info
+          service: chittyid
+          component: discovery
+        annotations:
+          summary: "New ChittyOS service detected"
+          description: "{{ $value }} new services have been discovered and registered"
+          runbook_url: "https://ops.chitty.cc/runbooks/service-onboarding"
+
+      - alert: ChittyIDTrustLevelUpgrade
+        expr: increase(chitty_trust_level_upgrades_total[1h]) > 50
+        for: 0s
+        labels:
+          severity: info
+          service: chittyid
+          component: trust
+        annotations:
+          summary: "High volume of trust level upgrades"
+          description: "{{ $value }} trust level upgrades in the last hour"
+          runbook_url: "https://ops.chitty.cc/runbooks/trust-upgrades"
+
+  - name: chittyid-security
+    rules:
+      - alert: ChittyIDUnauthorizedAccess
+        expr: sum(rate(chitty_security_unauthorized_total[5m])) > 5
+        for: 2m
+        labels:
+          severity: warning
+          service: chittyid
+          component: security
+        annotations:
+          summary: "Elevated unauthorized access attempts"
+          description: "{{ $value }} unauthorized access attempts per minute"
+          runbook_url: "https://ops.chitty.cc/runbooks/security-incident"
+
+      - alert: ChittyIDSuspiciousPattern
+        expr: chitty_security_suspicious_score > 80
+        for: 1m
+        labels:
+          severity: warning
+          service: chittyid
+          component: security
+        annotations:
+          summary: "Suspicious activity pattern detected"
+          description: "Security score: {{ $value }}/100. Threshold: 80"
+          runbook_url: "https://ops.chitty.cc/runbooks/suspicious-activity"
+
+      - alert: ChittyIDRateLimitExceeded
+        expr: sum(rate(chitty_rate_limit_exceeded_total[1m])) > 10
+        for: 3m
+        labels:
+          severity: info
+          service: chittyid
+          component: rate-limiting
+        annotations:
+          summary: "Rate limiting is actively blocking requests"
+          description: "{{ $value }} requests blocked per minute due to rate limiting"
+          runbook_url: "https://ops.chitty.cc/runbooks/rate-limiting"
+
+  - name: chittyid-business
+    rules:
+      - alert: ChittyIDUsageSpike
+        expr: sum(rate(chitty_requests_total[5m])) > 1000
+        for: 10m
+        labels:
+          severity: info
+          service: chittyid
+          component: usage
+        annotations:
+          summary: "ChittyID usage spike detected"
+          description: "Request rate: {{ $value }} req/min. May indicate viral adoption or attack."
+          runbook_url: "https://ops.chitty.cc/runbooks/usage-analysis"
+
+      - alert: ChittyIDCostThreshold
+        expr: chitty_estimated_daily_cost > 500
+        for: 1h
+        labels:
+          severity: warning
+          service: chittyid
+          component: cost
+        annotations:
+          summary: "Daily cost estimate exceeds threshold"
+          description: "Estimated daily cost: ${{ $value }}. Threshold: $500"
+          runbook_url: "https://ops.chitty.cc/runbooks/cost-optimization"
