@@ -1,19 +1,28 @@
-name = "chittyid-mothership"
-main = "worker.js"
-compatibility_date = "2025-01-16"
+name = "chittyid-foundation"
+main = "chittyid-service-worker.js"
+compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
+account_id = "84f0f32886f1d6196380fe6cbe9656a8"
 
+# Custom domain for Foundation service
+[env.production]
+routes = [
+  { pattern = "id.chitty.cc/*", custom_domain = true }
+]
+
+# ChittyID Foundation KV Storage
 [[kv_namespaces]]
-binding = "AUTH_CACHE"
-id = "e9636781ff6b45a19b01bd411900d863"
+binding = "CHITTYID_KV"
+id = "chittyid-foundation-audit"
 
+# ChittyOS Gateway Integration
 [[kv_namespaces]]
 binding = "CHITTYOS_CACHE"
 id = "37ed6409b6344a7599a11b733d99390f"
 
 [[kv_namespaces]]
-binding = "SESSIONS"
-id = "d209ee1d808344a7ac62680cc81e1bb0"
+binding = "REGISTRY_CACHE"
+id = "e9636781ff6b45a19b01bd411900d863"
 
 [[d1_databases]]
 binding = "AUTH_DB"
@@ -81,8 +90,31 @@ binding = "DLQ"
 id = "d209ee1d808344a7ac62680cc81e1bb0"
 
 [vars]
-NOTION_VERSION = "2022-06-28"
+# ChittyID Foundation Configuration
+CHITTYID_SERVICE_VERSION = "2.0.0"
+CHITTYID_FOUNDATION_URL = "https://id.chitty.cc"
+CHITTYID_FALLBACK_URL = "https://fallback.id.chitty.cc"
+
+# ChittyOS Gateway Integration
+CHITTYOS_GATEWAY_URL = "https://gateway.chitty.cc"
+CHITTYOS_REGISTRY_URL = "https://registry.chitty.cc"
+CHITTYOS_SCHEMA_URL = "https://schema.chitty.cc"
+
+# drand Beacon Configuration
+DRAND_BEACON_URL = "https://api.drand.sh/public/latest"
+
+# Production Environment Variables
+[env.production.vars]
+ENVIRONMENT = "production"
+CHITTYID_FOUNDATION_URL = "https://id.chitty.cc"
+
+# Staging Environment Variables
+[env.staging.vars]
+ENVIRONMENT = "staging"
+CHITTYID_FOUNDATION_URL = "https://staging.id.chitty.cc"
 
 # Secrets (set via wrangler secret put)
-# NOTION_TOKEN = "secret_xxx"
-# NOTION_DATABASE_ID_ATOMIC_FACTS = "xxx"
+# CHITTY_ID_TOKEN = "foundation-service-token"
+# CHITTYID_API_KEY = "foundation-api-key"
+# NEON_DATABASE_URL = "postgresql://user:pass@neon-host/chittyos?sslmode=require"
+# CHITTYOS_SERVICE_TOKEN = "gateway-integration-token"

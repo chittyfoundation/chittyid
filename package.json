@@ -1,28 +1,54 @@
 {
-  "name": "chittyid-mothership",
-  "version": "1.0.0",
-  "description": "ChittyID Mothership - Management System for ChittyIDs from id.chitty.cc Service",
-  "main": "src/index.js",
+  "name": "@chittyfoundation/chittyid",
+  "version": "2.0.0",
+  "description": "Official ChittyID Foundation Service - Authoritative identity management for ChittyOS ecosystem",
+  "main": "chittyid-service-worker.js",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chittyfoundation/chittyid.git"
+  },
+  "homepage": "https://id.chitty.cc",
+  "bugs": {
+    "url": "https://github.com/chittyfoundation/chittyid/issues"
+  },
+  "author": "ChittyFoundation",
+  "license": "Foundation Service",
+  "keywords": [
+    "chittyid",
+    "foundation",
+    "identity",
+    "chittyos",
+    "blockchain",
+    "drand",
+    "authentication"
+  ],
   "scripts": {
     "dev": "wrangler dev",
     "build": "wrangler build",
-    "deploy": "wrangler deploy",
-    "deploy:pages": "wrangler pages deploy dist --project-name=chittyid-mothership",
+    "deploy": "wrangler deploy --env production",
+    "deploy:staging": "wrangler deploy --env staging",
+    "deploy:gateway": "wrangler deploy --compatibility-date 2024-09-23 --name chittyid-foundation",
     "tail": "wrangler tail",
-    "test": "npm run test:unit && npm run test:integration",
+    "test": "npm run test:unit && npm run test:integration && npm run test:security",
     "test:unit": "vitest run",
     "test:integration": "node tests/integration.js",
-    "setup:vectorize": "wrangler vectorize create chittyid-routing --dimensions=384 --metric=cosine",
-    "setup:agents": "echo 'AI Agents configured'",
-    "setup": "npm run setup:vectorize && npm run setup:agents",
+    "test:security": "./test-security.sh",
+    "test:neon": "node tests/neon-connection.test.js",
+    "setup:cloudflare": "wrangler kv:namespace create CHITTYID_KV --env production",
+    "setup:neon": "node scripts/setup-neon-database.js",
+    "setup:gateway": "echo 'Connecting to ChittyOS Gateway infrastructure'",
+    "setup": "npm run setup:cloudflare && npm run setup:neon && npm run setup:gateway",
     "chittycheck": "/Users/nb/.claude/projects/-/chittycheck/chittycheck-enhanced.sh",
     "compliance": "/Users/nb/.claude/projects/-/chittycheck/chittycheck-enhanced.sh --qa",
-    "security": "/Users/nb/.claude/projects/-/chittycheck/chittycheck-enhanced.sh --security"
+    "security": "/Users/nb/.claude/projects/-/chittycheck/chittycheck-enhanced.sh --security",
+    "health": "curl https://id.chitty.cc/health",
+    "monitor": "wrangler tail --format=pretty"
   },
   "dependencies": {
     "@cloudflare/ai": "^1.0.0",
     "@cloudflare/workers-types": "^4.20250924.0",
+    "@neondatabase/serverless": "^0.9.0",
     "simple-peer": "^9.11.1",
     "socket.io-client": "^4.5.0"
   },
