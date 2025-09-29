@@ -1,0 +1,88 @@
+# Cloudflare Workers Configuration for Hybrid ChittyID System
+# Deploy with: wrangler deploy --config wrangler.hybrid.toml
+
+name = "chittyid-hybrid-system"
+main = "src/hybrid/ontology-controller.js"
+compatibility_date = "2024-09-23"
+account_id = "bbf9fcd845e78035b7a135c481e88541"
+
+# Multiple workers for hybrid system
+[[services]]
+name = "ontology-controller"
+script = "src/hybrid/ontology-controller.js"
+route = { pattern = "id.chitty.cc/ontology/*", zone_name = "chitty.cc" }
+
+[[services]]
+name = "id-translation"
+script = "src/hybrid/id-translation-worker.js"
+route = { pattern = "id.chitty.cc/translate/*", zone_name = "chitty.cc" }
+
+[[services]]
+name = "registry-governance"
+script = "src/hybrid/registry-governance.js"
+route = { pattern = "id.chitty.cc/governance/*", zone_name = "chitty.cc" }
+
+# KV Namespaces - using existing ChittyOS infrastructure
+[[kv_namespaces]]
+binding = "SERVICE_REGISTRY"
+id = "registry-kv-namespace-id"
+preview_id = "registry-kv-preview-id"
+
+[[kv_namespaces]]
+binding = "SCHEMA_KV"
+id = "schema-kv-namespace-id"
+preview_id = "schema-kv-preview-id"
+
+[[kv_namespaces]]
+binding = "PLATFORM_KV"
+id = "platform-kv-namespace-id"
+preview_id = "platform-kv-preview-id"
+
+# Database connection via Hyperdrive (when available)
+[[hyperdrive]]
+binding = "HYBRID_DB"
+id = "hyperdrive-config-id"
+
+# R2 for audit logs (when enabled)
+[[r2_buckets]]
+binding = "AUDIT_LOGS"
+bucket_name = "chittyos-audit-logs"
+preview_bucket_name = "chittyos-audit-logs-preview"
+
+# Durable Objects for state management
+[[durable_objects.bindings]]
+name = "HYBRID_STATE"
+class_name = "HybridChittyIDState"
+script_name = "hybrid-durable-object"
+
+# Environment variables that need to be set via wrangler secret put
+[vars]
+DRAND_BEACON_URL = "https://api.drand.sh/public/latest"
+CHITTYOS_VERSION = "1.0.0"
+HYBRID_SYSTEM_VERSION = "1.0.0"
+PIPELINE_ENFORCEMENT = "STRICT"
+GENERATION_MODE = "SERVER_ONLY"
+
+# Development environment
+[env.development]
+name = "chittyid-hybrid-development"
+vars = { ENVIRONMENT = "development" }
+
+# Production environment
+[env.production]
+name = "chittyid-hybrid-production"
+vars = { ENVIRONMENT = "production" }
+routes = [
+  { pattern = "id.chitty.cc/ontology/*", zone_name = "chitty.cc" },
+  { pattern = "id.chitty.cc/translate/*", zone_name = "chitty.cc" },
+  { pattern = "id.chitty.cc/governance/*", zone_name = "chitty.cc" }
+]
+
+# Cron triggers for maintenance
+[[triggers.crons]]
+cron = "0 */6 * * *"  # Every 6 hours
+action = "maintain-registry"
+
+[[triggers.crons]]
+cron = "0 0 * * *"    # Daily at midnight
+action = "audit-cleanup"
