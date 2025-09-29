@@ -31,13 +31,13 @@ export default {
             service: "chittyid-service",
             version: "1.0.0",
             purpose:
-              "ChittyID Generation, Verification & Audit (Dual Format: Official VV-G-LLL-SSSS-T-YM-C-X + Simple CHITTY-{ENTITY}-{SEQUENCE}-{CHECKSUM})",
+              "ChittyID Generation, Verification & Audit (Official Format: VV-G-LLL-SSSS-T-YM-C-X)",
             endpoints: [
               "/api/v2/chittyid/mint",
               "/api/v2/chittyid/verify",
               "/api/v2/chittyid/audit",
               "/api/v2/chittyid/mint/batch",
-              "/api/v2/fallback/request",
+              "REMOVED: /api/v2/fallback/request - Local generation prohibited",
             ],
           },
           corsHeaders,
@@ -277,101 +277,27 @@ export default {
         );
       }
 
-      // Fallback ChittyID generation - v2 API
+      // REMOVED: Fallback generation endpoint - SECURITY VIOLATION
       if (path === "/api/v2/fallback/request" && request.method === "POST") {
-        const { entity, name, metadata, format, reason } = await request.json();
-
-        if (!entity || !name) {
-          return jsonResponse(
-            {
-              success: false,
-              error: "Entity type and name required for fallback",
-            },
-            corsHeaders,
-            400,
-          );
-        }
-
-        if (!reason) {
-          return jsonResponse(
-            {
-              success: false,
-              error: "Reason for fallback request required",
-            },
-            corsHeaders,
-            400,
-          );
-        }
-
-        // Generate fallback ChittyID with error-coded format
-        const fallbackId = await generateFallbackChittyID(
-          entity.toUpperCase(),
-          name,
-          metadata,
-          format || "official",
-          reason,
-          env,
-        );
-
-        // Store fallback audit record
-        await storeFallbackAuditRecord(
-          fallbackId,
-          entity,
-          name,
-          metadata,
-          reason,
-          env,
-        );
-
-        // Create fallback status block
-        const fallbackStatusBlock = {
-          status: "fallback",
-          readable_status:
-            "This is a temporary fallback ChittyID issued due to primary service unavailability. " +
-            "It will be automatically reconciled with a permanent ID when the primary service is restored.",
-          creation_time: new Date().toISOString(),
-          fallback_reason: reason,
-          reconciliation_pending: true,
-          primary_service_url: "https://chittyid-foundation.workers.dev",
-          fallback_service_url:
-            env.CHITTYID_FALLBACK_URL ||
-            "https://fallback.chittyid-foundation.workers.dev",
-          drand_round: null,
-          last_validated: new Date().toISOString(),
-          verification_endpoint:
-            "https://chittyid-foundation.workers.dev/api/v2/chittyid/verify",
-        };
-
         return jsonResponse(
           {
-            chitty_id: fallbackId,
-            status_block: fallbackStatusBlock,
-            format:
-              format === "simple"
-                ? "CHITTY-{ENTITY}-{SEQUENCE}-{CHECKSUM}"
-                : "VV-G-LLL-SSSS-T-YM-C-X",
-            fallback: true,
-            reconciliation_required: true,
+            success: false,
+            error:
+              "SECURITY_VIOLATION: Local generation prohibited. All ChittyIDs must be requested from authorized servers only.",
+            policy: "https://id.chitty.cc - Server-only generation enforced",
+            violation_code: "FALLBACK_GENERATION_DISABLED",
           },
           corsHeaders,
+          403,
         );
       }
 
-      return jsonResponse(
-        {
-          error: "Not found",
-          availableEndpoints: [
-            "/health",
-            "/api/v1/request",
-            "/api/v1/verify",
-            "/api/v1/audit",
-            "/api/v1/request/batch",
-          ],
-        },
-        corsHeaders,
-        404,
-      );
+      // Other API endpoints would go here...
+
+      // If no route matches, return 404
+      return jsonResponse({ error: "Not found" }, corsHeaders, 404);
     } catch (error) {
+      console.error("ChittyID service error:", error);
       return jsonResponse(
         {
           error: "Internal server error",
@@ -384,10 +310,38 @@ export default {
   },
 };
 
+function createFallbackStatusBlock(reason) {
+  return {
+    status: "fallback",
+    readable_status:
+      "This is a temporary fallback ChittyID issued due to primary service unavailability. " +
+      "It will be automatically reconciled with a permanent ID when the primary service is restored.",
+    creation_time: new Date().toISOString(),
+    fallback_reason: reason,
+    reconciliation_pending: true,
+    primary_service_url: "https://chittyid-foundation.workers.dev",
+    fallback_service_url: "https://fallback.chittyid-foundation.workers.dev",
+    drand_round: null,
+    last_validated: new Date().toISOString(),
+    verification_endpoint:
+      "https://chittyid-foundation.workers.dev/api/v2/chittyid/verify",
+  };
+}
+
+// Helper function for JSON responses
+function jsonResponse(data, headers = {}, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      "Content-Type": "application/json",
+      ...headers,
+    },
+  });
+}
+
 /**
- * Generate ChittyID following Foundation dual-format protocol
+ * Generate ChittyID following Foundation protocol
  * Official Format: VV-G-LLL-SSSS-T-YM-C-X
- * Simple Format: CHITTY-{ENTITY}-{SEQUENCE}-{CHECKSUM}
  */
 async function generateChittyID(entity, name, metadata, format, env) {
   if (format === "simple") {
@@ -717,107 +671,22 @@ async function generateSimpleChecksum(data) {
  * Generate Fallback ChittyID with error-coded format
  * Uses 'E' domain instead of 'C' to indicate error/fallback state
  */
-async function generateFallbackChittyID(
-  entity,
-  name,
-  metadata,
-  format,
-  reason,
-  env,
-) {
-  if (format === "simple") {
-    return await generateFallbackSimpleChittyID(entity, name, reason, env);
-  } else {
-    return await generateFallbackOfficialChittyID(
-      entity,
-      name,
-      metadata,
-      reason,
-      env,
-    );
-  }
-}
-
 /**
- * Generate Fallback Official ChittyID with 'E' domain for error state
- * Format: VV-G-LLL-SSSS-T-YM-C-X where VV uses 'E' prefix
+ * REMOVED: Local ID generation functions - SECURITY VIOLATION
+ *
+ * This function has been removed as it violated ChittyOS security policy.
+ * ALL ChittyID generation must be performed by authorized servers only.
+ *
+ * NO LOCAL GENERATION - NO FALLBACK GENERATION - NO EXCEPTIONS
+ *
+ * Use: https://id.chitty.cc for all ChittyID requests
  */
-async function generateFallbackOfficialChittyID(
-  entity,
-  name,
-  metadata,
-  reason,
-  env,
-) {
-  // VV = Error Vertical (EP=Error Person, EL=Error Location, ET=Error Thing, EE=Error Event)
-  const verticalMap = {
-    PERSON: "EP",
-    LOCATION: "EL",
-    THING: "ET",
-    EVENT: "EE",
-  };
-  const vertical = verticalMap[entity];
+// REMOVED: Local ID generation function completely removed for security
 
-  // G = Generation (time-based epoch)
-  const now = new Date();
-  const epochMs = now.getTime();
-  const generation = Math.floor(epochMs / 1000000)
-    .toString(36)
-    .substring(0, 1)
-    .toUpperCase();
-
-  // LLL = Location/Node identifier (3 chars) - use fallback node
-  const fallbackNodeId = "FB1"; // Fallback node identifier
-
-  // SSSS = Fallback sequence from timestamp + random
-  const timestamp = Date.now();
-  const randomComponent = Math.floor(Math.random() * 1000);
-  const sequence = ((timestamp + randomComponent) % 10000)
-    .toString()
-    .padStart(4, "0");
-
-  // T = Type modifier
-  const typeModifier = entity.charAt(0);
-
-  // YM = Year-Month encoding
-  const yearMonth =
-    (now.getFullYear() % 100).toString().padStart(2, "0") +
-    (now.getMonth() + 1).toString().padStart(2, "0");
-
-  // C = Category/Trust level - always 'F' for fallback
-  const category = "F"; // F for Fallback
-
-  // Build base ID without checksum
-  const baseId = `${vertical}-${generation}-${fallbackNodeId}-${sequence}-${typeModifier}-${yearMonth}-${category}`;
-
-  // X = Mod-97 checksum (2 digits)
-  const checksum = calculateMod97Checksum(baseId).toString().padStart(2, "0");
-
-  return `${baseId}-${checksum}`;
-}
-
-/**
- * Generate Fallback Simple ChittyID with FALLBACK prefix
- * Format: FALLBACK-{ENTITY}-{SEQUENCE}-{CHECKSUM}
- */
-async function generateFallbackSimpleChittyID(entity, name, reason, env) {
-  // Get next fallback sequence number for this entity type
-  const sequenceKey = `sequence:fallback:${entity}`;
-  const currentSequence = (await env.CHITTYID_KV.get(sequenceKey)) || "0";
-  const nextSequence = (parseInt(currentSequence) + 1)
-    .toString()
-    .padStart(6, "0");
-
-  // Update sequence
-  await env.CHITTYID_KV.put(sequenceKey, nextSequence);
-
-  // Generate checksum including reason for uniqueness
-  const checksum = await generateSimpleChecksum(
-    `FALLBACK-${entity}-${nextSequence}-${name}-${reason}`,
-  );
-
-  return `FALLBACK-${entity}-${nextSequence}-${checksum}`;
-}
+// REMOVED: All local generation functions completely removed for security compliance
+// - Local official ID generation
+// - Local simple ID generation
+// All ChittyIDs must be requested from https://id.chitty.cc
 
 /**
  * Store audit record for fallback ChittyID
@@ -850,15 +719,4 @@ async function storeFallbackAuditRecord(
   await env.CHITTYID_KV.put(fallbackKey, JSON.stringify(auditRecord));
 }
 
-/**
- * Helper function for JSON responses
- */
-function jsonResponse(data, headers = {}, status = 200) {
-  return new Response(JSON.stringify(data, null, 2), {
-    status,
-    headers: {
-      "Content-Type": "application/json",
-      ...headers,
-    },
-  });
-}
+// Helper function for JSON responses already declared above

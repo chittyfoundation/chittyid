@@ -1,0 +1,95 @@
+{
+  "id": "mcp-demo-1759109276980",
+  "name": "chittyid-foundation",
+  "description": "Demo MCP project: chittyid-foundation",
+  "capabilities": [
+    "chittyid",
+    "langchain-ai",
+    "chittycases"
+  ],
+  "mcp_servers": [
+    {
+      "name": "chittyid-mcp",
+      "executable": "node",
+      "args": [
+        "mcp-handler.js"
+      ],
+      "status": "ready",
+      "capabilities": [
+        "chittyid",
+        "ai_legal_analysis",
+        "ai_fund_tracing",
+        "ai_document_generation",
+        "ai_evidence_compilation",
+        "ai_timeline_generation",
+        "ai_compliance_analysis",
+        "cases_legal_research",
+        "cases_document_analysis",
+        "cases_case_insights",
+        "cases_petition_generation",
+        "cases_contradiction_analysis",
+        "cases_dashboard_generation"
+      ]
+    }
+  ],
+  "registered_at": "2025-09-29T01:27:57.489Z",
+  "demo_mode": true,
+  "chittyauth_integration": {
+    "enabled": true,
+    "session_id": "demo-session-1759109276980",
+    "authenticated": true
+  },
+  "state": {
+    "tools_available": [
+      "chittyid",
+      "ai_legal_analysis",
+      "ai_fund_tracing",
+      "ai_document_generation",
+      "ai_evidence_compilation",
+      "ai_timeline_generation",
+      "ai_compliance_analysis",
+      "cases_legal_research",
+      "cases_document_analysis",
+      "cases_case_insights",
+      "cases_petition_generation",
+      "cases_contradiction_analysis",
+      "cases_dashboard_generation"
+    ],
+    "last_sync": "2025-09-29T01:29:48.268Z",
+    "session_data": {
+      "active": true,
+      "projects_synced": 1,
+      "last_activity": "2025-09-29T01:29:48.317Z"
+    },
+    "mcp_servers": [
+      {
+        "name": "chittyid-mcp",
+        "pid": 2165,
+        "status": "running",
+        "capabilities": [
+          "chittyid",
+          "ai_legal_analysis",
+          "ai_fund_tracing",
+          "ai_document_generation",
+          "ai_evidence_compilation",
+          "ai_timeline_generation",
+          "ai_compliance_analysis",
+          "cases_legal_research",
+          "cases_document_analysis",
+          "cases_case_insights",
+          "cases_petition_generation",
+          "cases_contradiction_analysis",
+          "cases_dashboard_generation"
+        ],
+        "started_at": "2025-09-29T01:28:52.159Z",
+        "demo_mode": true,
+        "endpoints": {
+          "tools_list": "/mcp/chittyid-mcp/tools/list",
+          "tools_call": "/mcp/chittyid-mcp/tools/call",
+          "health": "/mcp/chittyid-mcp/health"
+        }
+      }
+    ],
+    "sync_count": 1
+  }
+}

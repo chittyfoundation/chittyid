@@ -1,0 +1,594 @@
+{
+  "generated_at": "2025-09-29T07:14:43.800779+00:00",
+  "total_occurrences": 97,
+  "pattern_counts": {
+    "Math.random": 73,
+    "uuid": 10,
+    "nanoid": 11,
+    "crypto.randomUUID": 3
+  },
+  "items": [
+    {
+      "file": "session-sync.js",
+      "line": 48,
+      "pattern": "Math.random",
+      "code": "return 'session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}';"
+    },
+    {
+      "file": "session-sync.js",
+      "line": 304,
+      "pattern": "Math.random",
+      "code": "id: 'op-${Date.now()}-${Math.random().toString(36).substr(2, 6)}',"
+    },
+    {
+      "file": "chittyid-service-worker.js",
+      "line": 626,
+      "pattern": "Math.random",
+      "code": "const randomComponent = Math.floor(Math.random() * 100)"
+    },
+    {
+      "file": "demo-mcp-sync.js",
+      "line": 199,
+      "pattern": "Math.random",
+      "code": "pid: Math.floor(Math.random() * 10000) + 1000, // Demo PID"
+    },
+    {
+      "file": "research/chittyentry/server/security-middleware.ts",
+      "line": 81,
+      "pattern": "Math.random",
+      "code": ".update('${Date.now()}-${Math.random()}')"
+    },
+    {
+      "file": "research/chittyentry/client/src/components/ui/sidebar.tsx",
+      "line": 663,
+      "pattern": "Math.random",
+      "code": "return '${Math.floor(Math.random() * 40) + 50}%'"
+    },
+    {
+      "file": "research/chittyentry/client/src/lib/utils.ts",
+      "line": 83,
+      "pattern": "Math.random",
+      "code": "return messages[Math.floor(Math.random() * messages.length)];"
+    },
+    {
+      "file": "research/chittyentry/client/src/lib/utils.ts",
+      "line": 94,
+      "pattern": "Math.random",
+      "code": "result += digits.charAt(Math.floor(Math.random() * digits.length));"
+    },
+    {
+      "file": "research/chittyledger/client/src/components/ui/sidebar.tsx",
+      "line": 663,
+      "pattern": "Math.random",
+      "code": "return '${Math.floor(Math.random() * 40) + 50}%'"
+    },
+    {
+      "file": "research/chittyledger/client/src/pages/notion-sync.tsx",
+      "line": 26,
+      "pattern": "Math.random",
+      "code": "setEvidenceCount(prev => prev + Math.floor(Math.random() * 10));"
+    },
+    {
+      "file": "research/chittyfinance/database/system.schema.ts",
+      "line": 7,
+      "pattern": "uuid",
+      "code": "id: uuid('id').primaryKey().defaultRandom(),"
+    },
+    {
+      "file": "research/chittyfinance/database/system.schema.ts",
+      "line": 15,
+      "pattern": "uuid",
+      "code": "id: uuid('id').primaryKey().defaultRandom(),"
+    },
+    {
+      "file": "research/chittyfinance/database/system.schema.ts",
+      "line": 16,
+      "pattern": "uuid",
+      "code": "tenantId: uuid('tenant_id').notNull().references(() => tenants.id),"
+    },
+    {
+      "file": "research/chittyfinance/database/system.schema.ts",
+      "line": 27,
+      "pattern": "uuid",
+      "code": "id: uuid('id').primaryKey().defaultRandom(),"
+    },
+    {
+      "file": "research/chittyfinance/database/system.schema.ts",
+      "line": 28,
+      "pattern": "uuid",
+      "code": "tenantId: uuid('tenant_id').notNull().references(() => tenants.id),"
+    },
+    {
+      "file": "research/chittyfinance/database/system.schema.ts",
+      "line": 29,
+      "pattern": "uuid",
+      "code": "userId: uuid('user_id').notNull().references(() => users.id),"
+    },
+    {
+      "file": "research/chittyfinance/database/system.schema.ts",
+      "line": 39,
+      "pattern": "uuid",
+      "code": "id: uuid('id').primaryKey().defaultRandom(),"
+    },
+    {
+      "file": "research/chittyfinance/database/system.schema.ts",
+      "line": 40,
+      "pattern": "uuid",
+      "code": "tenantId: uuid('tenant_id').notNull().references(() => tenants.id),"
+    },
+    {
+      "file": "research/chittyfinance/database/system.schema.ts",
+      "line": 41,
+      "pattern": "uuid",
+      "code": "userId: uuid('user_id').notNull().references(() => users.id),"
+    },
+    {
+      "file": "research/chittyfinance/client/src/components/ui/sidebar.tsx",
+      "line": 654,
+      "pattern": "Math.random",
+      "code": "return '${Math.floor(Math.random() * 40) + 50}%'"
+    },
+    {
+      "file": "research/chittycases/chittychain/app/api/property/ingest/route.ts",
+      "line": 70,
+      "pattern": "Math.random",
+      "code": "return 'Qm${Math.random().toString(36).substring(2, 15)}';"
+    },
+    {
+      "file": "research/chittycases/chittychain/lib/property/divorce-workflow.ts",
+      "line": 116,
+      "pattern": "Math.random",
+      "code": "transactionHash: '0x${Math.random().toString(36).substring(2)}', // Mock"
+    },
+    {
+      "file": "research/chittycases/chittychain/lib/property/divorce-workflow.ts",
+      "line": 117,
+      "pattern": "Math.random",
+      "code": "blockNumber: Math.floor(Math.random() * 1000000),"
+    },
+    {
+      "file": "research/chittycases/chittychain/lib/blockchain/chittychain.ts",
+      "line": 115,
+      "pattern": "Math.random",
+      "code": "fullFact.block_number = Math.floor(Math.random() * 1000000);"
+    },
+    {
+      "file": "research/chittycases/chittychain/lib/blockchain/chittychain.ts",
+      "line": 146,
+      "pattern": "Math.random",
+      "code": "return Math.random().toString(36).substring(2, 15);"
+    },
+    {
+      "file": "research/chittycases/chittychain/lib/evidence-ledger/schemas/formulas.ts",
+      "line": 62,
+      "pattern": "Math.random",
+      "code": "const random = Math.random().toString(36).substring(2, 8);"
+    },
+    {
+      "file": "research/chittycases/chittychain/lib/evidence-ledger/schemas/formulas.ts",
+      "line": 68,
+      "pattern": "Math.random",
+      "code": "const random = Math.random().toString(36).substring(2, 8);"
+    },
+    {
+      "file": "research/chittycases/chittychain/lib/evidence-ledger/schemas/formulas.ts",
+      "line": 74,
+      "pattern": "Math.random",
+      "code": "const random = Math.random().toString(36).substring(2, 6);"
+    },
+    {
+      "file": "research/chittycases/chittychain/lib/evidence-ledger/schemas/formulas.ts",
+      "line": 89,
+      "pattern": "Math.random",
+      "code": "const random = Math.floor(Math.random() * 99999999);"
+    },
+    {
+      "file": "research/chittycases/cloudflare-workers/lib/chitty-core-mock.js",
+      "line": 92,
+      "pattern": "Math.random",
+      "code": "const random = Math.random().toString(36).substr(2, 9);"
+    },
+    {
+      "file": "research/chittychain/demo_property_nft.js",
+      "line": 70,
+      "pattern": "Math.random",
+      "code": "const tokenId = Math.floor(Math.random() * 10000) + 1;"
+    },
+    {
+      "file": "research/chittychain/tests/security/security-audit.test.ts",
+      "line": 335,
+      "pattern": "Math.random",
+      "code": "registrationNumber: 'REG${Math.random().toString().slice(2, 10)}'"
+    },
+    {
+      "file": "research/chittychain/tests/integration/evidence-flow.test.ts",
+      "line": 377,
+      "pattern": "Math.random",
+      "code": "registrationNumber: 'REG${Math.random().toString().slice(2, 10)}'"
+    },
+    {
+      "file": "research/chittychain/server/air/AIRGovernance.ts",
+      "line": 194,
+      "pattern": "Math.random",
+      "code": "const teamId = 'tea-${Date.now()}-${Math.random().toString(36).substr(2, 9)}';"
+    },
+    {
+      "file": "research/chittychain/server/air/AIRGovernance.ts",
+      "line": 359,
+      "pattern": "Math.random",
+      "code": "return 85 + Math.random() * 10; // 85-95"
+    },
+    {
+      "file": "research/chittychain/server/air/AIRGovernance.ts",
+      "line": 364,
+      "pattern": "Math.random",
+      "code": "return 80 + Math.random() * 15; // 80-95"
+    },
+    {
+      "file": "research/chittychain/server/routes/ai-analysis.ts",
+      "line": 189,
+      "pattern": "Math.random",
+      "code": "createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000), // Random dates in last 30 days"
+    },
+    {
+      "file": "research/chittychain/server/routes/auth/claudeCode.ts",
+      "line": 70,
+      "pattern": "Math.random",
+      "code": "const barNumber = 'BAR${Math.random().toString().slice(2, 8)}';"
+    },
+    {
+      "file": "research/chittychain/server/services/ChittyBeaconService.ts",
+      "line": 219,
+      "pattern": "Math.random",
+      "code": "recordId: Math.random().toString(36).substr(2, 9),"
+    },
+    {
+      "file": "research/chittychain/server/services/ChittyIDService.ts",
+      "line": 99,
+      "pattern": "Math.random",
+      "code": "const id = Math.random().toString(36).substr(2, 9);"
+    },
+    {
+      "file": "research/chittychain/client/src/components/ui/sidebar.tsx",
+      "line": 663,
+      "pattern": "Math.random",
+      "code": "return '${Math.floor(Math.random() * 40) + 50}%'"
+    },
+    {
+      "file": "research/chittychain/client/src/components/evidence/EvidenceUpload.tsx",
+      "line": 83,
+      "pattern": "Math.random",
+      "code": "id: Math.random().toString(36).substr(2, 9),"
+    },
+    {
+      "file": "research/chittychain/client/src/components/ai/EvidenceAnalysisModal.tsx",
+      "line": 220,
+      "pattern": "Math.random",
+      "code": "return prev + Math.random() * 15;"
+    },
+    {
+      "file": "research/chittychain/client/src/lib/chittyid.ts",
+      "line": 52,
+      "pattern": "Math.random",
+      "code": "const sequence = Math.random().toString(36).substr(2, 4).toUpperCase();"
+    },
+    {
+      "file": "research/chittycore/src/verify/index.ts",
+      "line": 72,
+      "pattern": "uuid",
+      "code": "uuid: z.string().uuid(),"
+    },
+    {
+      "file": "research/chittycore/src/auth/index.ts",
+      "line": 77,
+      "pattern": "nanoid",
+      "code": ".setJti(nanoid())"
+    },
+    {
+      "file": "research/chittycore/src/auth/index.ts",
+      "line": 80,
+      "pattern": "nanoid",
+      "code": "const refreshToken = nanoid(32)"
+    },
+    {
+      "file": "research/chittycore/src/auth/index.ts",
+      "line": 84,
+      "pattern": "nanoid",
+      "code": "id: nanoid(),"
+    },
+    {
+      "file": "research/chittycore/src/canon/index.ts",
+      "line": 71,
+      "pattern": "nanoid",
+      "code": "const canonId = 'CANON_${nanoid(21)}'"
+    },
+    {
+      "file": "research/chittycore/src/canon/index.ts",
+      "line": 81,
+      "pattern": "nanoid",
+      "code": "id: nanoid(),"
+    },
+    {
+      "file": "research/chittycore/src/canon/index.ts",
+      "line": 136,
+      "pattern": "nanoid",
+      "code": "id: nanoid(),"
+    },
+    {
+      "file": "research/chittycore/src/registry/index.ts",
+      "line": 96,
+      "pattern": "nanoid",
+      "code": "id: service.name + '_' + nanoid(8)"
+    },
+    {
+      "file": "research/chittycore/src/registry/index.ts",
+      "line": 192,
+      "pattern": "nanoid",
+      "code": "id: 'conn_${nanoid()}',"
+    },
+    {
+      "file": "research/chittycore/src/beacon/index.ts",
+      "line": 106,
+      "pattern": "nanoid",
+      "code": "return 'npm-${pkg.name}-${nanoid(8)}'"
+    },
+    {
+      "file": "research/chittycore/src/beacon/index.ts",
+      "line": 108,
+      "pattern": "nanoid",
+      "code": "return 'chitty-${nanoid()}'"
+    },
+    {
+      "file": "research/chittyassets/server/vite.ts",
+      "line": 59,
+      "pattern": "nanoid",
+      "code": "'src=\"/src/main.tsx?v=${nanoid()}\"',"
+    },
+    {
+      "file": "research/chittyassets/server/chittyCloudMcp.ts",
+      "line": 229,
+      "pattern": "Math.random",
+      "code": "Math.floor(Math.random() * 16).toString(16)"
+    },
+    {
+      "file": "research/chittyassets/server/auth.ts",
+      "line": 139,
+      "pattern": "crypto.randomUUID",
+      "code": "const userId = crypto.randomUUID();"
+    },
+    {
+      "file": "research/chittyassets/scripts/install-github-app.js",
+      "line": 276,
+      "pattern": "Math.random",
+      "code": "return Math.random().toString(36).substring(2, 15);"
+    },
+    {
+      "file": "research/chittyassets/client/src/components/ui/sidebar.tsx",
+      "line": 663,
+      "pattern": "Math.random",
+      "code": "return '${Math.floor(Math.random() * 40) + 50}%'"
+    },
+    {
+      "file": "tests/integration/topic-sync.test.js",
+      "line": 58,
+      "pattern": "Math.random",
+      "code": "data: [Array(384).fill(0).map(() => Math.random())]"
+    },
+    {
+      "file": "tests/integration/topic-sync.test.js",
+      "line": 92,
+      "pattern": "Math.random",
+      "code": "const mockEmbedding = Array(384).fill(0).map(() => Math.random());"
+    },
+    {
+      "file": "tests/integration/topic-sync.test.js",
+      "line": 483,
+      "pattern": "Math.random",
+      "code": "messages: Array(Math.floor(Math.random() * 10) + 1).fill(null).map((_, j) => ({"
+    },
+    {
+      "file": "tests/integration/topic-sync.test.js",
+      "line": 484,
+      "pattern": "Math.random",
+      "code": "timestamp: new Date(Date.now() - Math.random() * 86400000).toISOString()"
+    },
+    {
+      "file": "tests/integration/topic-sync.test.js",
+      "line": 621,
+      "pattern": "Math.random",
+      "code": "data: topics.map(() => Array(384).fill(0).map(() => Math.random()))"
+    },
+    {
+      "file": "tests/integration/chittyrouter-gateway.test.js",
+      "line": 441,
+      "pattern": "Math.random",
+      "code": "data: [Array(384).fill(0).map(() => Math.random())]"
+    },
+    {
+      "file": "functions/api/[[route]].js",
+      "line": 54,
+      "pattern": "Math.random",
+      "code": "return Math.floor(Math.random() * 9999)"
+    },
+    {
+      "file": "src/middleware/request-interceptor.js",
+      "line": 557,
+      "pattern": "Math.random",
+      "code": "if (Math.random() < 0.1) {"
+    },
+    {
+      "file": "src/pipeline/index.js",
+      "line": 394,
+      "pattern": "Math.random",
+      "code": "const sequential = Math.floor(Math.random() * 9999).toString().padStart(4, '0');"
+    },
+    {
+      "file": "src/agents/deduplication.js",
+      "line": 515,
+      "pattern": "Math.random",
+      "code": "confidence: Math.random() * 0.5, // Random low confidence"
+    },
+    {
+      "file": "src/agents/performance.js",
+      "line": 66,
+      "pattern": "Math.random",
+      "code": "const variance = Math.random() * regionLatency.variance;"
+    },
+    {
+      "file": "src/agents/performance.js",
+      "line": 395,
+      "pattern": "Math.random",
+      "code": "cpu_usage: Math.random() * 100, // Simulated"
+    },
+    {
+      "file": "src/agents/performance.js",
+      "line": 396,
+      "pattern": "Math.random",
+      "code": "memory_usage: Math.random() * 100, // Simulated"
+    },
+    {
+      "file": "src/agents/performance.js",
+      "line": 551,
+      "pattern": "Math.random",
+      "code": "return cached ? JSON.parse(cached).average : Math.random() * 200 + 50;"
+    },
+    {
+      "file": "src/agents/performance.js",
+      "line": 557,
+      "pattern": "Math.random",
+      "code": "return cached ? JSON.parse(cached).rate : Math.random() * 30 + 70; // 70-100%"
+    },
+    {
+      "file": "src/agents/performance.js",
+      "line": 563,
+      "pattern": "Math.random",
+      "code": "return cached ? JSON.parse(cached).rps : Math.random() * 500 + 100; // 100-600 RPS"
+    },
+    {
+      "file": "src/agents/performance.js",
+      "line": 569,
+      "pattern": "Math.random",
+      "code": "return cached ? JSON.parse(cached).rate : Math.random() * 5; // 0-5%"
+    },
+    {
+      "file": "src/agents/routing.js",
+      "line": 350,
+      "pattern": "Math.random",
+      "code": "load: Math.random(), // Random load between 0-1"
+    },
+    {
+      "file": "src/agents/routing.js",
+      "line": 418,
+      "pattern": "Math.random",
+      "code": "const vectorId = 'routing_${Date.now()}_${Math.random().toString(36).substring(7)}';"
+    },
+    {
+      "file": "src/agents/versioning.js",
+      "line": 234,
+      "pattern": "Math.random",
+      "code": "confidence: Math.random() * 0.2 + 0.8, // 0.8-1.0"
+    },
+    {
+      "file": "src/agents/versioning.js",
+      "line": 278,
+      "pattern": "Math.random",
+      "code": "success: Math.random() > 0.3,"
+    },
+    {
+      "file": "src/agents/versioning.js",
+      "line": 279,
+      "pattern": "Math.random",
+      "code": "confidence: Math.random() * 0.3 + 0.7,"
+    },
+    {
+      "file": "src/integrations/chittyrouter-gateway.js",
+      "line": 709,
+      "pattern": "Math.random",
+      "code": "const vectorId = 'route_${Date.now()}_${Math.random().toString(36).substring(7)}';"
+    },
+    {
+      "file": "src/workers/chittyid-websocket.ts",
+      "line": 42,
+      "pattern": "crypto.randomUUID",
+      "code": "const sessionId = crypto.randomUUID();"
+    },
+    {
+      "file": "src/workers/notion-sync-worker.js",
+      "line": 347,
+      "pattern": "Math.random",
+      "code": "const jitter = Math.random() * 1000;"
+    },
+    {
+      "file": "src/enforcement/compliance-monitor.js",
+      "line": 382,
+      "pattern": "Math.random",
+      "code": "if (Math.random() < 0.1) {"
+    },
+    {
+      "file": "src/enforcement/compliance-monitor.js",
+      "line": 454,
+      "pattern": "Math.random",
+      "code": "return 'monitor-${Date.now()}-${Math.random().toString(36).substr(2, 9)}';"
+    },
+    {
+      "file": "src/enforcement/compliance-monitor.js",
+      "line": 514,
+      "pattern": "Math.random",
+      "code": "const reportId = 'report-${Date.now()}-${Math.random().toString(36).substr(2, 9)}';"
+    },
+    {
+      "file": "src/services/topic-sync.js",
+      "line": 25,
+      "pattern": "Math.random",
+      "code": "const random = Math.random().toString(36).substring(2);"
+    },
+    {
+      "file": "src/services/topic-sync.js",
+      "line": 156,
+      "pattern": "Math.random",
+      "code": ".map(() => Math.random()), // Mock embedding for now"
+    },
+    {
+      "file": "src/services/topic-sync.js",
+      "line": 260,
+      "pattern": "Math.random",
+      "code": "id: 'msg_${Date.now()}_${Math.random().toString(36).substring(2)}',"
+    },
+    {
+      "file": "src/services/topic-sync.js",
+      "line": 381,
+      "pattern": "Math.random",
+      "code": "id: 'action_${Date.now()}_${Math.random().toString(36).substring(2)}',"
+    },
+    {
+      "file": "src/services/topic-sync.js",
+      "line": 393,
+      "pattern": "Math.random",
+      "code": "id: 'decision_${Date.now()}_${Math.random().toString(36).substring(2)}',"
+    },
+    {
+      "file": "src/services/notion-sync.js",
+      "line": 646,
+      "pattern": "Math.random",
+      "code": "const jitter = Math.random() * 1000;"
+    },
+    {
+      "file": "src/services/session-sync.js",
+      "line": 598,
+      "pattern": "Math.random",
+      "code": "const random = Math.random().toString(36).substr(2, 9);"
+    },
+    {
+      "file": "src/services/pipeline.js",
+      "line": 513,
+      "pattern": "Math.random",
+      "code": "const sequential = Math.floor(Math.random() * 9999).toString().padStart(4, '0');"
+    },
+    {
+      "file": "src/hybrid/registry-governance.js",
+      "line": 409,
+      "pattern": "crypto.randomUUID",
+      "code": "id: crypto.randomUUID(),"
+    }
+  ]
+}

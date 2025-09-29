@@ -1,0 +1,51 @@
+{
+  "version": "1.0.0",
+  "demo_mode": true,
+  "sync_enabled": true,
+  "projects": [
+    {
+      "id": "mcp-demo-1759109276980",
+      "name": "chittyid-foundation",
+      "registered_at": "2025-09-29T01:27:57.489Z",
+      "demo_mode": true
+    },
+    {
+      "id": "mcp-demo-1759123748209",
+      "name": "chittyid-foundation",
+      "registered_at": "2025-09-29T05:29:08.781Z",
+      "demo_mode": true
+    }
+  ],
+  "auth_integration": {
+    "enabled": true,
+    "provider": "chittyauth",
+    "session_validation": true,
+    "cross_session_sync": true,
+    "demo_mode": true
+  },
+  "mcp_servers": [
+    {
+      "name": "chittyid-mcp",
+      "executable": "node",
+      "args": [
+        "mcp-handler.js"
+      ],
+      "status": "ready",
+      "capabilities": [
+        "chittyid",
+        "ai_legal_analysis",
+        "ai_fund_tracing",
+        "ai_document_generation",
+        "ai_evidence_compilation",
+        "ai_timeline_generation",
+        "ai_compliance_analysis",
+        "cases_legal_research",
+        "cases_document_analysis",
+        "cases_case_insights",
+        "cases_petition_generation",
+        "cases_contradiction_analysis",
+        "cases_dashboard_generation"
+      ]
+    }
+  ]
+}

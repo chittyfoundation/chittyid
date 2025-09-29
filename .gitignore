@@ -8,4 +8,4 @@ dist/
 .DS_Store
 coverage/
 .vscode/
-.idea/
+.idea/.chittycheck/

@@ -19,9 +19,8 @@ This is the **authoritative ChittyID Foundation service** that defines HOW Chitt
 - **Services implement WHAT** - Domain-specific workflows using ChittyIDs
 - **NO LOCAL GENERATION** - All IDs must be requested from Foundation service
 
-### Dual Format Support
+### Official Format
 - **Official Format**: `VV-G-LLL-SSSS-T-YM-C-X` (e.g., `CP-A-001-1234-P-2509-I-82`)
-- **Simple Format**: `CHITTY-{ENTITY}-{SEQUENCE}-{CHECKSUM}` (e.g., `CHITTY-PERSON-000001-A1B2C3D4`)
 
 ## 🚀 API Endpoints
 

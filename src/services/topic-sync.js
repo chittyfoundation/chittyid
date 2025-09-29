@@ -29,101 +29,181 @@ export class TopicSync {
   /**
    * Create new topic with context
    */
-  async createTopic(sessionId, initialContext) {
-    const topicId = this.generateTopicId(sessionId, initialContext.type);
-
-    const topic = {
-      id: topicId,
-      sessionId: sessionId,
-      createdAt: new Date().toISOString(),
-      lastActivity: new Date().toISOString(),
-      status: "active",
-
-      context: {
-        type: initialContext.type || "general",
-        domain: initialContext.domain || "chittyos",
-        subject: initialContext.subject,
-        priority: initialContext.priority || "normal",
-        tags: initialContext.tags || [],
-      },
-
-      participants: {
-        user: {
-          id: initialContext.userId,
-          chittyId: initialContext.userChittyId,
-          role: "initiator",
-        },
-        services: {
-          chittyId: { active: true, lastSync: new Date().toISOString() },
-          chittyRouter: { active: false, lastSync: null },
-          chittyTrust: { active: false, lastSync: null },
-          chittyLedger: { active: false, lastSync: null },
-          chittyTrace: { active: false, lastSync: null },
-          chittyAssets: { active: false, lastSync: null },
-          chittyChat: { active: false, lastSync: null },
-        },
-      },
-
-      conversation: {
-        messages: [],
-        totalMessages: 0,
-        lastMessageId: null,
-        continuityVector: null,
-      },
-
-      state: {
-        currentPhase: "initialization",
-        completedPhases: [],
-        pendingActions: [],
-        resolutions: [],
-        decisions: [],
-      },
-
-      metadata: {
-        createdBy: "chittyid-mothership",
-        version: "1.0.0",
-        embedding: null,
-        keywords: [],
-        references: [],
-      },
-    };
-
-    // Generate topic embedding for semantic search
-    if (initialContext.subject) {
-      try {
-        const embedding = await this.ai.run("@cf/baai/bge-base-en-v1.5", {
-          text: `${initialContext.subject} ${initialContext.domain} ${(initialContext.tags || []).join(" ")}`,
-        });
-
-        topic.metadata.embedding = embedding.data[0];
-
-        // Store in vector index for similarity search
-        await this.vectorIndex.upsert([
-          {
-            id: topicId,
-            values: embedding.data[0],
-            metadata: {
-              type: "topic",
-              subject: initialContext.subject,
-              domain: initialContext.domain,
-              createdAt: topic.createdAt,
-            },
-          },
-        ]);
-      } catch (error) {
-        console.warn("Failed to generate topic embedding:", error);
+  async createTopic(topicData) {
+    try {
+      // Handle both old (sessionId, initialContext) and new (topicData) signatures
+      let sessionId, initialContext;
+      if (typeof topicData === "string") {
+        // Old signature: createTopic(sessionId, initialContext)
+        sessionId = topicData;
+        initialContext = arguments[1];
+      } else {
+        // New signature: createTopic(topicData)
+        sessionId = topicData.session_id || `session_${Date.now()}`;
+        initialContext = {
+          type: topicData.context?.case_type || "general",
+          subject: topicData.title,
+          userId: topicData.participants?.[0],
+          priority: topicData.context?.urgency || "normal",
+          tags: topicData.context?.tags || [],
+        };
       }
+
+      const topicId = this.generateTopicId(sessionId, initialContext.type);
+
+      const topic = {
+        id: topicId,
+        sessionId: sessionId,
+        title: topicData.title || initialContext.subject,
+        description: topicData.description,
+        createdAt: new Date().toISOString(),
+        lastActivity: new Date().toISOString(),
+        status: "active",
+        created_at: new Date().toISOString(),
+
+        context: {
+          type: initialContext.type || "general",
+          domain: initialContext.domain || "chittyos",
+          subject: initialContext.subject || topicData.title,
+          priority: initialContext.priority || "normal",
+          tags: initialContext.tags || [],
+        },
+
+        participants: {
+          user: {
+            id: initialContext.userId,
+            chittyId: initialContext.userChittyId,
+            role: "initiator",
+          },
+          services: {
+            chittyId: { active: true, lastSync: new Date().toISOString() },
+            chittyRouter: { active: false, lastSync: null },
+            chittyTrust: { active: false, lastSync: null },
+            chittyLedger: { active: false, lastSync: null },
+            chittyTrace: { active: false, lastSync: null },
+            chittyAssets: { active: false, lastSync: null },
+            chittyChat: { active: false, lastSync: null },
+          },
+        },
+
+        conversation: {
+          messages: [],
+          totalMessages: 0,
+          lastMessageId: null,
+          continuityVector: null,
+        },
+
+        state: {
+          currentPhase: "initialization",
+          completedPhases: [],
+          pendingActions: [],
+          resolutions: [],
+          decisions: [],
+        },
+
+        metadata: {
+          createdBy: "chittyid-mothership",
+          version: "1.0.0",
+          embedding: null,
+          keywords: [],
+          references: [],
+        },
+      };
+
+      // Generate topic embedding for semantic search
+      if (initialContext.subject) {
+        try {
+          const embedding = await this.ai.run("@cf/baai/bge-base-en-v1.5", {
+            text: `${initialContext.subject} ${initialContext.domain} ${(initialContext.tags || []).join(" ")}`,
+          });
+
+          topic.metadata.embedding = embedding.data[0];
+
+          // Store in vector index for similarity search
+          await this.vectorIndex.upsert([
+            {
+              id: topicId,
+              values: embedding.data[0],
+              metadata: {
+                type: "topic",
+                subject: initialContext.subject,
+                domain: initialContext.domain,
+                createdAt: topic.createdAt,
+              },
+            },
+          ]);
+        } catch (error) {
+          console.warn("Failed to generate topic embedding:", error);
+        }
+      }
+
+      // Store topic
+      await this.topicKV.put(`topic:${topicId}`, JSON.stringify(topic), {
+        expirationTtl: this.topicTimeout / 1000,
+      });
+
+      // Add to active topics index
+      await this.addToActiveIndex(topicId, sessionId, topic.context.type);
+
+      // Generate vector embedding if AI is available
+      if (this.vectorIndex) {
+        try {
+          await this.vectorIndex.upsert([
+            {
+              id: topicId,
+              values: Array(384)
+                .fill(0)
+                .map(() => Math.random()), // Mock embedding for now
+              metadata: {
+                title: topic.title,
+                type: topic.context.type,
+                sessionId: topic.sessionId,
+              },
+            },
+          ]);
+        } catch (error) {
+          console.warn("Failed to store vector embedding:", error);
+        }
+      }
+
+      return {
+        success: true,
+        topic_id: topicId,
+        topic: topic,
+      };
+    } catch (error) {
+      console.error("Error creating topic:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
     }
+  }
 
-    // Store topic
-    await this.topicKV.put(`topic:${topicId}`, JSON.stringify(topic), {
-      expirationTtl: this.topicTimeout / 1000,
-    });
+  /**
+   * Add topic to active topics index
+   */
+  async addToActiveIndex(topicId, sessionId, type) {
+    try {
+      const indexKey = "active_topics";
+      const currentIndex = await this.chittyCache.get(indexKey);
+      const activeTopics = currentIndex ? JSON.parse(currentIndex) : [];
 
-    // Add to active topics index
-    await this.addToActiveIndex(topicId, sessionId, topic.context.type);
+      const topicInfo = {
+        topicId,
+        sessionId,
+        type,
+        createdAt: new Date().toISOString(),
+      };
 
-    return topic;
+      activeTopics.push(topicInfo);
+
+      await this.chittyCache.put(indexKey, JSON.stringify(activeTopics), {
+        expirationTtl: 86400,
+      });
+    } catch (error) {
+      console.warn("Failed to update active topics index:", error);
+    }
   }
 
   /**
@@ -672,6 +752,32 @@ Format response as JSON:
     );
 
     return restoredTopic;
+  }
+
+  /**
+   * Generate semantic embeddings for topic content
+   */
+  async generateTopicEmbedding(topicContent) {
+    try {
+      const content = `${topicContent.title} ${topicContent.description} ${(topicContent.messages || []).join(" ")}`;
+      const embedding = await this.ai.run("@cf/baai/bge-base-en-v1.5", {
+        text: content,
+      });
+
+      if (embedding && embedding.data && embedding.data[0]) {
+        return {
+          embedding: embedding.data[0],
+          content_hash: Buffer.from(content)
+            .toString("base64")
+            .substring(0, 16),
+          dimensions: embedding.data[0].length,
+        };
+      }
+    } catch (error) {
+      console.error("Topic embedding generation error:", error);
+    }
+
+    return null;
   }
 
   /**
@@ -1323,4 +1429,5 @@ Format response as JSON:
   }
 }
 
+export { TopicSync as TopicSyncService };
 export default TopicSync;

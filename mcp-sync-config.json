@@ -1,0 +1,21 @@
+{
+  "version": "1.0.0",
+  "sync_enabled": true,
+  "projects": [],
+  "auth_integration": {
+    "enabled": true,
+    "provider": "chittyauth",
+    "session_validation": true,
+    "cross_session_sync": true
+  },
+  "mcp_servers": [
+    {
+      "name": "chittyid-mcp",
+      "executable": "node",
+      "args": [
+        "mcp-handler.js"
+      ],
+      "env": {}
+    }
+  ]
+}

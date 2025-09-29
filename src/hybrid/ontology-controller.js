@@ -18,15 +18,17 @@ export class OntologyController {
    */
   async validatePipelineRequest(request) {
     // Verify request comes through proper pipeline (Router → Intake → Trust → Authorization → Generation)
-    const pipelineHeader = request.headers.get('X-ChittyOS-Pipeline');
+    const pipelineHeader = request.headers.get("X-ChittyOS-Pipeline");
     if (!pipelineHeader || !this.validatePipelineSignature(pipelineHeader)) {
-      throw new Error('PIPELINE_VIOLATION: All requests must flow through ChittyOS pipeline');
+      throw new Error(
+        "PIPELINE_VIOLATION: All requests must flow through ChittyOS pipeline",
+      );
     }
 
     return {
       validated: true,
-      pipeline_stage: 'generation',
-      enforcement: 'STRICT_SERVER_ONLY'
+      pipeline_stage: "generation",
+      enforcement: "STRICT_SERVER_ONLY",
     };
   }
 
@@ -67,37 +69,37 @@ export class OntologyController {
       return {
         type: entity.type,
         category: entity.category,
-        source: 'registry',
-        precedence: 1
+        source: "registry",
+        precedence: 1,
       };
     }
 
     // Step 2: Check for legal patterns
     if (this.matchesLegalPattern(entityPath)) {
       return {
-        type: 'legal_data',
-        category: 'compliance',
-        source: 'pattern_detection',
-        precedence: 2
+        type: "legal_data",
+        category: "compliance",
+        source: "pattern_detection",
+        precedence: 2,
       };
     }
 
     // Step 3: Check for version control
-    if (entityPath.includes('.git') || entityPath.includes('/.git/')) {
+    if (entityPath.includes(".git") || entityPath.includes("/.git/")) {
       return {
-        type: 'version_control',
-        category: 'infrastructure',
-        source: 'pattern_detection',
-        precedence: 3
+        type: "version_control",
+        category: "infrastructure",
+        source: "pattern_detection",
+        precedence: 3,
       };
     }
 
     // Step 4: Default to unstructured
     return {
-      type: 'unstructured_data',
-      category: 'general',
-      source: 'default',
-      precedence: 4
+      type: "unstructured_data",
+      category: "general",
+      source: "default",
+      precedence: 4,
     };
   }
 
@@ -106,8 +108,12 @@ export class OntologyController {
    */
   validateClassification(classification) {
     const validTypes = [
-      'services', 'domains', 'infrastructure', 'legal_data',
-      'version_control', 'unstructured_data'
+      "services",
+      "domains",
+      "infrastructure",
+      "legal_data",
+      "version_control",
+      "unstructured_data",
     ];
 
     if (!validTypes.includes(classification.type)) {
@@ -117,7 +123,7 @@ export class OntologyController {
     return {
       ...classification,
       validated: true,
-      validation_timestamp: new Date().toISOString()
+      validation_timestamp: new Date().toISOString(),
     };
   }
 
@@ -125,22 +131,29 @@ export class OntologyController {
    * Generate hybrid IDs using drand-based VRF and registry classification
    * CRITICAL: Uses Cloudflare crypto.randomInt as specified in research
    */
-  async generateHybridId({ contentHash, entityType, jurisdiction = 'USA', drandBeacon }) {
+  async generateHybridId(
+    { contentHash, entityType, jurisdiction = "USA", drandBeacon },
+    request,
+  ) {
     // Validate pipeline authorization
-    const pipelineValidation = await this.validatePipelineRequest();
+    const pipelineValidation = await this.validatePipelineRequest(request);
 
     // Get entity classification from registry
     const classification = await this.loadEntityClassification(entityType);
 
-    // Generate SSSS using Cloudflare crypto.randomInt (1000-9999 range from research)
-    const ssss = crypto.randomInt(1000, 9999).toString().padStart(4, '0');
+    // Generate SSSS using crypto random values (1000-9999 range from research)
+    // Note: Cloudflare Workers don't have crypto.randomInt, using alternative
+    const randomBytes = new Uint8Array(2);
+    crypto.getRandomValues(randomBytes);
+    const randomNum = (randomBytes[0] << 8) | randomBytes[1];
+    const ssss = ((randomNum % 9000) + 1000).toString().padStart(4, "0");
 
     // Generate both technical and legal IDs
     const technicalId = await this.generateTechnicalId({
       classification,
       ssss,
       contentHash,
-      drandBeacon
+      drandBeacon,
     });
 
     const legalId = await this.generateLegalId({
@@ -148,7 +161,7 @@ export class OntologyController {
       ssss,
       contentHash,
       jurisdiction,
-      drandBeacon
+      drandBeacon,
     });
 
     // Store mapping in registry
@@ -160,7 +173,7 @@ export class OntologyController {
       ssss,
       content_hash: contentHash,
       drand_round: drandBeacon.round,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     });
 
     return {
@@ -168,25 +181,34 @@ export class OntologyController {
       legal_id: legalId,
       entity_classification: classification,
       drand_anchored: true,
-      pipeline_enforced: true
+      pipeline_enforced: true,
     };
   }
 
   /**
    * Generate technical ID: AA-C-TSK-1234-I-25-7-X
    */
-  async generateTechnicalId({ classification, ssss, contentHash, drandBeacon }) {
-    const version = 'AA';
-    const domain = 'C'; // Central server (C domain from research)
+  async generateTechnicalId({
+    classification,
+    ssss,
+    contentHash,
+    drandBeacon,
+  }) {
+    const version = "AA";
+    const domain = "C"; // Central server (C domain from research)
     const namespace = this.mapClassificationToNamespace(classification);
-    const type = 'I'; // Individual type
+    const type = "I"; // Individual type
     const yearMonth = this.generateYearMonth();
-    const component = '7'; // Version increment from research
+    const component = "7"; // Version increment from research
 
     const baseId = `${version}-${domain}-${namespace}-${ssss}-${type}-${yearMonth}-${component}`;
 
     // Calculate cryptographic checksum with content binding (from research PDF)
-    const checksum = await this.calculateVRFChecksum(baseId, contentHash, drandBeacon.randomness);
+    const checksum = await this.calculateVRFChecksum(
+      baseId,
+      contentHash,
+      drandBeacon.randomness,
+    );
 
     return `${baseId}-${checksum}`;
   }
@@ -194,17 +216,27 @@ export class OntologyController {
   /**
    * Generate legal ID: 01-N-USA-1234-P-25-3-X
    */
-  async generateLegalId({ classification, ssss, contentHash, jurisdiction, drandBeacon }) {
-    const version = '01';
+  async generateLegalId({
+    classification,
+    ssss,
+    contentHash,
+    jurisdiction,
+    drandBeacon,
+  }) {
+    const version = "01";
     const region = this.getRegionForJurisdiction(jurisdiction);
     const entityType = this.mapClassificationToLegalType(classification);
     const yearMonth = this.generateYearMonth();
-    const trustLevel = '3'; // Default trust level
+    const trustLevel = "3"; // Default trust level
 
     const baseId = `${version}-${region}-${jurisdiction}-${ssss}-${entityType}-${yearMonth}-${trustLevel}`;
 
     // Calculate cryptographic checksum with content binding
-    const checksum = await this.calculateVRFChecksum(baseId, contentHash, drandBeacon.randomness);
+    const checksum = await this.calculateVRFChecksum(
+      baseId,
+      contentHash,
+      drandBeacon.randomness,
+    );
 
     return `${baseId}-${checksum}`;
   }
@@ -219,7 +251,7 @@ export class OntologyController {
     // Use Web Crypto API for SHA-256
     const encoder = new TextEncoder();
     const data = encoder.encode(input);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
     const hashArray = new Uint8Array(hashBuffer);
 
     // Convert to numerical value and take modulo for single character checksum
@@ -237,15 +269,15 @@ export class OntologyController {
    */
   mapClassificationToNamespace(classification) {
     const namespaceMap = {
-      'services': 'SVC',
-      'domains': 'DOM',
-      'infrastructure': 'INF',
-      'legal_data': 'LEG',
-      'version_control': 'VCS',
-      'unstructured_data': 'DOC'
+      services: "SVC",
+      domains: "DOM",
+      infrastructure: "INF",
+      legal_data: "LEG",
+      version_control: "VCS",
+      unstructured_data: "DOC",
     };
 
-    return namespaceMap[classification.type] || 'DOC';
+    return namespaceMap[classification.type] || "DOC";
   }
 
   /**
@@ -253,15 +285,15 @@ export class OntologyController {
    */
   mapClassificationToLegalType(classification) {
     const legalTypeMap = {
-      'services': 'T', // Thing
-      'domains': 'L', // Location
-      'infrastructure': 'T', // Thing
-      'legal_data': 'P', // Person (legal entity)
-      'version_control': 'T', // Thing
-      'unstructured_data': 'T' // Thing
+      services: "T", // Thing
+      domains: "L", // Location
+      infrastructure: "T", // Thing
+      legal_data: "P", // Person (legal entity)
+      version_control: "T", // Thing
+      unstructured_data: "T", // Thing
     };
 
-    return legalTypeMap[classification.type] || 'T';
+    return legalTypeMap[classification.type] || "T";
   }
 
   /**
@@ -275,7 +307,10 @@ export class OntologyController {
     await Promise.all([
       this.registryKV.put(mappingKey, JSON.stringify(mapping)),
       this.registryKV.put(reverseMappingKey, JSON.stringify(mapping)),
-      this.platformKV.put(`mapping:${mapping.technical_id}`, JSON.stringify(mapping))
+      this.platformKV.put(
+        `mapping:${mapping.technical_id}`,
+        JSON.stringify(mapping),
+      ),
     ]);
   }
 
@@ -297,14 +332,9 @@ export class OntologyController {
    * Validate that entity path matches legal patterns (arias*, legal*)
    */
   matchesLegalPattern(entityPath) {
-    const legalPatterns = [
-      /^arias/i,
-      /legal/i,
-      /compliance/i,
-      /^.*\.legal\./i
-    ];
+    const legalPatterns = [/^arias/i, /legal/i, /compliance/i, /^.*\.legal\./i];
 
-    return legalPatterns.some(pattern => pattern.test(entityPath));
+    return legalPatterns.some((pattern) => pattern.test(entityPath));
   }
 
   /**
@@ -314,7 +344,7 @@ export class OntologyController {
     const now = new Date();
     const year = now.getFullYear() % 100; // Last 2 digits
     const month = now.getMonth() + 1;
-    return `${year}${month.toString().padStart(2, '0')}`;
+    return `${year}${month.toString().padStart(2, "0")}`;
   }
 
   /**
@@ -322,13 +352,18 @@ export class OntologyController {
    */
   getRegionForJurisdiction(jurisdiction) {
     const regionMap = {
-      'USA': 'N', 'CAN': 'N', // North America
-      'GBR': 'E', 'DEU': 'E', 'FRA': 'E', // Europe
-      'JPN': 'A', 'CHN': 'A', // Asia
-      'AUS': 'P', 'NZL': 'P' // Pacific
+      USA: "N",
+      CAN: "N", // North America
+      GBR: "E",
+      DEU: "E",
+      FRA: "E", // Europe
+      JPN: "A",
+      CHN: "A", // Asia
+      AUS: "P",
+      NZL: "P", // Pacific
     };
 
-    return regionMap[jurisdiction] || 'N';
+    return regionMap[jurisdiction] || "N";
   }
 
   /**
@@ -337,7 +372,9 @@ export class OntologyController {
   validatePipelineSignature(pipelineHeader) {
     // In production, this would validate cryptographic signature
     // For now, check for required pipeline flow marker
-    return pipelineHeader.includes('Router→Intake→Trust→Authorization→Generation');
+    return pipelineHeader.includes(
+      "Router→Intake→Trust→Authorization→Generation",
+    );
   }
 
   /**
@@ -346,23 +383,23 @@ export class OntologyController {
   async healthCheck() {
     try {
       // Test registry connectivity
-      await this.registryKV.get('health:check');
+      await this.registryKV.get("health:check");
 
       // Test schema access
-      await this.schemaKV.get('health:check');
+      await this.schemaKV.get("health:check");
 
       return {
-        status: 'healthy',
+        status: "healthy",
         registry_connected: true,
         schema_connected: true,
-        enforcement: 'STRICT_SERVER_ONLY',
-        pipeline_required: true
+        enforcement: "STRICT_SERVER_ONLY",
+        pipeline_required: true,
       };
     } catch (error) {
       return {
-        status: 'unhealthy',
+        status: "unhealthy",
         error: error.message,
-        enforcement: 'DEGRADED'
+        enforcement: "DEGRADED",
       };
     }
   }
@@ -378,75 +415,78 @@ export default {
 
     // CORS headers
     const corsHeaders = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, X-ChittyOS-Pipeline',
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, X-ChittyOS-Pipeline",
     };
 
-    if (request.method === 'OPTIONS') {
+    if (request.method === "OPTIONS") {
       return new Response(null, { headers: corsHeaders });
     }
 
     try {
       // Route handling with pipeline enforcement
-      if (url.pathname === '/generate-hybrid') {
+      if (url.pathname === "/generate-hybrid") {
         // STRICT ENFORCEMENT: Must have pipeline header
-        if (!request.headers.get('X-ChittyOS-Pipeline')) {
-          return new Response(JSON.stringify({
-            error: 'PIPELINE_VIOLATION',
-            message: 'All ID generation must flow through ChittyOS pipeline',
-            required_headers: ['X-ChittyOS-Pipeline']
-          }), {
-            status: 403,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-          });
+        if (!request.headers.get("X-ChittyOS-Pipeline")) {
+          return new Response(
+            JSON.stringify({
+              error: "PIPELINE_VIOLATION",
+              message: "All ID generation must flow through ChittyOS pipeline",
+              required_headers: ["X-ChittyOS-Pipeline"],
+            }),
+            {
+              status: 403,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
+          );
         }
 
         const requestData = await request.json();
-        const result = await controller.generateHybridId(requestData);
+        const result = await controller.generateHybridId(requestData, request);
 
         return new Response(JSON.stringify(result), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
-
-      } else if (url.pathname === '/lookup') {
-        const id = url.searchParams.get('id');
+      } else if (url.pathname === "/lookup") {
+        const id = url.searchParams.get("id");
         const result = await controller.lookupHybridMapping(id);
 
-        return new Response(JSON.stringify(result || { error: 'Not found' }), {
+        return new Response(JSON.stringify(result || { error: "Not found" }), {
           status: result ? 200 : 404,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
-
-      } else if (url.pathname === '/classify') {
-        const entity = url.searchParams.get('entity');
-        const classification = await controller.loadEntityClassification(entity);
+      } else if (url.pathname === "/classify") {
+        const entity = url.searchParams.get("entity");
+        const classification =
+          await controller.loadEntityClassification(entity);
 
         return new Response(JSON.stringify(classification), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
-
-      } else if (url.pathname === '/health') {
+      } else if (url.pathname === "/health") {
         const health = await controller.healthCheck();
 
         return new Response(JSON.stringify(health), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
-      return new Response('Not Found', { status: 404, headers: corsHeaders });
-
+      return new Response("Not Found", { status: 404, headers: corsHeaders });
     } catch (error) {
-      console.error('Ontology controller error:', error);
+      console.error("Ontology controller error:", error);
 
-      return new Response(JSON.stringify({
-        error: 'Internal server error',
-        message: error.message,
-        enforcement_note: 'Server-only generation strictly enforced'
-      }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          error: "Internal server error",
+          message: error.message,
+          enforcement_note: "Server-only generation strictly enforced",
+        }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
     }
-  }
+  },
 };

@@ -1,13 +1,19 @@
 /**
  * ChittyRouter AI Gateway Integration for ChittyID
  * Connects ChittyID validation and generation to the central AI orchestration hub
+ * Includes LangChain AI capabilities for legal and financial analysis
  */
+
+import { LangChainAIService } from "../services/langchain-ai.js";
+import { ChittyCasesService } from "../services/chittycases-integration.js";
 
 export class ChittyRouterGateway {
   constructor(env) {
     this.env = env;
     this.aiGateway = env.AI_GATEWAY;
     this.chittyRouter = env.CHITTY_ROUTER;
+    this.langChainAI = new LangChainAIService(env);
+    this.chittyCases = new ChittyCasesService(env);
   }
 
   /**
@@ -1172,6 +1178,583 @@ export class ChittyRouterGateway {
         allowed: true,
         error: error.message,
         reason: "Rate limit check failed",
+      };
+    }
+  }
+
+  /**
+   * Legal Analysis Pipeline powered by LangChain
+   */
+  async executeLegalAnalysis(request, analysisType, context) {
+    try {
+      const result = await this.langChainAI.analyzeLegalCase({
+        caseDetails: request.caseDetails,
+        analysisType,
+        provider: context.preferredProvider || "anthropic",
+      });
+
+      // Store result in ChittyOS systems
+      if (this.env.AUTH_CACHE) {
+        await this.env.AUTH_CACHE.put(
+          `legal_analysis:${result.chittyId}`,
+          JSON.stringify(result),
+          { expirationTtl: 86400 * 30 }, // 30 days
+        );
+      }
+
+      return {
+        success: true,
+        analysis: result,
+        chittyId: result.chittyId,
+        pipeline: "langchain_legal",
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      console.error("Legal analysis pipeline error:", error);
+      return {
+        success: false,
+        error: error.message,
+        pipeline: "langchain_legal",
+      };
+    }
+  }
+
+  /**
+   * Financial Fund Tracing Pipeline powered by LangChain
+   */
+  async executeFundTracing(request, context) {
+    try {
+      const result = await this.langChainAI.traceFunds({
+        sourceAccount: request.sourceAccount,
+        destination: request.destination,
+        dateRange: request.dateRange,
+        amount: request.amount,
+      });
+
+      // Store trace result
+      if (this.env.AUTH_CACHE) {
+        await this.env.AUTH_CACHE.put(
+          `fund_trace:${result.traceId}`,
+          JSON.stringify(result),
+          { expirationTtl: 86400 * 90 }, // 90 days
+        );
+      }
+
+      return {
+        success: true,
+        trace: result,
+        traceId: result.traceId,
+        pipeline: "langchain_financial",
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      console.error("Fund tracing pipeline error:", error);
+      return {
+        success: false,
+        error: error.message,
+        pipeline: "langchain_financial",
+      };
+    }
+  }
+
+  /**
+   * Document Generation Pipeline powered by LangChain
+   */
+  async executeDocumentGeneration(request, context) {
+    try {
+      const result = await this.langChainAI.generateDocument({
+        documentType: request.documentType,
+        caseData: request.caseData,
+        template: request.template,
+        requirements: request.requirements,
+      });
+
+      // Store document
+      if (this.env.AUTH_CACHE) {
+        await this.env.AUTH_CACHE.put(
+          `document:${result.documentId}`,
+          JSON.stringify(result),
+          { expirationTtl: 86400 * 365 }, // 1 year
+        );
+      }
+
+      return {
+        success: true,
+        document: result,
+        documentId: result.documentId,
+        pipeline: "langchain_document",
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      console.error("Document generation pipeline error:", error);
+      return {
+        success: false,
+        error: error.message,
+        pipeline: "langchain_document",
+      };
+    }
+  }
+
+  /**
+   * Evidence Compilation Pipeline powered by LangChain
+   */
+  async executeEvidenceCompilation(request, context) {
+    try {
+      const result = await this.langChainAI.compileEvidence({
+        claim: request.claim,
+        evidenceTypes: request.evidenceTypes,
+        searchCriteria: request.searchCriteria,
+      });
+
+      // Store evidence compilation
+      if (this.env.AUTH_CACHE) {
+        await this.env.AUTH_CACHE.put(
+          `evidence:${result.compilationId}`,
+          JSON.stringify(result),
+          { expirationTtl: 86400 * 180 }, // 180 days
+        );
+      }
+
+      return {
+        success: true,
+        evidence: result,
+        compilationId: result.compilationId,
+        pipeline: "langchain_evidence",
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      console.error("Evidence compilation pipeline error:", error);
+      return {
+        success: false,
+        error: error.message,
+        pipeline: "langchain_evidence",
+      };
+    }
+  }
+
+  /**
+   * Timeline Generation Pipeline powered by LangChain
+   */
+  async executeTimelineGeneration(request, context) {
+    try {
+      const result = await this.langChainAI.generateTimeline({
+        topic: request.topic,
+        dateRange: request.dateRange,
+        entities: request.entities,
+        events: request.events,
+      });
+
+      // Store timeline
+      if (this.env.AUTH_CACHE) {
+        await this.env.AUTH_CACHE.put(
+          `timeline:${result.timelineId}`,
+          JSON.stringify(result),
+          { expirationTtl: 86400 * 365 }, // 1 year
+        );
+      }
+
+      return {
+        success: true,
+        timeline: result,
+        timelineId: result.timelineId,
+        pipeline: "langchain_timeline",
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      console.error("Timeline generation pipeline error:", error);
+      return {
+        success: false,
+        error: error.message,
+        pipeline: "langchain_timeline",
+      };
+    }
+  }
+
+  /**
+   * Compliance Analysis Pipeline powered by LangChain
+   */
+  async executeComplianceAnalysis(request, context) {
+    try {
+      const result = await this.langChainAI.analyzeCompliance({
+        entity: request.entity,
+        regulations: request.regulations,
+        scope: request.scope,
+        documents: request.documents,
+      });
+
+      // Store compliance analysis
+      if (this.env.AUTH_CACHE) {
+        await this.env.AUTH_CACHE.put(
+          `compliance:${result.analysisId}`,
+          JSON.stringify(result),
+          { expirationTtl: 86400 * 90 }, // 90 days
+        );
+      }
+
+      return {
+        success: true,
+        compliance: result,
+        analysisId: result.analysisId,
+        pipeline: "langchain_compliance",
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      console.error("Compliance analysis pipeline error:", error);
+      return {
+        success: false,
+        error: error.message,
+        pipeline: "langchain_compliance",
+      };
+    }
+  }
+
+  /**
+   * Unified LangChain Pipeline Router
+   */
+  async executeLangChainPipeline(pipelineType, request, context = {}) {
+    const pipelineRoutes = {
+      legal_analysis: this.executeLegalAnalysis.bind(this),
+      fund_tracing: this.executeFundTracing.bind(this),
+      document_generation: this.executeDocumentGeneration.bind(this),
+      evidence_compilation: this.executeEvidenceCompilation.bind(this),
+      timeline_generation: this.executeTimelineGeneration.bind(this),
+      compliance_analysis: this.executeComplianceAnalysis.bind(this),
+    };
+
+    const pipelineHandler = pipelineRoutes[pipelineType];
+
+    if (!pipelineHandler) {
+      return {
+        success: false,
+        error: `Unknown LangChain pipeline type: ${pipelineType}`,
+        availablePipelines: Object.keys(pipelineRoutes),
+      };
+    }
+
+    // Execute the specific pipeline
+    const result = await pipelineHandler(request, context);
+
+    // Add common metadata
+    result.langchain_version = "0.3.28";
+    result.chittyos_version = "2.0.0";
+    result.gateway = "ChittyRouter";
+
+    return result;
+  }
+
+  /**
+   * LangChain Health Check
+   */
+  async checkLangChainHealth() {
+    try {
+      const health = await this.langChainAI.healthCheck();
+      return {
+        langchain_service: health,
+        integration_status: "active",
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      return {
+        langchain_service: { status: "error", error: error.message },
+        integration_status: "failed",
+        timestamp: new Date().toISOString(),
+      };
+    }
+  }
+
+  /**
+   * ChittyCases Legal Research Pipeline
+   */
+  async executeLegalResearch(request, context = {}) {
+    try {
+      const {
+        query,
+        caseNumber,
+        jurisdiction = "Cook County, Illinois",
+        caseContext,
+      } = request;
+
+      // Execute through ChittyCases service
+      const result = await this.chittyCases.performLegalResearch({
+        query,
+        caseNumber,
+        jurisdiction,
+        caseContext,
+      });
+
+      // Store in ChittyOS cache
+      if (this.env.CHITTYOS_CACHE) {
+        await this.env.CHITTYOS_CACHE.put(
+          `research:${result.researchId}`,
+          JSON.stringify(result),
+          { expirationTtl: 86400 },
+        );
+      }
+
+      return {
+        success: true,
+        pipeline: "chittycases_legal_research",
+        result,
+        chittyId: result.researchId,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      console.error("Legal research pipeline error:", error);
+      return {
+        success: false,
+        error: error.message,
+        pipeline: "chittycases_legal_research",
+      };
+    }
+  }
+
+  /**
+   * ChittyCases Document Analysis Pipeline
+   */
+  async executeDocumentAnalysis(request, context = {}) {
+    try {
+      const { documentContent, documentType, caseNumber, analysisType } =
+        request;
+
+      const result = await this.chittyCases.analyzeDocument({
+        documentContent,
+        documentType,
+        caseNumber,
+        analysisType,
+      });
+
+      // Store in ChittyOS cache
+      if (this.env.CHITTYOS_CACHE) {
+        await this.env.CHITTYOS_CACHE.put(
+          `analysis:${result.analysisId}`,
+          JSON.stringify(result),
+          { expirationTtl: 86400 },
+        );
+      }
+
+      return {
+        success: true,
+        pipeline: "chittycases_document_analysis",
+        result,
+        chittyId: result.analysisId,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      console.error("Document analysis pipeline error:", error);
+      return {
+        success: false,
+        error: error.message,
+        pipeline: "chittycases_document_analysis",
+      };
+    }
+  }
+
+  /**
+   * ChittyCases Case Insights Pipeline
+   */
+  async executeCaseInsights(request, context = {}) {
+    try {
+      const { caseNumber, caseData, insightType } = request;
+
+      const result = await this.chittyCases.getCaseInsights({
+        caseNumber,
+        caseData,
+        insightType,
+      });
+
+      // Store in ChittyOS cache
+      if (this.env.CHITTYOS_CACHE) {
+        await this.env.CHITTYOS_CACHE.put(
+          `insights:${result.insightId}`,
+          JSON.stringify(result),
+          { expirationTtl: 86400 },
+        );
+      }
+
+      return {
+        success: true,
+        pipeline: "chittycases_case_insights",
+        result,
+        chittyId: result.insightId,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      console.error("Case insights pipeline error:", error);
+      return {
+        success: false,
+        error: error.message,
+        pipeline: "chittycases_case_insights",
+      };
+    }
+  }
+
+  /**
+   * ChittyCases Petition Generation Pipeline
+   */
+  async executePetitionGeneration(request, context = {}) {
+    try {
+      const { petitionType, caseData, jurisdiction, urgency } = request;
+
+      const result = await this.chittyCases.generatePetition({
+        petitionType,
+        caseData,
+        jurisdiction,
+        urgency,
+      });
+
+      // Store in ChittyOS cache
+      if (this.env.CHITTYOS_CACHE) {
+        await this.env.CHITTYOS_CACHE.put(
+          `petition:${result.petitionId}`,
+          JSON.stringify(result),
+          { expirationTtl: 86400 },
+        );
+      }
+
+      return {
+        success: true,
+        pipeline: "chittycases_petition_generation",
+        result,
+        chittyId: result.petitionId,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      console.error("Petition generation pipeline error:", error);
+      return {
+        success: false,
+        error: error.message,
+        pipeline: "chittycases_petition_generation",
+      };
+    }
+  }
+
+  /**
+   * ChittyCases Contradiction Analysis Pipeline
+   */
+  async executeContradictionAnalysis(request, context = {}) {
+    try {
+      const { documents, statements, caseNumber } = request;
+
+      const result = await this.chittyCases.findContradictions({
+        documents,
+        statements,
+        caseNumber,
+      });
+
+      // Store in ChittyOS cache
+      if (this.env.CHITTYOS_CACHE) {
+        await this.env.CHITTYOS_CACHE.put(
+          `contradictions:${result.analysisId}`,
+          JSON.stringify(result),
+          { expirationTtl: 86400 },
+        );
+      }
+
+      return {
+        success: true,
+        pipeline: "chittycases_contradiction_analysis",
+        result,
+        chittyId: result.analysisId,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      console.error("Contradiction analysis pipeline error:", error);
+      return {
+        success: false,
+        error: error.message,
+        pipeline: "chittycases_contradiction_analysis",
+      };
+    }
+  }
+
+  /**
+   * ChittyCases Dashboard Generation Pipeline
+   */
+  async executeDashboardGeneration(request, context = {}) {
+    try {
+      const { caseNumber, caseData } = request;
+
+      const result = await this.chittyCases.generateDashboardData({
+        caseNumber,
+        caseData,
+      });
+
+      // Store in ChittyOS cache
+      if (this.env.CHITTYOS_CACHE) {
+        await this.env.CHITTYOS_CACHE.put(
+          `dashboard:${result.dashboardId}`,
+          JSON.stringify(result),
+          { expirationTtl: 3600 }, // Shorter TTL for dashboard data
+        );
+      }
+
+      return {
+        success: true,
+        pipeline: "chittycases_dashboard_generation",
+        result,
+        chittyId: result.dashboardId,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      console.error("Dashboard generation pipeline error:", error);
+      return {
+        success: false,
+        error: error.message,
+        pipeline: "chittycases_dashboard_generation",
+      };
+    }
+  }
+
+  /**
+   * Unified ChittyCases Pipeline Router
+   */
+  async executeChittyCasesPipeline(pipelineType, request, context = {}) {
+    const pipelineRoutes = {
+      legal_research: this.executeLegalResearch.bind(this),
+      document_analysis: this.executeDocumentAnalysis.bind(this),
+      case_insights: this.executeCaseInsights.bind(this),
+      petition_generation: this.executePetitionGeneration.bind(this),
+      contradiction_analysis: this.executeContradictionAnalysis.bind(this),
+      dashboard_generation: this.executeDashboardGeneration.bind(this),
+    };
+
+    const pipelineHandler = pipelineRoutes[pipelineType];
+
+    if (!pipelineHandler) {
+      return {
+        success: false,
+        error: `Unknown ChittyCases pipeline type: ${pipelineType}`,
+        availablePipelines: Object.keys(pipelineRoutes),
+      };
+    }
+
+    // Execute the specific pipeline
+    const result = await pipelineHandler(request, context);
+
+    // Add common metadata
+    result.chittycases_version = "1.0.0";
+    result.chittyos_version = "2.0.0";
+    result.gateway = "ChittyRouter";
+
+    return result;
+  }
+
+  /**
+   * ChittyCases Health Check
+   */
+  async checkChittyCasesHealth() {
+    try {
+      const health = await this.chittyCases.healthCheck();
+      return {
+        chittycases_service: health,
+        integration_status: "active",
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      return {
+        chittycases_service: { status: "error", error: error.message },
+        integration_status: "failed",
+        timestamp: new Date().toISOString(),
       };
     }
   }

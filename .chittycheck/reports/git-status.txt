@@ -1,0 +1,37 @@
+## main
+ M .gitignore
+ M README.md
+ M chittyid-service-worker.js
+ M chittyid.js
+ M mcp-handler.js
+ M package.json
+ m research/chittyassets
+ m research/chittycases
+ m research/chittychain
+ m research/chittycore
+ m research/chittyentry
+ m research/chittyevidence
+ m research/chittyfinance
+ m research/chittyforce
+ m research/chittyledger
+ m research/chittytrace
+ M src/hybrid/ontology-controller.js
+ M src/integrations/chittyrouter-gateway.js
+ M src/services/topic-sync.js
+ M worker.js
+ M wrangler.hybrid.toml
+ M wrangler.toml
+?? .chittycheck/
+?? .demo-projects/
+?? .last-sync
+?? COMPETITIVE_ANALYSIS_2024.md
+?? SECURITY_ENFORCEMENT.md
+?? cloudflare-mcp-portal-config.json
+?? demo-mcp-config.json
+?? demo-mcp-sync.js
+?? mcp-project-sync.js
+?? mcp-sync-config.json
+?? scripts/validate-compliance.sh
+?? session-sync-config.json
+?? session-sync.js
+?? test-mcp-langchain.js

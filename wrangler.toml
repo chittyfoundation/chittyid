@@ -2,36 +2,47 @@ name = "chittyid-foundation"
 main = "chittyid-service-worker.js"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
-account_id = "84f0f32886f1d6196380fe6cbe9656a8"
+account_id = "0bc21e3a5a9de1a4cc843be9c3e98121"
 
 # Custom domain for Foundation service
 [env.production]
 routes = [
-  { pattern = "id.chitty.cc/*", custom_domain = true }
+  { pattern = "id.chitty.cc", custom_domain = true }
 ]
+AI_GATEWAY = "chittyrouter-ai-gateway"
 
-# ChittyID Foundation KV Storage
+# MCP Portal KV Storage - Using proper namespaces
 [[kv_namespaces]]
-binding = "CHITTYID_KV"
-id = "chittyid-foundation-audit"
-
-# ChittyOS Gateway Integration
-[[kv_namespaces]]
-binding = "CHITTYOS_CACHE"
-id = "37ed6409b6344a7599a11b733d99390f"
+binding = "MCP_SESSIONS"
+id = "dd1dff525a27431aa47844eb364e6606"  # AUTH_SESSIONS
 
 [[kv_namespaces]]
-binding = "REGISTRY_CACHE"
-id = "e9636781ff6b45a19b01bd411900d863"
+binding = "OAUTH_TOKENS"
+id = "0189885179514d639776ec3bfe8f8274"  # AUTH_TOKENS
 
-[[d1_databases]]
-binding = "AUTH_DB"
-database_name = "chittyauth-prod"
-database_id = "3e6d7891-12f3-4041-bff2-9c892ad3f1b8"
+[[kv_namespaces]]
+binding = "API_KEYS"
+id = "41593bb3096745c0b59e0bf6d5cbae20"  # API_KEYS
 
-[[vectorize]]
-binding = "CHITTY_VECTORS"
-index_name = "chittyid-routing"
+# Platform Cache and KV
+[[kv_namespaces]]
+binding = "PLATFORM_CACHE"
+id = "d66c1e709c72456fa21aaa0d02f2db5e"
+
+[[kv_namespaces]]
+binding = "PLATFORM_KV"
+id = "d52d89c1eebd402b95719161d311e7df"
+
+# D1 Database - Not available in this account
+# [[d1_databases]]
+# binding = "AUTH_DB"
+# database_name = "chittyauth-prod"
+# database_id = "3e6d7891-12f3-4041-bff2-9c892ad3f1b8"
+
+# Vectorize - Not available in this account
+# [[vectorize]]
+# binding = "CHITTY_VECTORS"
+# index_name = "chittyid-routing"
 
 [ai]
 binding = "AI"
@@ -40,10 +51,10 @@ binding = "AI"
 # [[analytics_engine_datasets]]
 # binding = "CHITTY_ANALYTICS"
 
-# ChittyRouter AI Gateway Integration
-[[kv_namespaces]]
-binding = "AI_CACHE"
-id = "e9636781ff6b45a19b01bd411900d863"
+# AI Cache integrated with Platform Cache
+# [[kv_namespaces]]
+# binding = "AI_CACHE"
+# id = "e9636781ff6b45a19b01bd411900d863"
 
 # Durable Objects - commented out for Pages deployment
 # [[durable_objects.bindings]]
@@ -80,14 +91,12 @@ id = "e9636781ff6b45a19b01bd411900d863"
 # binding = "CHITTY_ASSETS"
 # service = "chittyassets-blockchain"
 
-# Additional AI Gateway binding
-[env.production]
-AI_GATEWAY = "chittyrouter-ai-gateway"
+# Additional AI Gateway binding removed - merged above
 
-# NotionSync Worker Configuration
-[[kv_namespaces]]
-binding = "DLQ"
-id = "d209ee1d808344a7ac62680cc81e1bb0"
+# NotionSync Worker Configuration - DLQ integrated with Platform KV
+# [[kv_namespaces]]
+# binding = "DLQ"
+# id = "d209ee1d808344a7ac62680cc81e1bb0"
 
 [vars]
 # ChittyID Foundation Configuration

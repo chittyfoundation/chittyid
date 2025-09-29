@@ -1,0 +1,366 @@
+{
+  "name": "ChittyOS MCP Integration",
+  "version": "1.0.0",
+  "description": "Comprehensive ChittyOS MCP server with ChittyAuth OAuth integration for Cloudflare MCP Portal",
+  "mcp_portal_config": {
+    "provider": "cloudflare",
+    "portal_url": "https://developers.cloudflare.com/cloudflare-one/applications/configure-apps/mcp-servers/mcp-portals/",
+    "integration_type": "oauth_managed",
+    "oauth_provider": "chittyauth"
+  },
+  "chittyauth_oauth": {
+    "provider_name": "ChittyAuth",
+    "authorization_url": "https://chittyauth-prod.workers.dev/oauth/authorize",
+    "token_url": "https://chittyauth-prod.workers.dev/oauth/token",
+    "userinfo_url": "https://chittyauth-prod.workers.dev/oauth/userinfo",
+    "scopes": [
+      "chittyid:read",
+      "chittyid:write",
+      "chittyid:validate",
+      "mcp:projects",
+      "session:sync",
+      "ai:langchain",
+      "cases:read",
+      "cases:write"
+    ],
+    "client_configuration": {
+      "client_id": "${CHITTYAUTH_CLIENT_ID}",
+      "client_secret": "${CHITTYAUTH_CLIENT_SECRET}",
+      "redirect_uri": "https://portal.cloudflare.com/oauth/callback/chittyauth",
+      "response_type": "code",
+      "grant_type": "authorization_code"
+    }
+  },
+  "mcp_server_config": {
+    "name": "chittyos-mcp-server",
+    "executable": "node",
+    "args": ["mcp-cloudflare-portal-handler.js"],
+    "environment": {
+      "CHITTYAUTH_OAUTH_ENABLED": "true",
+      "CLOUDFLARE_MCP_PORTAL": "true",
+      "MCP_SERVER_MODE": "portal"
+    },
+    "capabilities": {
+      "tools": [
+        {
+          "name": "chittyid_generate",
+          "description": "Generate ChittyID from central authority",
+          "oauth_scopes": ["chittyid:write"],
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "entity_type": {
+                "type": "string",
+                "enum": [
+                  "person",
+                  "location",
+                  "thing",
+                  "event",
+                  "info",
+                  "fact",
+                  "context",
+                  "actor"
+                ],
+                "description": "Type of entity for ChittyID generation"
+              },
+              "metadata": {
+                "type": "object",
+                "description": "Additional metadata for the entity"
+              }
+            },
+            "required": ["entity_type"]
+          }
+        },
+        {
+          "name": "chittyid_validate",
+          "description": "Validate ChittyID format and existence",
+          "oauth_scopes": ["chittyid:read"],
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "chitty_id": {
+                "type": "string",
+                "description": "ChittyID to validate (format: VV-G-LLL-SSSS-T-YM-C-X)"
+              }
+            },
+            "required": ["chitty_id"]
+          }
+        },
+        {
+          "name": "langchain_legal_analysis",
+          "description": "Perform legal case analysis using LangChain AI",
+          "oauth_scopes": ["ai:langchain"],
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "case_details": {
+                "type": "string",
+                "description": "Legal case details and context"
+              },
+              "analysis_type": {
+                "type": "string",
+                "enum": ["risk", "strategy", "summary", "precedent"],
+                "description": "Type of legal analysis to perform"
+              },
+              "ai_provider": {
+                "type": "string",
+                "enum": ["anthropic", "openai"],
+                "description": "AI provider preference (default: anthropic)"
+              }
+            },
+            "required": ["case_details", "analysis_type"]
+          }
+        },
+        {
+          "name": "langchain_document_generation",
+          "description": "Generate legal documents using LangChain AI",
+          "oauth_scopes": ["ai:langchain"],
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "document_type": {
+                "type": "string",
+                "enum": [
+                  "petition",
+                  "brief",
+                  "motion",
+                  "contract",
+                  "discovery"
+                ],
+                "description": "Type of legal document to generate"
+              },
+              "case_data": {
+                "type": "object",
+                "description": "Case data and context for document generation"
+              },
+              "jurisdiction": {
+                "type": "string",
+                "description": "Legal jurisdiction (default: Cook County, Illinois)"
+              }
+            },
+            "required": ["document_type", "case_data"]
+          }
+        },
+        {
+          "name": "chittycases_legal_research",
+          "description": "Perform legal research using ChittyCases database",
+          "oauth_scopes": ["cases:read"],
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string",
+                "description": "Legal research query"
+              },
+              "jurisdiction": {
+                "type": "string",
+                "description": "Legal jurisdiction (default: Cook County, Illinois)"
+              },
+              "case_number": {
+                "type": "string",
+                "description": "Specific case number (optional)"
+              }
+            },
+            "required": ["query"]
+          }
+        },
+        {
+          "name": "chittycases_case_insights",
+          "description": "Generate strategic case insights using ChittyCases",
+          "oauth_scopes": ["cases:read"],
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "case_number": {
+                "type": "string",
+                "description": "Case number for insights"
+              },
+              "insight_type": {
+                "type": "string",
+                "enum": ["strategic", "tactical", "procedural", "financial"],
+                "description": "Type of insights to generate"
+              }
+            },
+            "required": ["case_number"]
+          }
+        },
+        {
+          "name": "session_sync_status",
+          "description": "Get current session sync status and history",
+          "oauth_scopes": ["session:sync"],
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "include_history": {
+                "type": "boolean",
+                "description": "Include cross-session history (default: false)"
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "mcp_project_register",
+          "description": "Register new MCP project with ChittyAuth",
+          "oauth_scopes": ["mcp:projects"],
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "project_name": {
+                "type": "string",
+                "description": "Name of the MCP project"
+              },
+              "description": {
+                "type": "string",
+                "description": "Project description"
+              },
+              "capabilities": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Required capabilities for the project"
+              }
+            },
+            "required": ["project_name"]
+          }
+        }
+      ]
+    }
+  },
+  "api_key_management": {
+    "provider": "chittyauth",
+    "key_storage": "cloudflare_workers_secrets",
+    "key_rotation": {
+      "enabled": true,
+      "rotation_interval": "30d",
+      "notification_webhook": "https://chittyauth-prod.workers.dev/webhooks/key-rotation"
+    },
+    "managed_keys": [
+      {
+        "name": "CHITTY_API_KEY",
+        "service": "ChittyID",
+        "scopes": ["chittyid:read", "chittyid:write", "chittyid:validate"],
+        "auto_rotate": true
+      },
+      {
+        "name": "OPENAI_API_KEY",
+        "service": "OpenAI",
+        "scopes": ["ai:langchain"],
+        "auto_rotate": false,
+        "user_managed": true
+      },
+      {
+        "name": "ANTHROPIC_API_KEY",
+        "service": "Anthropic",
+        "scopes": ["ai:langchain"],
+        "auto_rotate": false,
+        "user_managed": true
+      },
+      {
+        "name": "CHITTYCASES_API_KEY",
+        "service": "ChittyCases",
+        "scopes": ["cases:read", "cases:write"],
+        "auto_rotate": true
+      }
+    ]
+  },
+  "security": {
+    "oauth_flow": {
+      "pkce_enabled": true,
+      "state_verification": true,
+      "nonce_verification": true,
+      "token_validation": "jwt_signature"
+    },
+    "api_security": {
+      "rate_limiting": {
+        "enabled": true,
+        "requests_per_minute": 100,
+        "burst_limit": 20
+      },
+      "request_signing": {
+        "enabled": true,
+        "algorithm": "HMAC-SHA256",
+        "header_name": "X-ChittyOS-Signature"
+      },
+      "ip_allowlist": {
+        "enabled": false,
+        "allowed_ranges": []
+      }
+    },
+    "data_protection": {
+      "encrypt_sensitive_params": true,
+      "audit_logging": true,
+      "data_retention_days": 30
+    }
+  },
+  "cloudflare_integration": {
+    "worker_configuration": {
+      "name": "chittyos-mcp-portal",
+      "account_id": "0bc21e3a5a9de1a4cc843be9c3e98121",
+      "routes": [
+        {
+          "pattern": "mcp.chitty.cc/*",
+          "zone_name": "chitty.cc"
+        }
+      ],
+      "environment": "production"
+    },
+    "kv_namespaces": [
+      {
+        "binding": "MCP_SESSIONS",
+        "purpose": "Session state storage"
+      },
+      {
+        "binding": "OAUTH_TOKENS",
+        "purpose": "OAuth token cache"
+      },
+      {
+        "binding": "API_KEYS",
+        "purpose": "Managed API key storage"
+      }
+    ],
+    "durable_objects": [
+      {
+        "binding": "MCP_STATE",
+        "class_name": "MCPPortalState",
+        "purpose": "Persistent MCP server state"
+      }
+    ]
+  },
+  "monitoring": {
+    "health_endpoints": ["/health", "/oauth/health", "/mcp/health"],
+    "metrics": {
+      "tool_usage_tracking": true,
+      "oauth_flow_metrics": true,
+      "api_key_usage_metrics": true,
+      "session_sync_metrics": true
+    },
+    "alerting": {
+      "oauth_failures": {
+        "threshold": 5,
+        "window": "5m"
+      },
+      "api_key_rotation_failures": {
+        "threshold": 1,
+        "window": "1h"
+      },
+      "tool_usage_anomalies": {
+        "enabled": true,
+        "baseline_window": "7d"
+      }
+    }
+  },
+  "deployment": {
+    "staging": {
+      "portal_url": "https://staging-mcp.chitty.cc",
+      "chittyauth_url": "https://chittyauth-staging.workers.dev",
+      "oauth_redirect": "https://portal-staging.cloudflare.com/oauth/callback/chittyauth"
+    },
+    "production": {
+      "portal_url": "https://mcp.chitty.cc",
+      "chittyauth_url": "https://chittyauth-prod.workers.dev",
+      "oauth_redirect": "https://portal.cloudflare.com/oauth/callback/chittyauth"
+    }
+  }
+}
