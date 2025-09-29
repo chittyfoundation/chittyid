@@ -1,0 +1,120 @@
+{
+  "syncVersion": "1.0.0",
+  "timestamp": "2025-09-29T04:00:00Z",
+  "projects": {
+    "chittyid": {
+      "path": "/Users/nb/.claude/projects/-/CHITTYFOUNDATION/chittyid",
+      "status": "modified",
+      "integrations": [
+        "langchain-ai",
+        "chittycases",
+        "topic-sync",
+        "mcp-portal",
+        "hybrid-system"
+      ],
+      "deployments": {
+        "production": {
+          "url": "https://id.chitty.cc",
+          "account": "0bc21e3a5a9de1a4cc843be9c3e98121",
+          "worker": "chittyid-foundation"
+        }
+      }
+    },
+    "chittychat": {
+      "path": "/Users/nb/.claude/projects/-/CHITTYOS/chittyos-services/chittychat",
+      "status": "modified",
+      "integrations": [
+        "langchain-handler",
+        "chittycases-handler",
+        "platform-worker",
+        "evidence-analysis"
+      ],
+      "deployments": {
+        "production": {
+          "url": "https://gateway.chitty.cc",
+          "account": "84f0f32886f1d6196380fe6cbe9656a8",
+          "worker": "chittyos-unified-platform"
+        }
+      }
+    },
+    "chittymcp": {
+      "path": "/Users/nb/.claude/projects/-/CHITTYOS/chittyos-services/chittymcp",
+      "status": "modified",
+      "integrations": [
+        "ultimate-worker",
+        "langchain-ai",
+        "chittycases",
+        "mcp-portal"
+      ],
+      "deployments": {
+        "production": {
+          "url": "https://chittyos-platform-live.chittycorp-llc.workers.dev",
+          "account": "0bc21e3a5a9de1a4cc843be9c3e98121",
+          "worker": "chittyos-platform-live",
+          "version": "59177ff0-717a-46e5-a9ec-61d5969fba66"
+        }
+      }
+    }
+  },
+  "sharedServices": {
+    "langchain": {
+      "type": "ai-service",
+      "endpoints": [
+        "/ai/legal-analysis",
+        "/ai/fund-tracing",
+        "/ai/document-generation",
+        "/ai/evidence-compilation",
+        "/ai/timeline-generation",
+        "/ai/compliance-analysis"
+      ],
+      "deployedIn": [
+        "chittymcp/ultimate-worker"
+      ]
+    },
+    "chittycases": {
+      "type": "mcp-portal-service",
+      "endpoints": [
+        "/cases/legal-research",
+        "/cases/document-analysis",
+        "/cases/case-insights",
+        "/cases/petition-generation",
+        "/cases/contradiction-analysis",
+        "/cases/dashboard-generation"
+      ],
+      "routesTo": "portal.chitty.cc/chittycases"
+    },
+    "portal": {
+      "type": "mcp-portal",
+      "url": "portal.chitty.cc",
+      "services": [
+        "chittycases",
+        "chittyauth",
+        "oauth",
+        "api-keys"
+      ],
+      "status": "live"
+    }
+  },
+  "kvNamespaces": {
+    "PLATFORM_CACHE": {
+      "id": "d66c1e709c72456fa21aaa0d02f2db5e",
+      "account": "0bc21e3a5a9de1a4cc843be9c3e98121"
+    },
+    "PLATFORM_KV": {
+      "id": "d52d89c1eebd402b95719161d311e7df",
+      "account": "0bc21e3a5a9de1a4cc843be9c3e98121"
+    }
+  },
+  "authentication": {
+    "chittyauth": {
+      "oauth": "portal.chitty.cc/oauth",
+      "apiKeys": "portal.chitty.cc/api-keys"
+    }
+  },
+  "syncStatus": {
+    "lastSync": "2025-09-29T07:08:25Z",
+    "nextSync": "scheduled",
+    "conflicts": [],
+    "pendingMerges": []
+  }
+}
