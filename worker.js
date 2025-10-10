@@ -15,6 +15,9 @@ import { onRequest } from "./functions/api/[[route]].js";
 // Import MCP Portal Handler for enhanced routing
 import { ChittyOSMCPPortalHandler } from "./mcp-cloudflare-portal-handler.js";
 
+// Import Ontology Controller for entity classification and hybrid ID generation
+import OntologyControllerWorker from "./src/hybrid/ontology-controller.js";
+
 /**
  * Main Worker entry point with hardened security
  */
@@ -178,6 +181,21 @@ export default {
             headers: { "Content-Type": "application/json" },
           });
         }
+      }
+
+      // Ontology System endpoints - Entity classification and hybrid ID generation
+      if (
+        url.pathname.startsWith("/ontology/") ||
+        url.pathname.startsWith("/translate/") ||
+        url.pathname.startsWith("/governance/")
+      ) {
+        // The OntologyController worker has its own fetch handler
+        // Strip the prefix and route to controller
+        const ontologyRequest = new Request(
+          request.url.replace(/\/(ontology|translate|governance)/, ""),
+          request,
+        );
+        return await OntologyControllerWorker.fetch(ontologyRequest, env, ctx);
       }
 
       // Create a context object that matches Pages Functions format

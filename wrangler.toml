@@ -1,17 +1,53 @@
-name = "chittyid-foundation"
-main = "chittyid-service-worker.js"
+name = "chittyid"
+main = "worker.js"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
-account_id = "0bc21e3a5a9de1a4cc843be9c3e98121"
+account_id = "bbf9fcd845e78035b7a135c481e88541"  # ChittyCorp LLC main account
 
-# Custom domain for Foundation service
+# Production environment
 [env.production]
-routes = [
-  { pattern = "id.chitty.cc", custom_domain = true }
-]
-AI_GATEWAY = "chittyrouter-ai-gateway"
+name = "chittyid-production"
 
-# MCP Portal KV Storage - Using proper namespaces
+# Route configuration for id.chitty.cc
+[[env.production.routes]]
+pattern = "id.chitty.cc/*"
+zone_name = "chitty.cc"
+
+# MCP Portal KV Storage - Using proper namespaces for production
+[[env.production.kv_namespaces]]
+binding = "MCP_SESSIONS"
+id = "dd1dff525a27431aa47844eb364e6606"
+
+[[env.production.kv_namespaces]]
+binding = "OAUTH_TOKENS"
+id = "0189885179514d639776ec3bfe8f8274"
+
+[[env.production.kv_namespaces]]
+binding = "API_KEYS"
+id = "41593bb3096745c0b59e0bf6d5cbae20"
+
+[[env.production.kv_namespaces]]
+binding = "PLATFORM_CACHE"
+id = "d66c1e709c72456fa21aaa0d02f2db5e"
+
+[[env.production.kv_namespaces]]
+binding = "PLATFORM_KV"
+id = "d52d89c1eebd402b95719161d311e7df"
+
+# Ontology System KV bindings (using PLATFORM_KV for now)
+[[env.production.kv_namespaces]]
+binding = "SERVICE_REGISTRY"
+id = "d52d89c1eebd402b95719161d311e7df"
+
+[[env.production.kv_namespaces]]
+binding = "SCHEMA_KV"
+id = "d52d89c1eebd402b95719161d311e7df"
+
+# AI binding for production
+[env.production.ai]
+binding = "AI"
+
+# MCP Portal KV Storage - Using proper namespaces (base/development)
 [[kv_namespaces]]
 binding = "MCP_SESSIONS"
 id = "dd1dff525a27431aa47844eb364e6606"  # AUTH_SESSIONS
@@ -114,8 +150,15 @@ DRAND_BEACON_URL = "https://api.drand.sh/public/latest"
 
 # Production Environment Variables
 [env.production.vars]
+AI_GATEWAY = "chittyrouter-ai-gateway"
 ENVIRONMENT = "production"
 CHITTYID_FOUNDATION_URL = "https://id.chitty.cc"
+CHITTYID_SERVICE_VERSION = "2.0.0"
+CHITTYID_FALLBACK_URL = "https://fallback.id.chitty.cc"
+CHITTYOS_GATEWAY_URL = "https://gateway.chitty.cc"
+CHITTYOS_REGISTRY_URL = "https://registry.chitty.cc"
+CHITTYOS_SCHEMA_URL = "https://schema.chitty.cc"
+DRAND_BEACON_URL = "https://api.drand.sh/public/latest"
 
 # Staging Environment Variables
 [env.staging.vars]
