@@ -11,7 +11,7 @@ export class ChittyPipeline {
       intake: new IntakeStage(env),
       trust: new TrustStage(env),
       authorization: new AuthorizationStage(env),
-      generation: new GenerationStage(env)
+      generation: new GenerationStage(env),
     };
   }
 
@@ -21,43 +21,56 @@ export class ChittyPipeline {
    * @param {string} purpose - Purpose of ID request (e.g., 'work-item', 'document')
    * @returns {Promise<PipelineResult>}
    */
-  async process(request, purpose = 'general') {
+  async process(request, purpose = "general") {
     const context = {
       request,
       purpose,
       timestamp: new Date().toISOString(),
-      stages: {}
+      stages: {},
     };
 
     try {
       // Stage 1: Router - Determine context and validate request
       context.stages.router = await this.stages.router.process(context);
       if (!context.stages.router.success) {
-        return this.createFailureResponse('router', context.stages.router.error);
+        return this.createFailureResponse(
+          "router",
+          context.stages.router.error,
+        );
       }
 
       // Stage 2: Intake - Validate user/project registration
       context.stages.intake = await this.stages.intake.process(context);
       if (!context.stages.intake.success) {
-        return this.createFailureResponse('intake', context.stages.intake.error);
+        return this.createFailureResponse(
+          "intake",
+          context.stages.intake.error,
+        );
       }
 
       // Stage 3: Trust - Evaluate trust level
       context.stages.trust = await this.stages.trust.process(context);
       if (!context.stages.trust.success) {
-        return this.createFailureResponse('trust', context.stages.trust.error);
+        return this.createFailureResponse("trust", context.stages.trust.error);
       }
 
       // Stage 4: Authorization - Final authorization check
-      context.stages.authorization = await this.stages.authorization.process(context);
+      context.stages.authorization =
+        await this.stages.authorization.process(context);
       if (!context.stages.authorization.success) {
-        return this.createFailureResponse('authorization', context.stages.authorization.error);
+        return this.createFailureResponse(
+          "authorization",
+          context.stages.authorization.error,
+        );
       }
 
       // Stage 5: Generation - Request ID from id.chitty.cc service
       context.stages.generation = await this.stages.generation.process(context);
       if (!context.stages.generation.success) {
-        return this.createFailureResponse('generation', context.stages.generation.error);
+        return this.createFailureResponse(
+          "generation",
+          context.stages.generation.error,
+        );
       }
 
       // Success - Return generated ChittyID
@@ -65,22 +78,22 @@ export class ChittyPipeline {
         success: true,
         chittyId: context.stages.generation.chittyId,
         metadata: {
-          pipeline: 'complete',
-          stages: Object.keys(context.stages).map(stage => ({
+          pipeline: "complete",
+          stages: Object.keys(context.stages).map((stage) => ({
             name: stage,
-            success: context.stages[stage].success
+            success: context.stages[stage].success,
           })),
           context: {
             user: context.stages.intake.user,
             project: context.stages.intake.project,
             trustLevel: context.stages.trust.trustLevel,
-            purpose
+            purpose,
           },
-          timestamp: context.timestamp
-        }
+          timestamp: context.timestamp,
+        },
       };
     } catch (error) {
-      return this.createFailureResponse('pipeline', error.message);
+      return this.createFailureResponse("pipeline", error.message);
     }
   }
 
@@ -89,7 +102,7 @@ export class ChittyPipeline {
       success: false,
       error: `Pipeline failed at ${stage} stage: ${error}`,
       stage,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 }
@@ -106,15 +119,15 @@ class RouterStage {
     const { request } = context;
 
     // Extract request metadata
-    const userAgent = request.headers.get('User-Agent') || 'unknown';
-    const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-    const authToken = request.headers.get('Authorization');
+    const userAgent = request.headers.get("User-Agent") || "unknown";
+    const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+    const authToken = request.headers.get("Authorization");
 
     // Basic validation
     if (!authToken) {
       return {
         success: false,
-        error: 'Authorization required - register your initiative first'
+        error: "Authorization required - register your initiative first",
       };
     }
 
@@ -124,8 +137,8 @@ class RouterStage {
         userAgent,
         ip,
         authToken,
-        region: request.headers.get('CF-IPCountry') || 'US'
-      }
+        region: request.headers.get("CF-IPCountry") || "US",
+      },
     };
   }
 }
@@ -143,12 +156,12 @@ class IntakeStage {
 
     // Validate auth token against session store
     const sessionKey = `session:${authToken}`;
-    const sessionData = await this.env.SESSIONS?.get(sessionKey);
+    const sessionData = await this.env.MCP_SESSIONS?.get(sessionKey);
 
     if (!sessionData) {
       return {
         success: false,
-        error: 'Invalid session - please authenticate through ChittyChat'
+        error: "Invalid session - please authenticate through ChittyChat",
       };
     }
 
@@ -158,14 +171,14 @@ class IntakeStage {
     if (!session.project?.registered) {
       return {
         success: false,
-        error: 'Project not registered - register your initiative first'
+        error: "Project not registered - register your initiative first",
       };
     }
 
     return {
       success: true,
       user: session.user,
-      project: session.project
+      project: session.project,
     };
   }
 }
@@ -188,41 +201,41 @@ class TrustStage {
     // User verification status
     if (user.verified) {
       trustLevel++;
-      factors.push('user_verified');
+      factors.push("user_verified");
     }
 
     // Project registration status
     if (project.registered) {
       trustLevel++;
-      factors.push('project_registered');
+      factors.push("project_registered");
     }
 
     // Historical compliance
     const complianceKey = `compliance:${user.id}`;
-    const complianceData = await this.env.AUTH_CACHE?.get(complianceKey);
+    const complianceData = await this.env.PLATFORM_CACHE?.get(complianceKey);
     if (complianceData) {
       const compliance = JSON.parse(complianceData);
       if (compliance.score > 0.8) {
         trustLevel++;
-        factors.push('high_compliance');
+        factors.push("high_compliance");
       }
     }
 
     // Additional verification layers
     if (user.twoFactorEnabled) {
       trustLevel++;
-      factors.push('2fa_enabled');
+      factors.push("2fa_enabled");
     }
 
     if (project.verified) {
       trustLevel++;
-      factors.push('project_verified');
+      factors.push("project_verified");
     }
 
     return {
       success: true,
       trustLevel: Math.min(trustLevel, 5), // Cap at 5
-      factors
+      factors,
     };
   }
 }
@@ -241,7 +254,7 @@ class AuthorizationStage {
 
     // Check rate limits
     const rateLimitKey = `ratelimit:${user.id}:${new Date().toISOString().slice(0, 10)}`;
-    const currentCount = await this.env.AUTH_CACHE?.get(rateLimitKey);
+    const currentCount = await this.env.PLATFORM_CACHE?.get(rateLimitKey);
     const count = currentCount ? parseInt(currentCount) : 0;
 
     // Trust level determines rate limit
@@ -250,20 +263,20 @@ class AuthorizationStage {
     if (count >= maxRequests) {
       return {
         success: false,
-        error: `Rate limit exceeded - maximum ${maxRequests} requests per day for trust level ${trustLevel}`
+        error: `Rate limit exceeded - maximum ${maxRequests} requests per day for trust level ${trustLevel}`,
       };
     }
 
     // Update rate limit counter
-    await this.env.AUTH_CACHE?.put(rateLimitKey, (count + 1).toString(), {
-      expirationTtl: 86400 // 24 hours
+    await this.env.PLATFORM_CACHE?.put(rateLimitKey, (count + 1).toString(), {
+      expirationTtl: 86400, // 24 hours
     });
 
     // Check project permissions
-    if (!project.permissions?.includes('generate_id')) {
+    if (!project.permissions?.includes("generate_id")) {
       return {
         success: false,
-        error: 'Project lacks permission to generate ChittyIDs'
+        error: "Project lacks permission to generate ChittyIDs",
       };
     }
 
@@ -272,8 +285,8 @@ class AuthorizationStage {
       authorized: true,
       rateLimit: {
         current: count + 1,
-        max: maxRequests
-      }
+        max: maxRequests,
+      },
     };
   }
 }
@@ -303,111 +316,150 @@ class GenerationStage {
           projectId: project.id,
           projectName: project.name,
           purpose,
-          timestamp: context.timestamp
-        }
+          timestamp: context.timestamp,
+        },
       };
 
       // Call id.chitty.cc service (simulated for now)
       const chittyId = await this.requestFromService(params);
 
       // Store ChittyID with metadata
-      await this.env.CHITTY_IDS?.put(chittyId, JSON.stringify({
+      await this.env.CHITTY_IDS?.put(
         chittyId,
-        ...params,
-        createdAt: context.timestamp,
-        pipeline: 'v2',
-        stages: Object.keys(context.stages)
-      }));
+        JSON.stringify({
+          chittyId,
+          ...params,
+          createdAt: context.timestamp,
+          pipeline: "v2",
+          stages: Object.keys(context.stages),
+        }),
+      );
 
       // Log to analytics
       if (this.env.CHITTY_ANALYTICS) {
         this.env.CHITTY_ANALYTICS.writeDataPoint({
-          indexes: ['chittyid_generated', project.id],
+          indexes: ["chittyid_generated", project.id],
           doubles: [trustLevel, Date.now()],
-          blobs: [chittyId, purpose]
+          blobs: [chittyId, purpose],
         });
       }
 
       return {
         success: true,
         chittyId,
-        parameters: params
+        parameters: params,
       };
     } catch (error) {
       return {
         success: false,
-        error: `Service error: ${error.message}`
+        error: `Service error: ${error.message}`,
       };
     }
   }
 
   determineRegion(user) {
     const regionMap = {
-      'US': '1', 'CA': '1', 'MX': '1', // North America
-      'BR': '2', 'AR': '2', 'CL': '2', // South America
-      'GB': '3', 'DE': '3', 'FR': '3', // Europe
-      'CN': '4', 'JP': '4', 'IN': '4', // Asia
-      'ZA': '5', 'NG': '5', 'EG': '5', // Africa
-      'AU': '6', 'NZ': '6', // Oceania
-      'AQ': '7', // Antarctica
-      'INT': '8', // International Waters
-      'DIGITAL': '9' // Digital/Virtual
+      US: "1",
+      CA: "1",
+      MX: "1", // North America
+      BR: "2",
+      AR: "2",
+      CL: "2", // South America
+      GB: "3",
+      DE: "3",
+      FR: "3", // Europe
+      CN: "4",
+      JP: "4",
+      IN: "4", // Asia
+      ZA: "5",
+      NG: "5",
+      EG: "5", // Africa
+      AU: "6",
+      NZ: "6", // Oceania
+      AQ: "7", // Antarctica
+      INT: "8", // International Waters
+      DIGITAL: "9", // Digital/Virtual
     };
-    return regionMap[user.country] || '9';
+    return regionMap[user.country] || "9";
   }
 
   determineJurisdiction(user) {
     // Use ISO 3-letter country codes
     const jurisdictionMap = {
-      'US': 'USA',
-      'CA': 'CAN',
-      'GB': 'GBR',
-      'DE': 'DEU',
-      'FR': 'FRA',
-      'JP': 'JPN',
-      'CN': 'CHN',
-      'AU': 'AUS',
-      'BR': 'BRA'
+      US: "USA",
+      CA: "CAN",
+      GB: "GBR",
+      DE: "DEU",
+      FR: "FRA",
+      JP: "JPN",
+      CN: "CHN",
+      AU: "AUS",
+      BR: "BRA",
     };
-    return jurisdictionMap[user.country] || 'INT';
+    return jurisdictionMap[user.country] || "INT";
   }
 
   mapPurposeToEntityType(purpose) {
     const mapping = {
-      'person': 'P',
-      'location': 'L',
-      'thing': 'T',
-      'event': 'E',
-      'work-item': 'T',
-      'document': 'T',
-      'asset': 'T',
-      'general': 'T'
+      person: "P",
+      location: "L",
+      thing: "T",
+      event: "E",
+      "work-item": "T",
+      document: "T",
+      asset: "T",
+      general: "T",
     };
-    return mapping[purpose.toLowerCase()] || 'T';
+    return mapping[purpose.toLowerCase()] || "T";
   }
 
   async requestFromService(params) {
-    // TODO: Actual call to id.chitty.cc service
-    // For now, simulate the service response
-    const version = '03'; // Current version
-    const yearMonth = new Date().toISOString().slice(2, 7).replace('-', '');
-    const sequential = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
+    // CRITICAL: This MUST call the actual id.chitty.cc service
+    // NO local generation allowed - this is the authority service
+    const serviceUrl = params.env?.CHITTYID_SERVICE || "https://id.chitty.cc";
 
-    const baseId = `${version}-${params.region}-${params.jurisdiction}-${sequential}-${params.entityType}-${yearMonth}-${params.trustLevel}`;
-    const checksum = this.calculateChecksum(baseId);
+    try {
+      const response = await fetch(`${serviceUrl}/v1/mint`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${params.env?.CHITTY_ID_TOKEN || ""}`,
+        },
+        body: JSON.stringify({
+          region: params.region,
+          jurisdiction: params.jurisdiction,
+          entityType: params.entityType,
+          trustLevel: params.trustLevel,
+          contentHash: params.contentHash, // For content binding
+          metadata: params.metadata,
+        }),
+      });
 
-    return `${baseId}-${checksum}`;
+      if (!response.ok) {
+        throw new Error(
+          `Service returned ${response.status}: ${await response.text()}`,
+        );
+      }
+
+      const result = await response.json();
+      return result.chittyId;
+    } catch (error) {
+      // NO fallback generation - must use proper fallback service
+      throw new Error(
+        `Failed to mint ChittyID from authority service: ${error.message}`,
+      );
+    }
   }
 
   calculateChecksum(baseId) {
     // Simple Mod-97 checksum calculation
-    const cleanId = baseId.replace(/-/g, '');
+    const cleanId = baseId.replace(/-/g, "");
     let sum = 0;
     for (let i = 0; i < cleanId.length; i++) {
       const char = cleanId[i];
       const value = isNaN(char) ? char.charCodeAt(0) - 55 : parseInt(char);
       sum += value * (i + 1);
     }
-    return (sum % 97).toString().padStart(2, '0');
+    return (sum % 97).toString().padStart(2, "0");
   }
 }

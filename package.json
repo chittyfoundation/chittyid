@@ -26,6 +26,8 @@
   "scripts": {
     "dev": "wrangler dev",
     "build": "wrangler build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "deploy": "wrangler deploy --env production",
     "deploy:staging": "wrangler deploy --env staging",
     "deploy:gateway": "wrangler deploy --compatibility-date 2024-09-23 --name chittyid-foundation",
@@ -47,6 +49,13 @@
     "chittycheck": "/Users/nb/.claude/projects/-/chittycheck/chittycheck-enhanced.sh",
     "compliance": "/Users/nb/.claude/projects/-/chittycheck/chittycheck-enhanced.sh --qa",
     "security": "/Users/nb/.claude/projects/-/chittycheck/chittycheck-enhanced.sh --security",
+    "chittycontext": "node scripts/chittycontext.js",
+    "context:validate": "node scripts/chittycontext.js validate",
+    "context:validate:dev": "node scripts/chittycontext.js validate development",
+    "context:validate:staging": "node scripts/chittycontext.js validate staging",
+    "context:validate:prod": "node scripts/chittycontext.js validate production",
+    "context:check-secrets": "node scripts/chittycontext.js check-secrets",
+    "context:export": "node scripts/chittycontext.js export-env",
     "health": "curl https://id.chitty.cc/health",
     "monitor": "wrangler tail --format=pretty"
   },

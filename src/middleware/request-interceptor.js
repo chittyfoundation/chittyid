@@ -395,7 +395,8 @@ export class RequestInterceptor {
     const token = authHeader.replace(/Bearer\s+/i, "");
 
     // Check if token is in abuse cache
-    const abuseData = await this.env.AUTH_CACHE.get(`abuse:token:${token}`);
+    const cache = this.env.PLATFORM_CACHE || this.env.PLATFORM_CACHE;
+    const abuseData = cache ? await cache.get(`abuse:token:${token}`) : null;
     if (abuseData) {
       const abuse = JSON.parse(abuseData);
       if (abuse.blocked) {
@@ -473,7 +474,8 @@ export class RequestInterceptor {
     }
 
     try {
-      const current = await this.env.AUTH_CACHE.get(rateLimitKey);
+      const cache = this.env.PLATFORM_CACHE || this.env.PLATFORM_CACHE;
+      const current = cache ? await cache.get(rateLimitKey) : null;
       const requests = current ? parseInt(current) : 0;
 
       if (requests >= limit) {
@@ -496,9 +498,11 @@ export class RequestInterceptor {
       }
 
       // Increment counter with sliding window
-      await this.env.AUTH_CACHE.put(rateLimitKey, (requests + 1).toString(), {
-        expirationTtl: window,
-      });
+      if (cache) {
+        await cache.put(rateLimitKey, (requests + 1).toString(), {
+          expirationTtl: window,
+        });
+      }
 
       return { exceeded: false, requests: requests + 1, limit };
     } catch (error) {
@@ -523,21 +527,24 @@ export class RequestInterceptor {
       details,
     };
 
-    // Store security event
-    await this.env.AUTH_CACHE.put(
-      `security:${eventType}:${Date.now()}`,
-      JSON.stringify(event),
-      { expirationTtl: 86400 * 30 }, // Keep for 30 days
-    );
+    // Store security event and increment counter
+    const cache = this.env.PLATFORM_CACHE;
+    if (cache) {
+      await cache.put(
+        `security:${eventType}:${Date.now()}`,
+        JSON.stringify(event),
+        { expirationTtl: 86400 * 30 }, // Keep for 30 days
+      );
 
-    // Increment security counter
-    const counterKey = `metrics:security:${eventType}`;
-    const current = await this.env.AUTH_CACHE.get(counterKey);
-    const count = current ? parseInt(current) + 1 : 1;
+      // Increment security counter
+      const counterKey = `metrics:security:${eventType}`;
+      const current = await cache.get(counterKey);
+      const count = current ? parseInt(current) + 1 : 1;
 
-    await this.env.AUTH_CACHE.put(counterKey, count.toString(), {
-      expirationTtl: 86400,
-    });
+      await cache.put(counterKey, count.toString(), {
+        expirationTtl: 86400,
+      });
+    }
   }
 
   /**
@@ -554,9 +561,10 @@ export class RequestInterceptor {
     };
 
     // Store request log (sampling for performance)
-    if (Math.random() < 0.1) {
+    const cache = this.env.PLATFORM_CACHE;
+    if (cache && Math.random() < 0.1) {
       // Log 10% of requests
-      await this.env.AUTH_CACHE.put(
+      await cache.put(
         `audit:request:${Date.now()}`,
         JSON.stringify(log),
         { expirationTtl: 86400 * 7 }, // Keep for 7 days

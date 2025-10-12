@@ -452,7 +452,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       sync.startPeriodicSync();
       break;
 
-    case "register":
+    case "register": {
       const projectName = process.argv[3];
       if (!projectName) {
         console.error(
@@ -473,6 +473,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
           console.log(JSON.stringify(result, null, 2));
         });
       break;
+    }
 
     case "health":
       sync.healthCheck().then((result) => {
@@ -480,7 +481,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       });
       break;
 
-    case "servers":
+    case "servers": {
       const projectId = process.argv[3];
       if (!projectId) {
         console.error(
@@ -496,6 +497,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
         console.log(JSON.stringify(servers, null, 2));
       });
       break;
+    }
 
     default:
       console.log(`

@@ -144,7 +144,7 @@ export class PipelineEnforcer {
     }
 
     // Validate session exists and has pipeline context
-    const sessionData = await this.env.SESSIONS.get(`session:${sessionId}`);
+    const sessionData = await this.env.MCP_SESSIONS.get(`session:${sessionId}`);
     if (!sessionData) {
       return {
         valid: false,
@@ -211,7 +211,7 @@ export class PipelineEnforcer {
       const token = authToken.replace('Bearer ', '');
 
       // Check token in auth cache
-      const authData = await this.env.AUTH_CACHE.get(`auth:${token}`);
+      const authData = await this.env.PLATFORM_CACHE.get(`auth:${token}`);
 
       // Consistent timing - ensure minimum 100ms processing time
       const elapsed = Date.now() - startTime;
@@ -403,7 +403,7 @@ export class PipelineEnforcer {
     };
 
     // Store in security logs
-    await this.env.AUTH_CACHE.put(
+    await this.env.PLATFORM_CACHE.put(
       `security:blocked:${Date.now()}`,
       JSON.stringify(logEntry),
       { expirationTtl: 86400 * 7 } // Keep for 7 days
@@ -411,10 +411,10 @@ export class PipelineEnforcer {
 
     // Increment blocked attempts counter
     const counterKey = `metrics:blocked:${reason}`;
-    const current = await this.env.AUTH_CACHE.get(counterKey);
+    const current = await this.env.PLATFORM_CACHE.get(counterKey);
     const count = current ? parseInt(current) + 1 : 1;
 
-    await this.env.AUTH_CACHE.put(
+    await this.env.PLATFORM_CACHE.put(
       counterKey,
       count.toString(),
       { expirationTtl: 86400 }

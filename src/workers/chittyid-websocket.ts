@@ -39,7 +39,7 @@ export class ChittyIDWebSocketHandler extends DurableObject {
 
       // Get authentication from query params or headers
       const chittyId = url.searchParams.get('chittyId');
-      const sessionId = crypto.randomUUID();
+      const sessionId = `pending-id-${Date.now()}`;
 
       // Store session information
       this.sessions.set(server, {

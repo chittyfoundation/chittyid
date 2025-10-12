@@ -186,7 +186,7 @@ class ChittyIDMCPHandler {
               ),
             );
           }
-        } catch (parseError) {
+        } catch (_parseError) {
           if (code === 0) {
             // Non-JSON output but successful
             resolve({
@@ -413,7 +413,7 @@ class ChittyIDMCPHandler {
   async healthCheck() {
     try {
       // Test basic CLI availability
-      const result = await this.executeCLI([this.cliPath]);
+      const _result = await this.executeCLI([this.cliPath]);
 
       // Test LangChain AI availability
       const aiHealth = await this.langChainAI.healthCheck();
@@ -772,7 +772,7 @@ class MCPServer {
             ],
           };
 
-        case "tools/call":
+        case "tools/call": {
           const { name, arguments: args } = params;
           const result = await this.handler.handleToolCall(name, args);
           return {
@@ -783,6 +783,7 @@ class MCPServer {
               },
             ],
           };
+        }
 
         case "ping":
           return { pong: true };

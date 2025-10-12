@@ -131,7 +131,7 @@ export class NotionBridgeAPI {
   async handleStatus(headers) {
     // Get today's metrics
     const metricsKey = `metrics:notion:${new Date().toISOString().slice(0, 10)}`;
-    const metricsData = await this.env.AUTH_CACHE?.get(metricsKey);
+    const metricsData = await this.env.PLATFORM_CACHE?.get(metricsKey);
     const metrics = metricsData ? JSON.parse(metricsData) : {};
 
     // Get DLQ status
@@ -139,7 +139,7 @@ export class NotionBridgeAPI {
 
     // Get last sync time
     const lastSyncKey = 'notion:last_sync';
-    const lastSync = await this.env.AUTH_CACHE?.get(lastSyncKey);
+    const lastSync = await this.env.PLATFORM_CACHE?.get(lastSyncKey);
 
     return new Response(JSON.stringify({
       status: 'operational',
@@ -201,14 +201,14 @@ export class NotionBridgeAPI {
   async getDlqItems(maxItems) {
     const items = [];
     const prefix = 'dlq:notion:';
-    const list = await this.env.AUTH_CACHE?.list({
+    const list = await this.env.PLATFORM_CACHE?.list({
       prefix,
       limit: maxItems
     });
 
     if (list?.keys) {
       for (const key of list.keys) {
-        const data = await this.env.AUTH_CACHE.get(key.name);
+        const data = await this.env.PLATFORM_CACHE.get(key.name);
         if (data) {
           items.push(JSON.parse(data));
         }
@@ -223,7 +223,7 @@ export class NotionBridgeAPI {
    */
   async getDlqCount() {
     const prefix = 'dlq:notion:';
-    const list = await this.env.AUTH_CACHE?.list({ prefix });
+    const list = await this.env.PLATFORM_CACHE?.list({ prefix });
     return list?.keys?.length || 0;
   }
 

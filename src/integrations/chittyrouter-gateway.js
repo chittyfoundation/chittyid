@@ -1030,14 +1030,14 @@ export class ChittyRouterGateway {
       const token = authHeader.substring(7);
       const sessionKey = `session:${token}`;
 
-      if (!this.env.SESSIONS) {
+      if (!this.env.MCP_SESSIONS) {
         return {
           authorized: false,
           reason: "Session store not available",
         };
       }
 
-      const session = await this.env.SESSIONS.get(sessionKey);
+      const session = await this.env.MCP_SESSIONS.get(sessionKey);
       if (!session) {
         return {
           authorized: false,
@@ -1119,12 +1119,12 @@ export class ChittyRouterGateway {
       const now = Date.now();
       const windowStart = now - window;
 
-      if (!this.env.AUTH_CACHE) {
+      if (!this.env.PLATFORM_CACHE) {
         return { allowed: true, reason: "Rate limiting not available" };
       }
 
       const rateLimitKey = `rate_limit:${userId}`;
-      const existing = await this.env.AUTH_CACHE.get(rateLimitKey);
+      const existing = await this.env.PLATFORM_CACHE.get(rateLimitKey);
 
       let requestData;
       if (existing) {
@@ -1162,7 +1162,7 @@ export class ChittyRouterGateway {
       requestData.requests_count++;
 
       // Store updated data
-      await this.env.AUTH_CACHE.put(rateLimitKey, JSON.stringify(requestData), {
+      await this.env.PLATFORM_CACHE.put(rateLimitKey, JSON.stringify(requestData), {
         expirationTtl: Math.ceil(window / 1000) + 60, // Extra buffer
       });
 
@@ -1194,8 +1194,8 @@ export class ChittyRouterGateway {
       });
 
       // Store result in ChittyOS systems
-      if (this.env.AUTH_CACHE) {
-        await this.env.AUTH_CACHE.put(
+      if (this.env.PLATFORM_CACHE) {
+        await this.env.PLATFORM_CACHE.put(
           `legal_analysis:${result.chittyId}`,
           JSON.stringify(result),
           { expirationTtl: 86400 * 30 }, // 30 days
@@ -1232,8 +1232,8 @@ export class ChittyRouterGateway {
       });
 
       // Store trace result
-      if (this.env.AUTH_CACHE) {
-        await this.env.AUTH_CACHE.put(
+      if (this.env.PLATFORM_CACHE) {
+        await this.env.PLATFORM_CACHE.put(
           `fund_trace:${result.traceId}`,
           JSON.stringify(result),
           { expirationTtl: 86400 * 90 }, // 90 days
@@ -1270,8 +1270,8 @@ export class ChittyRouterGateway {
       });
 
       // Store document
-      if (this.env.AUTH_CACHE) {
-        await this.env.AUTH_CACHE.put(
+      if (this.env.PLATFORM_CACHE) {
+        await this.env.PLATFORM_CACHE.put(
           `document:${result.documentId}`,
           JSON.stringify(result),
           { expirationTtl: 86400 * 365 }, // 1 year
@@ -1307,8 +1307,8 @@ export class ChittyRouterGateway {
       });
 
       // Store evidence compilation
-      if (this.env.AUTH_CACHE) {
-        await this.env.AUTH_CACHE.put(
+      if (this.env.PLATFORM_CACHE) {
+        await this.env.PLATFORM_CACHE.put(
           `evidence:${result.compilationId}`,
           JSON.stringify(result),
           { expirationTtl: 86400 * 180 }, // 180 days
@@ -1345,8 +1345,8 @@ export class ChittyRouterGateway {
       });
 
       // Store timeline
-      if (this.env.AUTH_CACHE) {
-        await this.env.AUTH_CACHE.put(
+      if (this.env.PLATFORM_CACHE) {
+        await this.env.PLATFORM_CACHE.put(
           `timeline:${result.timelineId}`,
           JSON.stringify(result),
           { expirationTtl: 86400 * 365 }, // 1 year
@@ -1383,8 +1383,8 @@ export class ChittyRouterGateway {
       });
 
       // Store compliance analysis
-      if (this.env.AUTH_CACHE) {
-        await this.env.AUTH_CACHE.put(
+      if (this.env.PLATFORM_CACHE) {
+        await this.env.PLATFORM_CACHE.put(
           `compliance:${result.analysisId}`,
           JSON.stringify(result),
           { expirationTtl: 86400 * 90 }, // 90 days

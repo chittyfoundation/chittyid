@@ -505,14 +505,14 @@ export class NotionSyncService {
     };
 
     // Check if already in DLQ
-    const existing = await this.env.AUTH_CACHE?.get(dlqKey);
+    const existing = await this.env.PLATFORM_CACHE?.get(dlqKey);
     if (existing) {
       const parsed = JSON.parse(existing);
       dlqItem.attempts = parsed.attempts + 1;
       dlqItem.firstFailure = parsed.firstFailure;
     }
 
-    await this.env.AUTH_CACHE?.put(dlqKey, JSON.stringify(dlqItem), {
+    await this.env.PLATFORM_CACHE?.put(dlqKey, JSON.stringify(dlqItem), {
       expirationTtl: 86400, // 24 hours
     });
   }
@@ -522,19 +522,19 @@ export class NotionSyncService {
    */
   async processDlqItems(results) {
     const dlqPrefix = "dlq:notion:";
-    const dlqItems = await this.env.AUTH_CACHE?.list({ prefix: dlqPrefix });
+    const dlqItems = await this.env.PLATFORM_CACHE?.list({ prefix: dlqPrefix });
 
     if (!dlqItems?.keys?.length) return;
 
     for (const key of dlqItems.keys) {
-      const item = JSON.parse(await this.env.AUTH_CACHE.get(key.name));
+      const item = JSON.parse(await this.env.PLATFORM_CACHE.get(key.name));
 
       if (new Date(item.retryAt) > new Date()) continue;
 
       try {
         const result = await this.upsertFact(item.fact);
         if (result.created || result.updated) {
-          await this.env.AUTH_CACHE.delete(key.name);
+          await this.env.PLATFORM_CACHE.delete(key.name);
           results.metrics.notion_ok++;
         }
       } catch (error) {
@@ -546,9 +546,9 @@ export class NotionSyncService {
 
         if (item.attempts >= 10) {
           console.error(`DLQ item ${item.fact.factId} exceeded max attempts`);
-          await this.env.AUTH_CACHE.delete(key.name);
+          await this.env.PLATFORM_CACHE.delete(key.name);
         } else {
-          await this.env.AUTH_CACHE.put(key.name, JSON.stringify(item));
+          await this.env.PLATFORM_CACHE.put(key.name, JSON.stringify(item));
         }
       }
     }
@@ -615,7 +615,7 @@ export class NotionSyncService {
    */
   async storeMetrics(metrics) {
     const metricsKey = `metrics:notion:${new Date().toISOString().slice(0, 10)}`;
-    await this.env.AUTH_CACHE?.put(
+    await this.env.PLATFORM_CACHE?.put(
       metricsKey,
       JSON.stringify({
         ...metrics,

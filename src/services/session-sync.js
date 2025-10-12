@@ -368,7 +368,7 @@ export class SessionSyncService {
     }
 
     // Check KV storage
-    const stored = await this.env.SESSIONS?.get(`session:${sessionId}`);
+    const stored = await this.env.MCP_SESSIONS?.get(`session:${sessionId}`);
     if (stored) {
       const session = JSON.parse(stored);
       this.sessionState.local.set(sessionId, session);
@@ -423,7 +423,7 @@ export class SessionSyncService {
     this.sessionState.local.set(session.id, session);
 
     // Persistent storage
-    await this.env.SESSIONS?.put(
+    await this.env.MCP_SESSIONS?.put(
       `session:${session.id}`,
       JSON.stringify(session),
       {
@@ -447,7 +447,7 @@ export class SessionSyncService {
       checksum: this.calculateChecksum(session),
     };
 
-    await this.env.SESSIONS?.put(
+    await this.env.MCP_SESSIONS?.put(
       `checkpoint:${sessionId}:${Date.now()}`,
       JSON.stringify(checkpoint),
       { expirationTtl: 86400 }, // 24 hours
@@ -458,7 +458,7 @@ export class SessionSyncService {
    * Store conflict records
    */
   async storeConflicts(sessionId, conflicts) {
-    await this.env.SESSIONS?.put(
+    await this.env.MCP_SESSIONS?.put(
       `conflicts:${sessionId}:${Date.now()}`,
       JSON.stringify({
         sessionId,
@@ -484,7 +484,7 @@ export class SessionSyncService {
     };
 
     // Check if already queued
-    const existing = await this.env.SESSIONS?.get(retryKey);
+    const existing = await this.env.MCP_SESSIONS?.get(retryKey);
     if (existing) {
       const data = JSON.parse(existing);
       retryData.attempts = data.attempts + 1;
@@ -494,7 +494,7 @@ export class SessionSyncService {
       ).toISOString();
     }
 
-    await this.env.SESSIONS?.put(retryKey, JSON.stringify(retryData), {
+    await this.env.MCP_SESSIONS?.put(retryKey, JSON.stringify(retryData), {
       expirationTtl: 3600,
     });
   }
@@ -503,12 +503,12 @@ export class SessionSyncService {
    * Process retry queue
    */
   async processRetryQueue() {
-    const retries = await this.env.SESSIONS?.list({ prefix: "retry:" });
+    const retries = await this.env.MCP_SESSIONS?.list({ prefix: "retry:" });
 
     if (!retries?.keys?.length) return;
 
     for (const key of retries.keys) {
-      const data = JSON.parse(await this.env.SESSIONS.get(key.name));
+      const data = JSON.parse(await this.env.MCP_SESSIONS.get(key.name));
 
       if (new Date(data.nextRetry) <= new Date()) {
         // Attempt retry
@@ -516,7 +516,7 @@ export class SessionSyncService {
 
         if (result.success || data.attempts >= 5) {
           // Success or max attempts reached
-          await this.env.SESSIONS.delete(key.name);
+          await this.env.MCP_SESSIONS.delete(key.name);
         } else {
           // Update retry data
           await this.queueForRetry(data.sessionId, data.updates);
@@ -537,13 +537,13 @@ export class SessionSyncService {
       consecutiveFailures: healthy ? 0 : 1,
     };
 
-    const existing = await this.env.SESSIONS?.get(healthKey);
+    const existing = await this.env.MCP_SESSIONS?.get(healthKey);
     if (existing && !healthy) {
       const prev = JSON.parse(existing);
       health.consecutiveFailures = prev.consecutiveFailures + 1;
     }
 
-    await this.env.SESSIONS?.put(healthKey, JSON.stringify(health), {
+    await this.env.MCP_SESSIONS?.put(healthKey, JSON.stringify(health), {
       expirationTtl: 3600,
     });
 
@@ -662,7 +662,7 @@ export class SessionSyncService {
 
     for (const sessionId of expired) {
       this.sessionState.local.delete(sessionId);
-      await this.env.SESSIONS?.delete(`session:${sessionId}`);
+      await this.env.MCP_SESSIONS?.delete(`session:${sessionId}`);
     }
 
     return { cleaned: expired.length };

@@ -770,7 +770,7 @@ class MCPCloudflarePortalServer {
             ],
           };
 
-        case "tools/call":
+        case "tools/call": {
           const { name, arguments: args } = params;
           const oauthToken = params.oauth_token || process.env.OAUTH_TOKEN;
 
@@ -791,6 +791,7 @@ class MCPCloudflarePortalServer {
               },
             ],
           };
+        }
 
         case "ping":
           return { pong: true };

@@ -205,7 +205,7 @@ export class SessionMiddleware {
       });
 
       // Cleanup test session
-      await this.env.SESSIONS?.delete(`session:${testSession.sessionId}`);
+      await this.env.MCP_SESSIONS?.delete(`session:${testSession.sessionId}`);
 
       return {
         healthy: true,

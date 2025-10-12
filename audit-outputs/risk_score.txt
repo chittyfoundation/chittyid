@@ -1,0 +1,9 @@
+35/100
+
+Breakdown:
+- Sourcing quality: 18/40 (commits verified, code verified, but deployment metrics and endpoint tests missing)
+- Numerical accuracy: 12/25 (sizes and version ID unverifiable, account ID contradictory)
+- Logical consistency: 18/25 (account ID contradiction, overstated capability claims)
+- Domain modifiers: -13/10 (infrastructure deployment context: +2 for verifiable git commits, -5 for missing deployment proof, -10 for account ID conflict that could indicate wrong deployment target)
+
+Primary risk: Claims about production deployment cannot be verified without wrangler output. Account ID discrepancy suggests possible deployment to wrong Cloudflare account. Feature capability claims exceed demonstrated implementation.

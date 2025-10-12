@@ -25,7 +25,7 @@ export class PipelineCircuitBreaker {
    */
   async checkCircuit(serviceName, operation) {
     const circuitKey = `circuit:${serviceName}:${operation}`;
-    const circuitData = await this.env.AUTH_CACHE.get(circuitKey);
+    const circuitData = await this.env.PLATFORM_CACHE.get(circuitKey);
 
     if (!circuitData) {
       // No circuit data - allow through and initialize
@@ -58,7 +58,7 @@ export class PipelineCircuitBreaker {
    */
   async recordSuccess(serviceName, operation) {
     const circuitKey = `circuit:${serviceName}:${operation}`;
-    const circuitData = await this.env.AUTH_CACHE.get(circuitKey);
+    const circuitData = await this.env.PLATFORM_CACHE.get(circuitKey);
 
     if (!circuitData) {
       await this.initializeCircuit(circuitKey);
@@ -88,7 +88,7 @@ export class PipelineCircuitBreaker {
       circuit.consecutiveFailures = 0;
     }
 
-    await this.env.AUTH_CACHE.put(circuitKey, JSON.stringify(circuit));
+    await this.env.PLATFORM_CACHE.put(circuitKey, JSON.stringify(circuit));
   }
 
   /**
@@ -96,7 +96,7 @@ export class PipelineCircuitBreaker {
    */
   async recordFailure(serviceName, operation, error) {
     const circuitKey = `circuit:${serviceName}:${operation}`;
-    const circuitData = await this.env.AUTH_CACHE.get(circuitKey);
+    const circuitData = await this.env.PLATFORM_CACHE.get(circuitKey);
 
     if (!circuitData) {
       await this.initializeCircuit(circuitKey);
@@ -130,7 +130,7 @@ export class PipelineCircuitBreaker {
       await this.logCircuitStateChange(serviceName, operation, 'OPEN_FROM_HALF', error);
     }
 
-    await this.env.AUTH_CACHE.put(circuitKey, JSON.stringify(circuit));
+    await this.env.PLATFORM_CACHE.put(circuitKey, JSON.stringify(circuit));
   }
 
   /**
@@ -154,7 +154,7 @@ export class PipelineCircuitBreaker {
       // Try half-open state
       circuit.state = this.states.HALF_OPEN;
       circuit.consecutiveSuccesses = 0;
-      await this.env.AUTH_CACHE.put(circuitKey, JSON.stringify(circuit));
+      await this.env.PLATFORM_CACHE.put(circuitKey, JSON.stringify(circuit));
 
       await this.logCircuitStateChange(
         circuitKey.split(':')[1],
@@ -204,7 +204,7 @@ export class PipelineCircuitBreaker {
       createdAt: Date.now()
     };
 
-    await this.env.AUTH_CACHE.put(circuitKey, JSON.stringify(circuit));
+    await this.env.PLATFORM_CACHE.put(circuitKey, JSON.stringify(circuit));
   }
 
   /**
@@ -219,7 +219,7 @@ export class PipelineCircuitBreaker {
       error: error ? error.message : null
     };
 
-    await this.env.AUTH_CACHE.put(
+    await this.env.PLATFORM_CACHE.put(
       `circuit:log:${Date.now()}`,
       JSON.stringify(logEntry),
       { expirationTtl: 86400 * 7 } // Keep logs for 7 days
@@ -233,7 +233,7 @@ export class PipelineCircuitBreaker {
    */
   async getCircuitStatus(serviceName, operation) {
     const circuitKey = `circuit:${serviceName}:${operation}`;
-    const circuitData = await this.env.AUTH_CACHE.get(circuitKey);
+    const circuitData = await this.env.PLATFORM_CACHE.get(circuitKey);
 
     if (!circuitData) {
       return {
@@ -271,7 +271,7 @@ export class PipelineCircuitBreaker {
    */
   async getAllCircuitStatuses() {
     const circuits = {};
-    const keys = await this.env.AUTH_CACHE.list({ prefix: 'circuit:' });
+    const keys = await this.env.PLATFORM_CACHE.list({ prefix: 'circuit:' });
 
     for (const key of keys.keys) {
       if (key.name.startsWith('circuit:log:')) continue;
@@ -331,7 +331,7 @@ export class PipelineIntegrityBreaker extends PipelineCircuitBreaker {
       severity: 'HIGH'
     };
 
-    await this.env.AUTH_CACHE.put(
+    await this.env.PLATFORM_CACHE.put(
       `pipeline:failure:${Date.now()}`,
       JSON.stringify(pipelineLog),
       { expirationTtl: 86400 * 30 } // Keep pipeline failures for 30 days
@@ -370,7 +370,7 @@ export class PipelineIntegrityBreaker extends PipelineCircuitBreaker {
       failingOperations: this.criticalOperations
     };
 
-    await this.env.AUTH_CACHE.put(
+    await this.env.PLATFORM_CACHE.put(
       'pipeline:emergency:active',
       JSON.stringify(emergencyData),
       { expirationTtl: 3600 } // 1 hour emergency mode
@@ -383,7 +383,7 @@ export class PipelineIntegrityBreaker extends PipelineCircuitBreaker {
    * Check if pipeline is in emergency mode
    */
   async isEmergencyMode() {
-    const emergencyData = await this.env.AUTH_CACHE.get('pipeline:emergency:active');
+    const emergencyData = await this.env.PLATFORM_CACHE.get('pipeline:emergency:active');
     return !!emergencyData;
   }
 }

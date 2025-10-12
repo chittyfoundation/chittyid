@@ -117,8 +117,8 @@ export default class ValidationService {
     };
 
     // Store validation in cache
-    if (this.env.AUTH_CACHE) {
-      await this.env.AUTH_CACHE.put(
+    if (this.env.PLATFORM_CACHE) {
+      await this.env.PLATFORM_CACHE.put(
         `validation:${chittyId}`,
         JSON.stringify({
           valid: true,
@@ -169,8 +169,8 @@ export default class ValidationService {
 
     // Check validation cache
     let cachedValidation = null;
-    if (this.env.AUTH_CACHE) {
-      const cached = await this.env.AUTH_CACHE.get(`validation:${chittyId}`);
+    if (this.env.PLATFORM_CACHE) {
+      const cached = await this.env.PLATFORM_CACHE.get(`validation:${chittyId}`);
       if (cached) {
         cachedValidation = JSON.parse(cached);
       }

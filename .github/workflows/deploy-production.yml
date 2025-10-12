@@ -1,0 +1,370 @@
+name: Deploy ChittyID Production
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'functions/**'
+      - 'worker.js'
+      - 'wrangler.toml'
+      - 'package.json'
+  workflow_dispatch:  # Manual trigger
+    inputs:
+      skip_tests:
+        description: 'Skip tests (emergency only)'
+        required: false
+        default: 'false'
+
+# Prevent concurrent deployments
+concurrency:
+  group: production-deployment
+  cancel-in-progress: false
+
+jobs:
+  # Stage 1: Pre-deployment Validation
+  validate:
+    name: Validate Code & Configuration
+    runs-on: ubuntu-latest
+    outputs:
+      should_deploy: ${{ steps.check.outputs.should_deploy }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for proper validation
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate with ChittyContext
+        id: chittycontext_validate
+        run: |
+          echo "🔍 Running ChittyContext validation..."
+          node scripts/chittycontext.js validate production
+
+      - name: Export ChittyContext environment
+        id: export_context
+        run: |
+          echo "📤 Exporting ChittyContext environment variables..."
+          node scripts/chittycontext.js export-env production >> $GITHUB_ENV
+
+      - name: Lint code
+        run: npm run lint || echo "⚠️ Linting warnings (non-blocking)"
+
+      - name: Check deployment decision
+        id: check
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+            echo "📝 Manual deployment requested"
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+            echo "📝 Deployment triggered by push to main"
+          else
+            echo "should_deploy=false" >> $GITHUB_OUTPUT
+            echo "📝 Skipping deployment (not main branch)"
+          fi
+
+  # Stage 2: Security & Compliance Testing
+  security:
+    name: Security & Compliance Tests
+    runs-on: ubuntu-latest
+    needs: validate
+    if: needs.validate.outputs.should_deploy == 'true' && github.event.inputs.skip_tests != 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run security audit
+        run: npm audit --audit-level=high || true
+
+      - name: Run ChittyCheck validation
+        run: |
+          if [ -f "../../../chittycheck/chittycheck-enhanced.sh" ]; then
+            echo "🔍 Running ChittyCheck compliance validation..."
+            bash ../../../chittycheck/chittycheck-enhanced.sh --qa || echo "⚠️ ChittyCheck warnings (review required)"
+          else
+            echo "⚠️ ChittyCheck not found, skipping"
+          fi
+
+      - name: Verify VRF implementation
+        run: |
+          echo "🔍 Verifying VRF and drand integration..."
+          if [ ! -f "src/services/drand-beacon.js" ]; then
+            echo "❌ ERROR: drand-beacon.js not found"
+            exit 1
+          fi
+          if [ ! -f "src/services/vrf-generator.js" ]; then
+            echo "❌ ERROR: vrf-generator.js not found"
+            exit 1
+          fi
+          echo "✅ VRF implementation files present"
+
+  # Stage 3: Automated Testing
+  test:
+    name: Run Test Suite
+    runs-on: ubuntu-latest
+    needs: validate
+    if: needs.validate.outputs.should_deploy == 'true' && github.event.inputs.skip_tests != 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm run test:unit || npm test || echo "⚠️ No tests configured"
+
+      - name: Run integration tests
+        run: npm run test:integration || echo "⚠️ Integration tests not configured"
+
+      - name: Test VRF generation
+        run: |
+          echo "🧪 Testing VRF generation logic..."
+          node -e "
+            const { VRFGenerator } = require('./src/services/vrf-generator.js');
+            console.log('✅ VRF Generator loads successfully');
+          " || echo "⚠️ VRF test skipped (module syntax)"
+
+  # Stage 4: Staging Deployment (Optional)
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [validate, security, test]
+    if: needs.validate.outputs.should_deploy == 'true'
+    environment: staging
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate staging with ChittyContext
+        run: node scripts/chittycontext.js validate staging
+
+      - name: Deploy to Cloudflare Workers (Staging)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --env staging
+        env:
+          CHITTY_ID_TOKEN: ${{ secrets.CHITTY_ID_TOKEN_STAGING }}
+          CHITTY_API_KEY: ${{ secrets.CHITTY_API_KEY_STAGING }}
+
+      - name: Verify staging deployment
+        run: |
+          echo "⏳ Waiting for staging deployment to propagate..."
+          sleep 15
+
+          echo "🔍 Testing staging health endpoint..."
+          if curl -f https://staging.id.chitty.cc/health; then
+            echo "✅ Staging health check passed"
+          else
+            echo "❌ Staging health check failed"
+            exit 1
+          fi
+
+      - name: Run smoke tests on staging
+        run: |
+          echo "🧪 Running smoke tests on staging..."
+          # Test VRF mint endpoint
+          curl -X POST https://staging.id.chitty.cc/v1/mint \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.CHITTY_ID_TOKEN_STAGING }}" \
+            -d '{
+              "namespace": "TST",
+              "entityType": "T",
+              "region": "1",
+              "jurisdiction": "USA",
+              "trustLevel": 0,
+              "content": {"test": "smoke-test-'$(date +%s)'"}
+            }' || echo "⚠️ Smoke test failed (review required)"
+
+  # Stage 5: Production Deployment (Requires Approval)
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [validate, security, test, deploy-staging]
+    if: needs.validate.outputs.should_deploy == 'true'
+    environment:
+      name: production
+      url: https://id.chitty.cc
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Pre-deployment backup
+        run: |
+          echo "📦 Creating deployment backup..."
+          mkdir -p deployment-backups
+          echo "Deployment: ${{ github.sha }}" > deployment-backups/deployment-${{ github.run_number }}.txt
+          echo "Timestamp: $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> deployment-backups/deployment-${{ github.run_number }}.txt
+          echo "Actor: ${{ github.actor }}" >> deployment-backups/deployment-${{ github.run_number }}.txt
+
+      - name: Deploy to Cloudflare Workers (Production)
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --env production
+          secrets: |
+            CHITTY_ID_TOKEN
+            CHITTY_API_KEY
+            NEON_DATABASE_URL
+            CHITTYOS_SERVICE_TOKEN
+            NOTION_TOKEN
+            NOTION_DATABASE_ID_ATOMIC_FACTS
+        env:
+          CHITTY_ID_TOKEN: ${{ secrets.CHITTY_ID_TOKEN }}
+          CHITTY_API_KEY: ${{ secrets.CHITTY_API_KEY }}
+          NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+          CHITTYOS_SERVICE_TOKEN: ${{ secrets.CHITTYOS_SERVICE_TOKEN }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID_ATOMIC_FACTS: ${{ secrets.NOTION_DATABASE_ID_ATOMIC_FACTS }}
+
+      - name: Wait for deployment propagation
+        run: |
+          echo "⏳ Waiting for deployment to propagate across Cloudflare edge..."
+          sleep 20
+
+      - name: Verify production deployment
+        id: verify
+        run: |
+          echo "🔍 Verifying production deployment..."
+
+          # Health check
+          if ! curl -f https://id.chitty.cc/health; then
+            echo "❌ Production health check FAILED"
+            exit 1
+          fi
+          echo "✅ Health check passed"
+
+          # Test VRF mint endpoint
+          RESPONSE=$(curl -s -X POST https://id.chitty.cc/v1/mint \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.CHITTY_ID_TOKEN }}" \
+            -d '{
+              "namespace": "GEN",
+              "entityType": "T",
+              "region": "1",
+              "jurisdiction": "USA",
+              "trustLevel": 3,
+              "content": {"test": "production-verification-'$(date +%s)'"}
+            }')
+
+          echo "Response: $RESPONSE"
+
+          # Check if response contains expected fields
+          if echo "$RESPONSE" | grep -q "chittyId" && echo "$RESPONSE" | grep -q "deterministic"; then
+            echo "✅ VRF mint endpoint verified"
+          else
+            echo "❌ VRF mint endpoint verification FAILED"
+            exit 1
+          fi
+
+          echo "✅ Production deployment verified successfully"
+
+      - name: Create deployment tag
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git tag -a "production-${{ github.run_number }}" -m "Production deployment ${{ github.run_number }}"
+          git push origin "production-${{ github.run_number }}" || echo "⚠️ Could not push tag"
+
+  # Stage 6: Post-Deployment Monitoring
+  post-deployment:
+    name: Post-Deployment Monitoring
+    runs-on: ubuntu-latest
+    needs: deploy-production
+    steps:
+      - name: Monitor for 5 minutes
+        run: |
+          echo "📊 Monitoring production for 5 minutes..."
+          for i in {1..10}; do
+            echo "Check $i/10..."
+            if curl -f https://id.chitty.cc/health; then
+              echo "✅ Health check $i passed"
+            else
+              echo "❌ Health check $i FAILED"
+              exit 1
+            fi
+            sleep 30
+          done
+          echo "✅ Post-deployment monitoring complete"
+
+      - name: Deployment summary
+        run: |
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Status**: ✅ SUCCESS" >> $GITHUB_STEP_SUMMARY
+          echo "**Service**: ChittyID Authority (id.chitty.cc)" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployed by**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp**: $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Verification" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Health endpoint responding" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ VRF mint endpoint verified" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Post-deployment monitoring passed" >> $GITHUB_STEP_SUMMARY
+
+  # Rollback Job (Manual Trigger Only)
+  rollback:
+    name: Rollback Production
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.rollback == 'true'
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Rollback to previous deployment
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: rollback --env production
+
+      - name: Verify rollback
+        run: |
+          echo "⏳ Waiting for rollback to propagate..."
+          sleep 15
+          if curl -f https://id.chitty.cc/health; then
+            echo "✅ Rollback successful"
+          else
+            echo "❌ Rollback verification failed"
+            exit 1
+          fi

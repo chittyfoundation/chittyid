@@ -5,7 +5,7 @@
  */
 
 export default {
-  async fetch(request, env, ctx) {
+  async fetch(request, env, _ctx) {
     const url = new URL(request.url);
     const path = url.pathname;
 
@@ -310,23 +310,24 @@ export default {
   },
 };
 
-function createFallbackStatusBlock(reason) {
-  return {
-    status: "fallback",
-    readable_status:
-      "This is a temporary fallback ChittyID issued due to primary service unavailability. " +
-      "It will be automatically reconciled with a permanent ID when the primary service is restored.",
-    creation_time: new Date().toISOString(),
-    fallback_reason: reason,
-    reconciliation_pending: true,
-    primary_service_url: "https://chittyid-foundation.workers.dev",
-    fallback_service_url: "https://fallback.chittyid-foundation.workers.dev",
-    drand_round: null,
-    last_validated: new Date().toISOString(),
-    verification_endpoint:
-      "https://chittyid-foundation.workers.dev/api/v2/chittyid/verify",
-  };
-}
+// Unused - kept for reference
+// function createFallbackStatusBlock(reason) {
+//   return {
+//     status: "fallback",
+//     readable_status:
+//       "This is a temporary fallback ChittyID issued due to primary service unavailability. " +
+//       "It will be automatically reconciled with a permanent ID when the primary service is restored.",
+//     creation_time: new Date().toISOString(),
+//     fallback_reason: reason,
+//     reconciliation_pending: true,
+//     primary_service_url: "https://chittyid-foundation.workers.dev",
+//     fallback_service_url: "https://fallback.chittyid-foundation.workers.dev",
+//     drand_round: null,
+//     last_validated: new Date().toISOString(),
+//     verification_endpoint:
+//       "https://chittyid-foundation.workers.dev/api/v2/chittyid/verify",
+//   };
+// }
 
 // Helper function for JSON responses
 function jsonResponse(data, headers = {}, status = 200) {
@@ -422,7 +423,7 @@ async function verifyChittyID(chittyId, env) {
 /**
  * Verify Official ChittyID Format: VV-G-LLL-SSSS-T-YM-C-X
  */
-async function verifyOfficialChittyID(chittyId, env) {
+async function verifyOfficialChittyID(chittyId, _env) {
   const parts = chittyId.split("-");
 
   if (parts.length !== 8) {
@@ -490,7 +491,7 @@ async function verifySimpleChittyID(chittyId, env) {
     return { valid: false, format: false, reason: "Invalid simple format" };
   }
 
-  const [prefix, entity, sequence, providedChecksum] = parts;
+  const [_prefix, entity, sequence, providedChecksum] = parts;
 
   // Get audit record to verify with original name
   const auditRecord = await env.CHITTYID_KV.get(`audit:${chittyId}`);
@@ -689,8 +690,9 @@ async function generateSimpleChecksum(data) {
 // All ChittyIDs must be requested from https://id.chitty.cc
 
 /**
- * Store audit record for fallback ChittyID
+ * Store audit record for fallback ChittyID (Unused - kept for reference)
  */
+// eslint-disable-next-line no-unused-vars
 async function storeFallbackAuditRecord(
   chittyId,
   entity,

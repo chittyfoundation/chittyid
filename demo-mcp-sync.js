@@ -345,7 +345,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const command = process.argv[2];
 
   switch (command) {
-    case "register":
+    case "register": {
       const projectName = process.argv[3];
       if (!projectName) {
         console.error(
@@ -367,8 +367,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
           console.log(JSON.stringify(result, null, 2));
         });
       break;
+    }
 
-    case "servers":
+    case "servers": {
       const projectId = process.argv[3];
       if (!projectId) {
         console.error(
@@ -382,8 +383,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
         console.log(JSON.stringify(servers, null, 2));
       });
       break;
+    }
 
-    case "sync":
+    case "sync": {
       const syncProjectId = process.argv[3];
       if (!syncProjectId) {
         console.error(
@@ -397,6 +399,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
         console.log(JSON.stringify(result, null, 2));
       });
       break;
+    }
 
     case "list":
       demoSync.listProjects();

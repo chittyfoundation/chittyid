@@ -406,7 +406,7 @@ export class RegistryGovernance {
    */
   async logGovernanceDecision(decision) {
     const logEntry = {
-      id: crypto.randomUUID(),
+      id: `pending-id-${Date.now()}`,
       timestamp: decision.timestamp,
       entity: decision.entity,
       operation: decision.operation,

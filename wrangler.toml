@@ -34,6 +34,11 @@ id = "d66c1e709c72456fa21aaa0d02f2db5e"
 binding = "PLATFORM_KV"
 id = "d52d89c1eebd402b95719161d311e7df"
 
+# ChittyID Sequential Counter Storage - CRITICAL for deterministic generation
+[[env.production.kv_namespaces]]
+binding = "CHITTYID_KV"
+id = "ec782932b5f54c359d9aef2e28898bf9"
+
 # Ontology System KV bindings (using PLATFORM_KV for now)
 [[env.production.kv_namespaces]]
 binding = "SERVICE_REGISTRY"
@@ -68,6 +73,11 @@ id = "d66c1e709c72456fa21aaa0d02f2db5e"
 [[kv_namespaces]]
 binding = "PLATFORM_KV"
 id = "d52d89c1eebd402b95719161d311e7df"
+
+# ChittyID Sequential Counter Storage - CRITICAL for deterministic generation
+[[kv_namespaces]]
+binding = "CHITTYID_KV"
+id = "ec782932b5f54c359d9aef2e28898bf9"
 
 # D1 Database - Not available in this account
 # [[d1_databases]]

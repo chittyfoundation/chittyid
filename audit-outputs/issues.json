@@ -1,0 +1,65 @@
+[
+  {
+    "type": "missing_source",
+    "claim": "Version: a5f1d132-ce7f-4f02-8ce4-8b11647f16a3",
+    "location": "Deployment Summary section",
+    "severity": "medium",
+    "suggested_fix": "Provide actual wrangler deploy output showing this version ID, or remove the specific version claim"
+  },
+  {
+    "type": "missing_source",
+    "claim": "Upload Size: 220.13 KiB (gzip: 41.28 KiB)",
+    "location": "Deployment Summary section",
+    "severity": "medium",
+    "suggested_fix": "Include wrangler deployment output showing these exact size metrics, or omit specific numbers"
+  },
+  {
+    "type": "missing_source",
+    "claim": "✅ `/health` - Main health check (healthy)",
+    "location": "Verified Endpoints section",
+    "severity": "medium",
+    "suggested_fix": "Provide curl test output showing 200 response and 'healthy' status from https://id.chitty.cc/health"
+  },
+  {
+    "type": "missing_source",
+    "claim": "✅ `/ontology/health` - Ontology system (healthy, all KV connected)",
+    "location": "Verified Endpoints section",
+    "severity": "medium",
+    "suggested_fix": "Provide curl test output showing successful KV connection validation"
+  },
+  {
+    "type": "missing_source",
+    "claim": "✅ `/mcp/health` - MCP portal (degraded due to external auth, expected)",
+    "location": "Verified Endpoints section",
+    "severity": "medium",
+    "suggested_fix": "Provide actual curl response showing degraded status and auth error message"
+  },
+  {
+    "type": "unsupported_claim",
+    "claim": "✅ Hybrid ID generation capability",
+    "location": "New Features Deployed section",
+    "severity": "low",
+    "suggested_fix": "Either demonstrate hybrid ID generation with test output, or reword to 'Hybrid ID generation foundation' to indicate infrastructure is in place but not fully tested"
+  },
+  {
+    "type": "logical_contradiction",
+    "claim": "Changed account_id from bbf9fcd845e78035b7a135c481e88541 to correct 0bc21e3a5a9de1a4cc843be9c3e98121",
+    "location": "Commits section, commit 20afbd4 description",
+    "severity": "critical",
+    "suggested_fix": "Verify actual account ID from wrangler.toml (shows 0bc21e3a5a9de1a4cc843be9c3e98121) and clarify the 'corrected to ChittyCorp LLC' claim - the summary states this was a correction but documentation shows bbf9fcd845e78035b7a135c481e88541 as ChittyCorp LLC account elsewhere"
+  },
+  {
+    "type": "exaggeration",
+    "claim": "The ontology system is now live and can classify entities, translate between formats, and generate hybrid ChittyIDs!",
+    "location": "Final paragraph",
+    "severity": "low",
+    "suggested_fix": "Replace with: 'The ontology system infrastructure is deployed and ready for entity classification, format translation, and hybrid ChittyID generation testing.'"
+  },
+  {
+    "type": "missing_source",
+    "claim": "KV bindings: SERVICE_REGISTRY, SCHEMA_KV",
+    "location": "New Features Deployed section",
+    "severity": "low",
+    "suggested_fix": "Technically accurate based on wrangler.toml, but note these bindings both point to the same PLATFORM_KV namespace (d52d89c1eebd402b95719161d311e7df) - add caveat about shared namespace"
+  }
+]

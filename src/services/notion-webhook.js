@@ -262,11 +262,11 @@ export class NotionWebhookService {
       console.log('AtomicFacts database schema updated');
 
       // Clear any cached schema information
-      await this.env.AUTH_CACHE.delete('notion:schema:atomic_facts');
+      await this.env.PLATFORM_CACHE.delete('notion:schema:atomic_facts');
 
       // Refetch and cache new schema
       const schema = await this.fetchDatabaseSchema(databaseId);
-      await this.env.AUTH_CACHE.put(
+      await this.env.PLATFORM_CACHE.put(
         'notion:schema:atomic_facts',
         JSON.stringify(schema),
         { expirationTtl: 86400 }
@@ -550,7 +550,7 @@ export class NotionWebhookService {
       payload: JSON.stringify(payload)
     };
 
-    await this.env.AUTH_CACHE.put(
+    await this.env.PLATFORM_CACHE.put(
       `webhook:log:${Date.now()}`,
       JSON.stringify(logEntry),
       { expirationTtl: 86400 * 7 } // Keep logs for 7 days
@@ -569,7 +569,7 @@ export class NotionWebhookService {
       attempts: 1
     };
 
-    await this.env.AUTH_CACHE.put(
+    await this.env.PLATFORM_CACHE.put(
       `dlq:webhook:${Date.now()}`,
       JSON.stringify(dlqEntry),
       { expirationTtl: 86400 * 3 } // Keep for 3 days
@@ -580,7 +580,7 @@ export class NotionWebhookService {
    * Store metrics
    */
   async storeMetrics() {
-    await this.env.AUTH_CACHE.put(
+    await this.env.PLATFORM_CACHE.put(
       'metrics:notion:webhooks',
       JSON.stringify({
         ...this.metrics,

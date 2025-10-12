@@ -193,7 +193,7 @@ export class SessionAPI {
     const result = await this.syncService.syncSession(sessionId, session);
 
     // Remove from local storage
-    await this.env.SESSIONS?.delete(`session:${sessionId}`);
+    await this.env.MCP_SESSIONS?.delete(`session:${sessionId}`);
 
     return {
       success: true,
@@ -212,7 +212,7 @@ export class SessionAPI {
     // Check each service health
     for (const [service, config] of Object.entries(this.syncService.services)) {
       const healthKey = `health:${service}`;
-      const healthData = await this.env.SESSIONS?.get(healthKey);
+      const healthData = await this.env.MCP_SESSIONS?.get(healthKey);
 
       services[service] = healthData ? JSON.parse(healthData) : {
         healthy: false,
@@ -221,11 +221,11 @@ export class SessionAPI {
     }
 
     // Get retry queue size
-    const retryQueue = await this.env.SESSIONS?.list({ prefix: 'retry:' });
+    const retryQueue = await this.env.MCP_SESSIONS?.list({ prefix: 'retry:' });
     const retryCount = retryQueue?.keys?.length || 0;
 
     // Get active sessions count
-    const sessions = await this.env.SESSIONS?.list({ prefix: 'session:' });
+    const sessions = await this.env.MCP_SESSIONS?.list({ prefix: 'session:' });
     const sessionCount = sessions?.keys?.length || 0;
 
     return {

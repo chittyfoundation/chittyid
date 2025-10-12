@@ -244,7 +244,7 @@ class IntakeStage {
 
   async validateToken(token) {
     // Check token in KV cache
-    const cached = await this.env.AUTH_CACHE?.get(`token:${token}`);
+    const cached = await this.env.PLATFORM_CACHE?.get(`token:${token}`);
     if (cached) {
       return JSON.parse(cached);
     }
@@ -259,7 +259,7 @@ class IntakeStage {
     };
 
     // Cache validation result
-    await this.env.AUTH_CACHE?.put(
+    await this.env.PLATFORM_CACHE?.put(
       `token:${token}`,
       JSON.stringify(validation),
       { expirationTtl: 3600 }
@@ -269,7 +269,7 @@ class IntakeStage {
   }
 
   async getUser(userId) {
-    const cached = await this.env.SESSIONS?.get(`user:${userId}`);
+    const cached = await this.env.MCP_SESSIONS?.get(`user:${userId}`);
     if (cached) {
       return JSON.parse(cached);
     }
@@ -285,7 +285,7 @@ class IntakeStage {
   }
 
   async getProject(projectId) {
-    const cached = await this.env.SESSIONS?.get(`project:${projectId}`);
+    const cached = await this.env.MCP_SESSIONS?.get(`project:${projectId}`);
     if (cached) {
       return JSON.parse(cached);
     }

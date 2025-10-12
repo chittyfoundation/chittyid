@@ -4,7 +4,7 @@
 name = "chittyid-hybrid-system"
 main = "src/hybrid/ontology-controller.js"
 compatibility_date = "2024-09-23"
-account_id = "0bc21e3a5a9de1a4cc843be9c3e98121"
+account_id = "bbf9fcd845e78035b7a135c481e88541"  # ChittyCorp LLC main account
 
 # Routes for hybrid system endpoints
 [[routes]]
@@ -66,12 +66,54 @@ vars = { ENVIRONMENT = "development" }
 # Production environment
 [env.production]
 name = "chittyid-hybrid-production"
-vars = { ENVIRONMENT = "production" }
-routes = [
-  { pattern = "id.chitty.cc/ontology/*", zone_name = "chitty.cc" },
-  { pattern = "id.chitty.cc/translate/*", zone_name = "chitty.cc" },
-  { pattern = "id.chitty.cc/governance/*", zone_name = "chitty.cc" }
-]
+[env.production.vars]
+ENVIRONMENT = "production"
+DRAND_BEACON_URL = "https://api.drand.sh/public/latest"
+CHITTYOS_VERSION = "1.0.0"
+HYBRID_SYSTEM_VERSION = "1.0.0"
+PIPELINE_ENFORCEMENT = "STRICT"
+GENERATION_MODE = "SERVER_ONLY"
+
+[[env.production.routes]]
+pattern = "id.chitty.cc/ontology/*"
+zone_name = "chitty.cc"
+
+[[env.production.routes]]
+pattern = "id.chitty.cc/translate/*"
+zone_name = "chitty.cc"
+
+[[env.production.routes]]
+pattern = "id.chitty.cc/governance/*"
+zone_name = "chitty.cc"
+
+[[env.production.kv_namespaces]]
+binding = "MCP_SESSIONS"
+id = "6eadda4b8d914cf68855ec7a4fbd06f2"
+
+[[env.production.kv_namespaces]]
+binding = "OAUTH_TOKENS"
+id = "52aed0020ff34f918420d4133a50a764"
+
+[[env.production.kv_namespaces]]
+binding = "API_KEYS"
+id = "a555554722eb4b8ba9ecb31a78215d32"
+
+[[env.production.kv_namespaces]]
+binding = "PLATFORM_KV"
+id = "d52d89c1eebd402b95719161d311e7df"
+
+[[env.production.kv_namespaces]]
+binding = "SERVICE_REGISTRY"
+id = "d52d89c1eebd402b95719161d311e7df"  # Using PLATFORM_KV for now
+
+[[env.production.kv_namespaces]]
+binding = "SCHEMA_KV"
+id = "d52d89c1eebd402b95719161d311e7df"  # Using PLATFORM_KV for now
+
+[[env.production.r2_buckets]]
+binding = "AUDIT_LOGS"
+bucket_name = "chittyos-audit-logs"
+preview_bucket_name = "chittyos-audit-logs-preview"
 
 # Cron triggers for maintenance
 [[triggers.crons]]

@@ -1,0 +1,92 @@
+[
+  {
+    "claim": "Commits: 50423f8 - Ontology integration",
+    "url": "git://local",
+    "title": "git show 50423f8",
+    "date": "2025-10-10",
+    "status": "verified",
+    "quote_match": true,
+    "note": "Commit exists and contains ontology controller integration as described"
+  },
+  {
+    "claim": "Commits: 20afbd4 - Account ID fix",
+    "url": "git://local",
+    "title": "git show 20afbd4",
+    "date": "2025-10-10",
+    "status": "verified",
+    "quote_match": true,
+    "note": "Commit exists but description conflicts with other ChittyOS documentation about correct ChittyCorp LLC account ID"
+  },
+  {
+    "claim": "New Features: /ontology/*, /translate/*, /governance/* routes",
+    "url": "file:///worker.js",
+    "title": "worker.js lines 186-199",
+    "date": "2025-10-10",
+    "status": "verified",
+    "quote_match": true,
+    "note": "Routes implemented and forwarding to OntologyControllerWorker"
+  },
+  {
+    "claim": "KV bindings: SERVICE_REGISTRY, SCHEMA_KV",
+    "url": "file:///wrangler.toml",
+    "title": "wrangler.toml lines 37-44",
+    "date": "2025-10-10",
+    "status": "verified",
+    "quote_match": true,
+    "note": "Bindings exist but both point to same PLATFORM_KV namespace (d52d89c1eebd402b95719161d311e7df)"
+  },
+  {
+    "claim": "Version: a5f1d132-ce7f-4f02-8ce4-8b11647f16a3",
+    "url": null,
+    "title": null,
+    "date": null,
+    "status": "unverifiable",
+    "quote_match": false,
+    "note": "No wrangler deployment output provided to verify this version ID. grep returned no matches in codebase."
+  },
+  {
+    "claim": "Upload Size: 220.13 KiB (gzip: 41.28 KiB)",
+    "url": null,
+    "title": null,
+    "date": null,
+    "status": "unverifiable",
+    "quote_match": false,
+    "note": "No wrangler deployment output provided to verify upload sizes"
+  },
+  {
+    "claim": "Endpoint health checks verified as healthy/degraded",
+    "url": null,
+    "title": null,
+    "date": null,
+    "status": "unverifiable",
+    "quote_match": false,
+    "note": "No curl test outputs provided. Cannot verify actual endpoint responses."
+  },
+  {
+    "claim": "Production Worker: chittyid-production at id.chitty.cc",
+    "url": "file:///wrangler.toml",
+    "title": "wrangler.toml lines 9-14",
+    "date": "2025-10-10",
+    "status": "verified",
+    "quote_match": true,
+    "note": "Worker name and route pattern configured correctly in wrangler.toml"
+  },
+  {
+    "claim": "Hybrid ID generation capability",
+    "url": "file:///src/hybrid/ontology-controller.js",
+    "title": "ontology-controller.js",
+    "date": "2025-10-10",
+    "status": "mismatch",
+    "quote_match": false,
+    "note": "Code shows OntologyController class with classification methods, but no actual ID generation implementation visible in reviewed lines 1-100. Infrastructure exists but 'capability' overstates completion."
+  },
+  {
+    "claim": "Backward Compatibility: All existing endpoints preserved and working",
+    "url": "file:///worker.js",
+    "title": "worker.js routing logic",
+    "date": "2025-10-10",
+    "status": "verified",
+    "quote_match": true,
+    "note": "Code structure preserves existing route forwarding to onRequest() handler, new routes are additive only"
+  }
+]

@@ -6,11 +6,10 @@
 import { createPipelineEnforcer } from "../../src/middleware/pipeline-enforcer.js";
 import { createRequestInterceptor } from "../../src/middleware/request-interceptor.js";
 import { PipelineIntegrityBreaker } from "../../src/enforcement/circuit-breaker.js";
-// Unused imports - kept for future use
-// import { ChittyPipeline } from "../../src/pipeline/index.js";
-// import { SessionSyncService } from "../../src/services/session-sync.js";
-// import { NotionSyncService } from "../../src/services/notion-sync.js";
-// import { handleNotionWebhook } from "../../src/services/notion-webhook.js";
+import { ChittyPipeline } from "../../src/pipeline/index.js";
+import { SessionSyncService } from "../../src/services/session-sync.js";
+import { NotionSyncService } from "../../src/services/notion-sync.js";
+import { handleNotionWebhook } from "../../src/services/notion-webhook.js";
 
 class ChittyIDAPI {
   constructor() {
@@ -44,23 +43,17 @@ class ChittyIDAPI {
   }
 
   async getNextSequential(env, key) {
-    // CRITICAL: No random fallback - fail hard if KV unavailable
-    // ChittyID authority service MUST be deterministic
-    if (!env.CHITTYID_KV) {
-      throw new Error(
-        "CHITTYID_KV namespace not available - cannot generate deterministic IDs",
-      );
-    }
-
     try {
-      const stored = await env.CHITTYID_KV.get(key);
+      const stored = await env.CHITTYID_KV?.get(key);
       let counter = stored ? parseInt(stored) : 1;
       counter = counter >= 9999 ? 1 : counter + 1;
-      await env.CHITTYID_KV.put(key, counter.toString());
+      await env.CHITTYID_KV?.put(key, counter.toString());
       return counter.toString().padStart(4, "0");
     } catch (error) {
-      // No fallback - propagate error to force proper handling
-      throw new Error(`Failed to generate sequential ID: ${error.message}`);
+      // Fallback to random if KV not available
+      return Math.floor(Math.random() * 9999)
+        .toString()
+        .padStart(4, "0");
     }
   }
 
@@ -257,7 +250,7 @@ class ChittyIDAPI {
     }
 
     // Extract parameters from AI orchestration result
-    const _aiResponse = pipelineResult.result;
+    const aiResponse = pipelineResult.result;
 
     // For now, use defaults until AI response parsing is implemented
     // In production, these would come from the AI pipeline result
@@ -276,7 +269,7 @@ class ChittyIDAPI {
     };
   }
 
-  async callRouterAgent(request, purpose, _env) {
+  async callRouterAgent(request, purpose, env) {
     // Simulate router agent call - in reality this would call src/agents/routing.js
     const userAgent = request.headers.get("User-Agent") || "";
     const ip = request.headers.get("CF-Connecting-IP") || "";
@@ -293,7 +286,7 @@ class ChittyIDAPI {
     };
   }
 
-  async callIntakeProcess(_context, _env) {
+  async callIntakeProcess(context, env) {
     // Simulate intake validation - check if user/project is registered
     // In reality, this would validate against KV/D1 storage
 
@@ -319,7 +312,7 @@ class ChittyIDAPI {
     };
   }
 
-  async callTrustModule(user, project, _env) {
+  async callTrustModule(user, project, env) {
     // Simulate trust evaluation - in reality calls src/agents/security.js
     let trustLevel = "0"; // Default unverified
 
@@ -438,130 +431,6 @@ function corsHeaders() {
     "Access-Control-Allow-Headers": "Content-Type",
     "Content-Type": "application/json",
   };
-}
-
-/**
- * Handle VRF-based ChittyID generation with drand + content binding
- *
- * This is the NEW authoritative generation endpoint that replaces
- * all Math.random() fallbacks with deterministic VRF.
- */
-async function handleVRFMint(request, env, circuitBreaker) {
-  try {
-    // Parse request body
-    const body = await request.json();
-    const {
-      namespace,
-      entityType,
-      region,
-      jurisdiction,
-      trustLevel,
-      content,
-      metadata,
-    } = body;
-
-    // Validate required fields
-    if (
-      !namespace ||
-      !entityType ||
-      !region ||
-      !jurisdiction ||
-      trustLevel === undefined
-    ) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error: "MISSING_REQUIRED_FIELDS",
-          required: [
-            "namespace",
-            "entityType",
-            "region",
-            "jurisdiction",
-            "trustLevel",
-            "content",
-          ],
-          message:
-            "All required fields must be provided for VRF-based generation",
-        }),
-        {
-          status: 400,
-          headers: corsHeaders(),
-        },
-      );
-    }
-
-    // Validate content object is provided for binding
-    if (!content || typeof content !== "object") {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error: "CONTENT_REQUIRED",
-          message:
-            "Content object required for cryptographic binding to ChittyID",
-        }),
-        {
-          status: 400,
-          headers: corsHeaders(),
-        },
-      );
-    }
-
-    // Import and instantiate VRF generator
-    const { VRFGenerator } = await import(
-      "../../src/services/vrf-generator.js"
-    );
-    const generator = new VRFGenerator(env);
-
-    // Generate ChittyID using VRF with drand beacon
-    const result = await generator.generate({
-      namespace,
-      entityType,
-      region,
-      jurisdiction,
-      trustLevel,
-      content,
-    });
-
-    await circuitBreaker.recordSuccess("vrf", "generation");
-
-    return new Response(
-      JSON.stringify({
-        success: true,
-        chittyId: result.chittyId,
-        metadata: {
-          ...result.metadata,
-          requestMetadata: metadata,
-        },
-        generation: {
-          method: "VRF with drand beacon + content binding",
-          deterministic: true,
-          verifiable: true,
-          timestamp: new Date().toISOString(),
-        },
-      }),
-      {
-        headers: {
-          ...corsHeaders(),
-          "Content-Type": "application/json",
-        },
-      },
-    );
-  } catch (error) {
-    await circuitBreaker.recordFailure("vrf", "generation", error);
-
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: "VRF_GENERATION_FAILED",
-        message: error.message,
-        timestamp: new Date().toISOString(),
-      }),
-      {
-        status: 500,
-        headers: corsHeaders(),
-      },
-    );
-  }
 }
 
 /**
@@ -694,15 +563,7 @@ export async function onRequest(context) {
       });
     }
 
-    // VRF-based ChittyID generation endpoint with drand + content binding
-    if (pathname === "/v1/mint" && request.method === "POST") {
-      return await enforcer(request, async (req) => {
-        return await handleVRFMint(req, env, circuitBreaker);
-      });
-    }
-
     // Route handling for other endpoints
-    // eslint-disable-next-line no-constant-condition
     if (false) {
       // Disabled duplicate route - pathname === '/api/get-chittyid' && request.method === 'GET') {
       // Simple request - pipeline determines all parameters

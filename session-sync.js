@@ -45,7 +45,7 @@ class ChittySessionSync {
    * Generate unique session ID
    */
   generateSessionId() {
-    return `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `session-${Date.now()}`;
   }
 
   /**
@@ -301,7 +301,7 @@ class ChittySessionSync {
     if (!this.config.sync_data.tool_usage) return;
 
     const operation = {
-      id: `op-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
+      id: `op-${Date.now()}`,
       timestamp: new Date().toISOString(),
       tool: toolName,
       parameters: this.config.security.encrypt_sensitive

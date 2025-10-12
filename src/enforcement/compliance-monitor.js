@@ -174,7 +174,7 @@ export class ComplianceMonitor {
     }
 
     // Verify pipeline completion in session
-    const sessionData = await this.env.SESSIONS.get(`session:${sessionId}`);
+    const sessionData = await this.env.MCP_SESSIONS.get(`session:${sessionId}`);
     if (!sessionData) {
       return {
         rule: "MANDATORY_PIPELINE",
@@ -235,7 +235,7 @@ export class ComplianceMonitor {
     }
 
     // Verify session exists and is valid
-    const sessionData = await this.env.SESSIONS.get(`session:${sessionId}`);
+    const sessionData = await this.env.MCP_SESSIONS.get(`session:${sessionId}`);
     if (!sessionData) {
       return {
         rule: "SESSION_REQUIRED",
@@ -347,7 +347,7 @@ export class ComplianceMonitor {
     };
 
     // Store violation record
-    await this.env.AUTH_CACHE.put(
+    await this.env.PLATFORM_CACHE.put(
       `compliance:violation:${monitoringId}`,
       JSON.stringify(violationRecord),
       { expirationTtl: 86400 * 90 }, // Keep for 90 days
@@ -356,10 +356,10 @@ export class ComplianceMonitor {
     // Update violation counters
     for (const violation of violations) {
       const counterKey = `metrics:violations:${violation.rule}`;
-      const current = await this.env.AUTH_CACHE.get(counterKey);
+      const current = await this.env.PLATFORM_CACHE.get(counterKey);
       const count = current ? parseInt(current) + 1 : 1;
 
-      await this.env.AUTH_CACHE.put(counterKey, count.toString(), {
+      await this.env.PLATFORM_CACHE.put(counterKey, count.toString(), {
         expirationTtl: 86400,
       });
     }
@@ -381,7 +381,7 @@ export class ComplianceMonitor {
     // Store compliance record (sampling for performance)
     if (Math.random() < 0.1) {
       // Sample 10%
-      await this.env.AUTH_CACHE.put(
+      await this.env.PLATFORM_CACHE.put(
         `compliance:success:${monitoringId}`,
         JSON.stringify(complianceRecord),
         { expirationTtl: 86400 * 7 }, // Keep for 7 days
@@ -390,10 +390,10 @@ export class ComplianceMonitor {
 
     // Update compliance counter
     const counterKey = "metrics:compliance:success";
-    const current = await this.env.AUTH_CACHE.get(counterKey);
+    const current = await this.env.PLATFORM_CACHE.get(counterKey);
     const count = current ? parseInt(current) + 1 : 1;
 
-    await this.env.AUTH_CACHE.put(counterKey, count.toString(), {
+    await this.env.PLATFORM_CACHE.put(counterKey, count.toString(), {
       expirationTtl: 86400,
     });
   }
@@ -418,7 +418,7 @@ export class ComplianceMonitor {
       };
 
       // Store alert
-      await this.env.AUTH_CACHE.put(
+      await this.env.PLATFORM_CACHE.put(
         `alert:compliance:${Date.now()}`,
         JSON.stringify(alert),
         { expirationTtl: 86400 * 30 }, // Keep alerts for 30 days
@@ -451,7 +451,7 @@ export class ComplianceMonitor {
    * Generate unique monitoring ID
    */
   generateMonitoringId() {
-    return `monitor-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `monitor-${Date.now()}`;
   }
 
   /**
@@ -465,18 +465,18 @@ export class ComplianceMonitor {
     };
 
     // Get violation counts
-    const violationKeys = await this.env.AUTH_CACHE.list({
+    const violationKeys = await this.env.PLATFORM_CACHE.list({
       prefix: "metrics:violations:",
     });
     for (const key of violationKeys.keys) {
       const rule = key.name.replace("metrics:violations:", "");
-      const count = await this.env.AUTH_CACHE.get(key.name);
+      const count = await this.env.PLATFORM_CACHE.get(key.name);
       stats.violations[rule] = parseInt(count) || 0;
       stats.totalViolations += stats.violations[rule];
     }
 
     // Get compliance count
-    const complianceCount = await this.env.AUTH_CACHE.get(
+    const complianceCount = await this.env.PLATFORM_CACHE.get(
       "metrics:compliance:success",
     );
     stats.totalCompliant = parseInt(complianceCount) || 0;
@@ -494,15 +494,15 @@ export class ComplianceMonitor {
    */
   async resetMonitoring() {
     // Clear violation counters
-    const violationKeys = await this.env.AUTH_CACHE.list({
+    const violationKeys = await this.env.PLATFORM_CACHE.list({
       prefix: "metrics:violations:",
     });
     for (const key of violationKeys.keys) {
-      await this.env.AUTH_CACHE.delete(key.name);
+      await this.env.PLATFORM_CACHE.delete(key.name);
     }
 
     // Clear compliance counter
-    await this.env.AUTH_CACHE.delete("metrics:compliance:success");
+    await this.env.PLATFORM_CACHE.delete("metrics:compliance:success");
 
     console.log("Compliance monitoring statistics reset");
   }
@@ -511,18 +511,18 @@ export class ComplianceMonitor {
    * Generate comprehensive compliance report
    */
   async generateComplianceReport(request) {
-    const reportId = `report-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const reportId = `report-${Date.now()}`;
     const stats = await this.getComplianceStats();
 
     // Get recent violations
-    const violationKeys = await this.env.AUTH_CACHE.list({
+    const violationKeys = await this.env.PLATFORM_CACHE.list({
       prefix: "compliance:violation:",
       limit: 100,
     });
 
     const violations = [];
     for (const key of violationKeys.keys) {
-      const data = await this.env.AUTH_CACHE.get(key.name);
+      const data = await this.env.PLATFORM_CACHE.get(key.name);
       if (data) violations.push(JSON.parse(data));
     }
 
@@ -547,7 +547,7 @@ export class ComplianceMonitor {
     };
 
     // Store the report
-    await this.env.AUTH_CACHE.put(
+    await this.env.PLATFORM_CACHE.put(
       `compliance:report:${reportId}`,
       JSON.stringify(report),
       { expirationTtl: 86400 * 90 }, // Keep for 90 days
@@ -618,7 +618,7 @@ export class ComplianceMonitor {
     }
 
     // Log the action for audit trail
-    await this.env.AUTH_CACHE.put(
+    await this.env.PLATFORM_CACHE.put(
       `sox:audit:${Date.now()}`,
       JSON.stringify({
         timestamp: new Date().toISOString(),
@@ -681,7 +681,7 @@ export class ComplianceMonitor {
       }
 
       // Log access for audit
-      await this.env.AUTH_CACHE.put(
+      await this.env.PLATFORM_CACHE.put(
         `hipaa:access:${Date.now()}`,
         JSON.stringify({
           timestamp: new Date().toISOString(),
@@ -842,7 +842,7 @@ export class ComplianceMonitor {
     // Check access pattern anomalies
     const ip = request.headers.get("CF-Connecting-IP");
     const accessKey = `access:pattern:${ip}`;
-    const recentAccess = await this.env.AUTH_CACHE.get(accessKey);
+    const recentAccess = await this.env.PLATFORM_CACHE.get(accessKey);
 
     if (recentAccess) {
       const accessCount = parseInt(recentAccess);
@@ -854,7 +854,7 @@ export class ComplianceMonitor {
     }
 
     // Update access counter
-    await this.env.AUTH_CACHE.put(
+    await this.env.PLATFORM_CACHE.put(
       accessKey,
       String((parseInt(recentAccess) || 0) + 1),
       { expirationTtl: 3600 }, // Reset hourly
