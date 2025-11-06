@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+> **🎯 Project Orchestration:** This project follows [ChittyCan™ Project Standards](../CHITTYCAN_PROJECT_ORCHESTRATOR.md)
+
 ## Project Overview
 
 This is the **ChittyID Mothership** - a Cloudflare Worker-based management system for ChittyIDs from the id.chitty.cc service. ChittyID is a universal identity system for people, places, things, and events, implemented as part of the broader ChittyOS ecosystem.
