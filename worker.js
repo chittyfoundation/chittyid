@@ -198,6 +198,48 @@ export default {
         return await OntologyControllerWorker.fetch(ontologyRequest, env, ctx);
       }
 
+      // Direct API handlers (bypassing Pages Functions import issues)
+      if (url.pathname === "/api/get-chittyid" && request.method === "GET") {
+        return await handleDirectChittyIdGeneration(url, env);
+      }
+
+      if (url.pathname === "/api/health" && request.method === "GET") {
+        return new Response(JSON.stringify({
+          status: "healthy",
+          version: "2.0.0",
+          timestamp: new Date().toISOString(),
+          service: "chittyid-mothership"
+        }), {
+          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+        });
+      }
+
+      if (url.pathname === "/api/validate" && request.method === "POST") {
+        const body = await request.json();
+        const result = validateChittyId(body.id);
+        return new Response(JSON.stringify({
+          success: true,
+          ...result,
+          timestamp: new Date().toISOString()
+        }), {
+          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+        });
+      }
+
+      if (url.pathname === "/api/spec" && request.method === "GET") {
+        return new Response(JSON.stringify({
+          success: true,
+          specification: {
+            format: "VV-G-LLL-SSSS-T-YM-C-X",
+            entityTypes: { P: "Person", L: "Place", T: "Thing", E: "Event", A: "Authority" },
+            trustLevels: { 0: "Unverified", 1: "Basic", 2: "Standard", 3: "Verified", 4: "Premium", 5: "Official" }
+          },
+          timestamp: new Date().toISOString()
+        }), {
+          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+        });
+      }
+
       // Create a context object that matches Pages Functions format
       const context = {
         request,

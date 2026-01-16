@@ -1,0 +1,35 @@
+# ChittyConnect Configuration for chittyid
+service:
+  name: chittyid
+  display_name: Chittyid
+  type: foundation
+  tier: 0
+  organization: CHITTYFOUNDATION
+  chitty_id: ${CHITTYID_SERVICE_ID}
+  domains:
+    production: id.chitty.cc
+
+onboarding:
+  endpoint: https://get.chitty.cc/api/onboard
+  provisions: [chitty_id, service_token, certificate, trust_chain]
+
+auth:
+  provider: chittyauth
+  endpoint: https://auth.chitty.cc
+  service_token:
+    source: chittyconnect
+    key: CHITTYID_SERVICE_TOKEN
+
+secrets:
+  provider: chittyconnect
+  vault: 1password
+  paths:
+    production: op://ChittyOS/chittyid-prod
+
+github:
+  repository: CHITTYFOUNDATION/chittyid
+
+monitoring:
+  health:
+    endpoint: /health
+    interval: 60s
