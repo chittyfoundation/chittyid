@@ -1,24 +1,19 @@
-# Unified CI Pipeline for chittyid
-# Calls the centralized reusable workflow from chittyfoundation/.github
-# This reduces duplication and ensures consistent CI across all repos
-
 name: CI
 
 on:
   push:
       branches: [main]
         pull_request:
-            types: [opened, synchronize, reopened]
 
-            jobs:
-              ci-pipeline:
-                  name: CI Pipeline
-                      uses: chittyfoundation/.github/.github/workflows/reusable-ci-pipeline.yml@main
-                          with:
-                                node-version: '20'
-                                      run-tests: true
-                                            run-lint: true
-                                                  run-ai-review: true
-                                                        run-governance: true
-                                                            secrets:
-                                                                  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        jobs:
+          ci-pipeline:
+              name: CI Pipeline
+                  uses: chittyfoundation/.github/.github/workflows/reusable-ci-pipeline.yml@main
+                      with:
+                            node-version: '20'
+                                  run-tests: true
+                                        run-lint: true
+                                              run-ai-review: true
+                                                    run-governance: true
+                                                        secrets:
+                                                              ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
