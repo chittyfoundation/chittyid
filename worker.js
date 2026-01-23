@@ -19,10 +19,10 @@ import { ChittyOSMCPPortalHandler } from "./mcp-cloudflare-portal-handler.js";
 // Import Ontology Controller for entity classification and hybrid ID generation
 import OntologyControllerWorker from "./src/hybrid/ontology-controller.js";
 
-// Entity type mapping
-const ENTITY_TYPES = { person: 'P', place: 'L', thing: 'T', event: 'E', authority: 'A' };
+// Note: Minting is now delegated to ChittyMint (mint.chitty.cc)
+// ChittyID serves as the API layer for ID operations
 
-// Mod-97 checksum calculation
+// Mod-97 checksum calculation (used for local validation only)
 function mod97Checksum(str) {
   let checksum = 0;
   for (let i = 0; i < str.length; i++) {
@@ -36,61 +36,64 @@ function mod97Checksum(str) {
   return (98 - checksum) % 97;
 }
 
-// Get current year-month code
-function getCurrentYearMonth() {
-  const now = new Date();
-  const year = now.getFullYear().toString().slice(-2);
-  const month = (now.getMonth() + 1).toString().padStart(2, '0');
-  return year + month.slice(1);
-}
+// ChittyMint service URL
+const CHITTYMINT_URL = 'https://mint.chitty.cc';
 
-// Get next sequential ID
-async function getNextSequential(env, key) {
-  if (!env.CHITTYID_KV) {
-    throw new Error('CHITTYID_KV namespace not available');
-  }
-  const stored = await env.CHITTYID_KV.get(key);
-  let counter = stored ? parseInt(stored) : 1;
-  counter = counter >= 9999 ? 1 : counter + 1;
-  await env.CHITTYID_KV.put(key, counter.toString());
-  return counter.toString().padStart(4, '0');
-}
-
-// Direct ChittyID generation handler
-async function handleDirectChittyIdGeneration(url, env) {
+// Direct ChittyID generation handler - delegates to ChittyMint
+async function handleDirectChittyIdGeneration(url, env, request) {
   const entityTypeParam = (url.searchParams.get('type') || url.searchParams.get('for') || 'thing').toLowerCase();
-  const entityType = ENTITY_TYPES[entityTypeParam] || 'T';
-  const region = '1'; // North America default
-  const jurisdiction = 'USA';
-  const trustLevel = '3'; // Verified default
-  const version = '03';
+
+  // Extract auth token if present (forward to ChittyMint)
+  const authHeader = request?.headers?.get('Authorization');
+
+  // Build request body for ChittyMint
+  const mintRequest = {
+    entityType: entityTypeParam
+  };
+
+  // Add optional parameters if provided
+  const regionParam = url.searchParams.get('region');
+  if (regionParam) mintRequest.region = regionParam;
+
+  const jurisdictionParam = url.searchParams.get('jurisdiction');
+  if (jurisdictionParam) mintRequest.jurisdiction = jurisdictionParam;
+
+  const trustParam = url.searchParams.get('trust');
+  if (trustParam) mintRequest.trust = parseInt(trustParam);
 
   try {
-    const sequentialKey = `seq_${region}_${jurisdiction}_${entityType}`;
-    const sequential = await getNextSequential(env, sequentialKey);
-    const yearMonth = getCurrentYearMonth();
+    // Call ChittyMint for actual ID generation
+    const mintResponse = await fetch(`${CHITTYMINT_URL}/api/mint`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authHeader ? { 'Authorization': authHeader } : {}),
+        // Forward CF geolocation for region/jurisdiction auto-detection
+        ...(request?.cf?.country ? { 'CF-IPCountry': request.cf.country } : {})
+      },
+      body: JSON.stringify(mintRequest)
+    });
 
-    const baseId = `${version}${region}${jurisdiction}${sequential}${entityType}${yearMonth}${trustLevel}`;
-    const checksum = mod97Checksum(baseId).toString().padStart(2, '0');
-    const chittyId = `${version}-${region}-${jurisdiction}-${sequential}-${entityType}-${yearMonth}-${trustLevel}-${checksum}`;
+    const result = await mintResponse.json();
 
+    // Pass through the ChittyMint response
     return new Response(JSON.stringify({
-      success: true,
-      chittyId,
-      components: { version, region, jurisdiction, sequential, entityType, yearMonth, trustLevel, checksum },
-      timestamp: new Date().toISOString(),
-      service: 'id.chitty.cc'
+      ...result,
+      service: 'id.chitty.cc',
+      mintedBy: 'mint.chitty.cc'
     }), {
+      status: mintResponse.status,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });
   } catch (error) {
     return new Response(JSON.stringify({
       success: false,
-      error: 'GENERATION_FAILED',
-      message: error.message,
+      error: 'MINT_SERVICE_ERROR',
+      message: `Failed to reach ChittyMint: ${error.message}`,
+      fallback: 'ChittyMint service unavailable',
       timestamp: new Date().toISOString()
     }), {
-      status: 500,
+      status: 503,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });
   }
@@ -112,7 +115,7 @@ function validateChittyId(id) {
   if (!/^[A-Z]{3}$/.test(jurisdiction)) return { valid: false, error: 'Jurisdiction must be 3 uppercase letters' };
   if (!/^\d{4}$/.test(sequential)) return { valid: false, error: 'Sequential must be 4 digits' };
   if (!/^[PLTEA]$/.test(entityType)) return { valid: false, error: 'Entity type must be P, L, T, E, or A' };
-  if (!/^\d{2,3}$/.test(yearMonth)) return { valid: false, error: 'Year-Month must be 2-3 digits' };
+  if (!/^\d{4}$/.test(yearMonth)) return { valid: false, error: 'Year-Month must be 4 digits (YYMM)' };
   if (!/^[0-5]$/.test(trustLevel)) return { valid: false, error: 'Trust level must be 0-5' };
   if (!/^\d{2}$/.test(checksum)) return { valid: false, error: 'Checksum must be 2 digits' };
 
@@ -308,7 +311,7 @@ export default {
 
       // Direct API handlers (bypassing Pages Functions import issues)
       if (url.pathname === "/api/get-chittyid" && request.method === "GET") {
-        return await handleDirectChittyIdGeneration(url, env);
+        return await handleDirectChittyIdGeneration(url, env, request);
       }
 
       if (url.pathname === "/api/health" && request.method === "GET") {

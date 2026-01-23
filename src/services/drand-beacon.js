@@ -120,9 +120,10 @@ export class DrandBeaconService {
     const hashArray = Array.from(new Uint8Array(hashBuffer));
 
     // Convert to 4-digit sequential field (0000-9999)
-    const hash32 = hashArray
+    // Use >>> 0 to ensure unsigned 32-bit integer (prevents negative values)
+    const hash32 = (hashArray
       .slice(0, 4)
-      .reduce((acc, byte) => (acc << 8) | byte, 0);
+      .reduce((acc, byte) => (acc << 8) | byte, 0)) >>> 0;
     const sequential = (hash32 % 10000).toString().padStart(4, "0");
 
     return sequential;
