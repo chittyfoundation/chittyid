@@ -178,8 +178,20 @@ isSystemService(authToken) {
   return authToken.startsWith('CHITTY_SERVICE_') ||
          authToken === this.serviceToken;
 }
+```
 
-// This grants L5 trust (line 37-42):
+**Attack Example:**
+```bash
+# Attacker discovers the prefix pattern from error messages or documentation
+# Crafts a fake service token with the known prefix
+curl -H "Authorization: Bearer CHITTY_SERVICE_ATTACK" \
+     https://id.chitty.cc/api/get-chittyid?type=person
+
+# Result: isSystemService() returns true, granting L5 trust
+```
+
+This grants L5 trust (line 37-42):
+```javascript
 if (this.isSystemService(authToken)) {
   return {
     level: 5,  // ❌ Highest privilege level
@@ -542,12 +554,12 @@ const CHITTYMINT_URL = 'https://mint.chitty.cc';
 
 ### Blocking Issues (Must Fix Before Merge)
 
-1. ✅ **Security Policy:** Either keep minting in id.chitty.cc OR update SECURITY_ENFORCEMENT.md with approval
-2. ✅ **Pipeline Enforcement:** Add `X-ChittyOS-Pipeline` header to all requests
-3. ✅ **Auth Bypass:** Fix `isSystemService()` to only accept exact token match
-4. ✅ **Error Handling:** Properly handle ChittyMint error responses
-5. ✅ **Network Errors:** Implement proper fallback architecture
-6. ✅ **Build Fix:** Sync package-lock.json with package.json
+1. 🔴 **Security Policy:** Either keep minting in id.chitty.cc OR update SECURITY_ENFORCEMENT.md with approval
+2. 🔴 **Pipeline Enforcement:** Add `X-ChittyOS-Pipeline` header to all requests
+3. 🔴 **Auth Bypass:** Fix `isSystemService()` to only accept exact token match
+4. 🔴 **Error Handling:** Properly handle ChittyMint error responses
+5. 🔴 **Network Errors:** Implement proper fallback architecture
+6. 🔴 **Build Fix:** Sync package-lock.json with package.json
 
 ### Recommended Improvements
 
