@@ -37,9 +37,86 @@ function mod97Checksum(str) {
 }
 
 // ChittyMint service URL
-const CHITTYMINT_URL = 'https://mint.chitty.cc';
+const CHITTYMINT_URL = process.env.CHITTYMINT_URL || 'https://mint.chitty.cc';
 
-// Direct ChittyID generation handler - delegates to ChittyMint
+// Error code mapping for fallback IDs
+// Encoded in SSSS field (0000-0099 reserved for error codes)
+const ERROR_CODES = {
+  MINT_UNAVAILABLE: '0001',    // ChittyMint service unreachable
+  MINT_TIMEOUT: '0002',        // ChittyMint request timed out
+  MINT_REJECTED: '0003',       // ChittyMint rejected the request
+  DRAND_UNAVAILABLE: '0004',   // drand beacon unavailable
+  CERT_UNAVAILABLE: '0005',    // ChittyCert unavailable
+  TRUST_UNAVAILABLE: '0006',   // ChittyTrust unavailable
+  RATE_LIMITED: '0007',        // Rate limit exceeded
+  INVALID_REQUEST: '0008',     // Invalid mint request
+  INTERNAL_ERROR: '0099'       // Unknown internal error
+};
+
+// Entity type codes
+const ENTITY_TYPES = { person: 'P', place: 'L', thing: 'T', event: 'E', authority: 'A' };
+
+/**
+ * Generate a fallback error ID
+ * Uses existing ChittyID format with error code encoded in SSSS field
+ * These IDs are replaced with real IDs on next verification attempt
+ */
+function generateFallbackErrorId(errorCode, entityType, originalRequest) {
+  const version = '03';
+  const region = '0';  // Region 0 = Error/Pending
+  const jurisdiction = 'ERR';  // Reserved jurisdiction for errors
+  const sequential = ERROR_CODES[errorCode] || ERROR_CODES.INTERNAL_ERROR;
+  const type = ENTITY_TYPES[entityType?.toLowerCase()] || 'T';
+  const now = new Date();
+  const yearMonth = now.getFullYear().toString().slice(-2) + (now.getMonth() + 1).toString().padStart(2, '0');
+  const trustLevel = '0';  // Trust 0 = Unverified/Error
+
+  // Calculate checksum
+  const baseId = `${version}${region}${jurisdiction}${sequential}${type}${yearMonth}${trustLevel}`;
+  const checksum = mod97Checksum(baseId).toString().padStart(2, '0');
+
+  return `${version}-${region}-${jurisdiction}-${sequential}-${type}-${yearMonth}-${trustLevel}-${checksum}`;
+}
+
+/**
+ * Check if a ChittyID is a fallback error ID
+ */
+function isErrorId(chittyId) {
+  if (!chittyId) return false;
+  const parts = chittyId.split('-');
+  if (parts.length !== 8) return false;
+
+  const [version, region, jurisdiction, sequential] = parts;
+
+  // Error IDs have: region=0, jurisdiction=ERR, sequential in 0000-0099
+  return region === '0' &&
+         jurisdiction === 'ERR' &&
+         parseInt(sequential) >= 0 &&
+         parseInt(sequential) <= 99;
+}
+
+/**
+ * Get error details from a fallback error ID
+ */
+function getErrorFromId(chittyId) {
+  if (!isErrorId(chittyId)) return null;
+
+  const parts = chittyId.split('-');
+  const sequential = parts[3];
+
+  // Find the error code name
+  const errorName = Object.entries(ERROR_CODES).find(([, code]) => code === sequential)?.[0];
+
+  return {
+    isError: true,
+    errorCode: sequential,
+    errorName: errorName || 'UNKNOWN_ERROR',
+    message: `This is a fallback error ID. Error: ${errorName || sequential}. Re-verify to attempt replacement with a valid ID.`,
+    canReplace: true
+  };
+}
+
+// Direct ChittyID generation handler - delegates to ChittyMint with fallback
 async function handleDirectChittyIdGeneration(url, env, request) {
   const entityTypeParam = (url.searchParams.get('type') || url.searchParams.get('for') || 'thing').toLowerCase();
 
@@ -74,6 +151,13 @@ async function handleDirectChittyIdGeneration(url, env, request) {
       body: JSON.stringify(mintRequest)
     });
 
+    if (!mintResponse.ok) {
+      // ChittyMint rejected - generate fallback error ID
+      const errorCode = mintResponse.status === 429 ? 'RATE_LIMITED' :
+                        mintResponse.status === 400 ? 'INVALID_REQUEST' : 'MINT_REJECTED';
+      return generateFallbackResponse(errorCode, entityTypeParam, mintRequest, env);
+    }
+
     const result = await mintResponse.json();
 
     // Pass through the ChittyMint response
@@ -86,17 +170,54 @@ async function handleDirectChittyIdGeneration(url, env, request) {
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });
   } catch (error) {
-    return new Response(JSON.stringify({
-      success: false,
-      error: 'MINT_SERVICE_ERROR',
-      message: `Failed to reach ChittyMint: ${error.message}`,
-      fallback: 'ChittyMint service unavailable',
-      timestamp: new Date().toISOString()
-    }), {
-      status: 503,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-    });
+    // ChittyMint unavailable - generate fallback error ID
+    const errorCode = error.message?.includes('timeout') ? 'MINT_TIMEOUT' : 'MINT_UNAVAILABLE';
+    return generateFallbackResponse(errorCode, entityTypeParam, mintRequest, env);
   }
+}
+
+/**
+ * Generate fallback response with error ID
+ * Stores the original request for later replacement
+ */
+async function generateFallbackResponse(errorCode, entityType, originalRequest, env) {
+  const fallbackId = generateFallbackErrorId(errorCode, entityType, originalRequest);
+
+  // Store the pending request for later replacement (if KV available)
+  if (env?.CHITTYID_PENDING) {
+    await env.CHITTYID_PENDING.put(fallbackId, JSON.stringify({
+      originalRequest,
+      errorCode,
+      createdAt: new Date().toISOString(),
+      attempts: 0
+    }), { expirationTtl: 86400 * 7 }); // 7 day TTL
+  }
+
+  return new Response(JSON.stringify({
+    success: true,
+    chittyId: fallbackId,
+    fallback: true,
+    errorCode,
+    message: `ChittyMint unavailable. Issued fallback ID with error code ${errorCode}. This ID will be replaced with a valid ID on next verification.`,
+    components: {
+      version: '03',
+      region: '0',
+      jurisdiction: 'ERR',
+      sequential: ERROR_CODES[errorCode],
+      entityType: ENTITY_TYPES[entityType?.toLowerCase()] || 'T',
+      yearMonth: new Date().getFullYear().toString().slice(-2) + (new Date().getMonth() + 1).toString().padStart(2, '0'),
+      trustLevel: '0',
+      checksum: fallbackId.split('-')[7]
+    },
+    geo: { region: '0', regionName: 'Error/Pending', jurisdiction: 'ERR', source: 'fallback' },
+    trust: { level: 0, source: 'fallback', verified: false },
+    timestamp: new Date().toISOString(),
+    service: 'id.chitty.cc',
+    mintedBy: 'fallback'
+  }), {
+    status: 200, // Return 200 even for fallback (ID was issued)
+    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+  });
 }
 
 // Validate ChittyID format
@@ -327,6 +448,67 @@ export default {
 
       if (url.pathname === "/api/validate" && request.method === "POST") {
         const body = await request.json();
+
+        // Check if this is a fallback error ID that needs replacement
+        if (isErrorId(body.id)) {
+          const errorInfo = getErrorFromId(body.id);
+
+          // Try to get the original request and mint a real ID
+          if (env?.CHITTYID_PENDING) {
+            const pendingData = await env.CHITTYID_PENDING.get(body.id);
+            if (pendingData) {
+              const pending = JSON.parse(pendingData);
+
+              // Attempt to mint a real ID via ChittyMint
+              try {
+                const authHeader = request?.headers?.get('Authorization');
+                const mintResponse = await fetch(`${CHITTYMINT_URL}/api/mint`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    ...(authHeader ? { 'Authorization': authHeader } : {})
+                  },
+                  body: JSON.stringify(pending.originalRequest)
+                });
+
+                if (mintResponse.ok) {
+                  const mintResult = await mintResponse.json();
+
+                  // Delete the pending entry
+                  await env.CHITTYID_PENDING.delete(body.id);
+
+                  return new Response(JSON.stringify({
+                    success: true,
+                    replaced: true,
+                    oldId: body.id,
+                    newId: mintResult.chittyId,
+                    message: 'Fallback error ID has been replaced with a valid ChittyID',
+                    ...mintResult,
+                    timestamp: new Date().toISOString()
+                  }), {
+                    headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+                  });
+                }
+              } catch (e) {
+                // ChittyMint still unavailable - return error info
+                pending.attempts = (pending.attempts || 0) + 1;
+                await env.CHITTYID_PENDING.put(body.id, JSON.stringify(pending), { expirationTtl: 86400 * 7 });
+              }
+            }
+          }
+
+          // Return error ID info if replacement failed
+          return new Response(JSON.stringify({
+            success: true,
+            valid: false,
+            ...errorInfo,
+            timestamp: new Date().toISOString()
+          }), {
+            headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+          });
+        }
+
+        // Normal validation for non-error IDs
         const result = validateChittyId(body.id);
         return new Response(JSON.stringify({
           success: true,

@@ -38,6 +38,11 @@ id = "d52d89c1eebd402b95719161d311e7df"
 binding = "CHITTYID_KV"
 id = "ec782932b5f54c359d9aef2e28898bf9"
 
+# Pending fallback error IDs - for replacement on next verification
+[[env.production.kv_namespaces]]
+binding = "CHITTYID_PENDING"
+id = "ec782932b5f54c359d9aef2e28898bf9"  # TODO: Create dedicated namespace
+
 # Ontology System KV bindings (using PLATFORM_KV for now)
 [[env.production.kv_namespaces]]
 binding = "SERVICE_REGISTRY"
@@ -77,6 +82,11 @@ id = "d52d89c1eebd402b95719161d311e7df"
 [[kv_namespaces]]
 binding = "CHITTYID_KV"
 id = "ec782932b5f54c359d9aef2e28898bf9"
+
+# Pending fallback error IDs - for replacement on next verification
+[[kv_namespaces]]
+binding = "CHITTYID_PENDING"
+id = "ec782932b5f54c359d9aef2e28898bf9"  # TODO: Create dedicated namespace
 
 # D1 Database - Not available in this account
 # [[d1_databases]]
@@ -148,6 +158,7 @@ binding = "AI"
 CHITTYID_SERVICE_VERSION = "2.0.0"
 CHITTYID_FOUNDATION_URL = "https://id.chitty.cc"
 CHITTYID_FALLBACK_URL = "https://fallback.id.chitty.cc"
+CHITTYMINT_URL = "https://mint.chitty.cc"
 
 # ChittyOS Gateway Integration
 CHITTYOS_GATEWAY_URL = "https://gateway.chitty.cc"
@@ -161,6 +172,7 @@ DRAND_BEACON_URL = "https://api.drand.sh/public/latest"
 [env.production.vars]
 AI_GATEWAY = "chittyrouter-ai-gateway"
 ENVIRONMENT = "production"
+CHITTYMINT_URL = "https://mint.chitty.cc"
 CHITTYID_FOUNDATION_URL = "https://id.chitty.cc"
 CHITTYID_SERVICE_VERSION = "2.0.0"
 CHITTYID_FALLBACK_URL = "https://fallback.id.chitty.cc"
