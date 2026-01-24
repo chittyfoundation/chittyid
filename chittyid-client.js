@@ -1,5 +1,5 @@
 // ChittyID Service Client
-const CHITTYID_SERVICE = 'https://id.chitty.cc';
+const CHITTYID_SERVICE = 'https://foundation.thechitty.com';
 
 async function mintChittyID(domain, subtype, metadata = {}) {
   const response = await fetch(`${CHITTYID_SERVICE}/v1/mint`, {

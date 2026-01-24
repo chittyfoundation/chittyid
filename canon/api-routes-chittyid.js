@@ -64,7 +64,7 @@ class ChittyIDAPI {
     trustLevel,
     env,
   ) {
-    // Fetch ChittyID from id.chitty.cc service
+    // Fetch ChittyID from foundation.thechitty.com service
     if (!region || !jurisdiction || !entityType || trustLevel === undefined) {
       throw new Error(
         "Missing required parameters: region, jurisdiction, entityType, trustLevel",
@@ -754,7 +754,7 @@ export async function onRequest(context) {
               status: "healthy",
               endpoint: "core.chitty.cc",
             },
-            { name: "chittyid", status: "healthy", endpoint: "id.chitty.cc" },
+            { name: "chittyid", status: "healthy", endpoint: "foundation.thechitty.com" },
             {
               name: "chittyrouter",
               status: "healthy",

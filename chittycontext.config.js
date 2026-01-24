@@ -39,8 +39,8 @@ export const chittyContext = {
 
     staging: {
       name: "staging",
-      domain: "staging.id.chitty.cc",
-      url: "https://staging.id.chitty.cc",
+      domain: "staging.foundation.thechitty.com",
+      url: "https://staging.foundation.thechitty.com",
       workerName: "chittyid-staging",
       kvNamespaces: {
         CHITTYID_KV: "ec782932b5f54c359d9aef2e28898bf9",
@@ -70,8 +70,8 @@ export const chittyContext = {
 
     production: {
       name: "production",
-      domain: "id.chitty.cc",
-      url: "https://id.chitty.cc",
+      domain: "foundation.thechitty.com",
+      url: "https://foundation.thechitty.com",
       workerName: "chittyid-production",
       kvNamespaces: {
         CHITTYID_KV: "ec782932b5f54c359d9aef2e28898bf9",
@@ -135,10 +135,10 @@ export const chittyContext = {
    */
   cloudflare: {
     accountId: "0bc21e3a5a9de1a4cc843be9c3e98121", // ChittyCorp LLC
-    zoneName: "chitty.cc",
+    zoneName: "thechitty.com",
     routes: {
-      production: "id.chitty.cc/*",
-      staging: "staging.id.chitty.cc/*",
+      production: "foundation.thechitty.com/*",
+      staging: "staging.foundation.thechitty.com/*",
     },
   },
 

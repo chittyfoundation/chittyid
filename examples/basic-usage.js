@@ -5,7 +5,7 @@
  * Demonstrates common usage patterns for the ChittyID API
  */
 
-const API_BASE = 'https://id.chitty.cc';
+const API_BASE = 'https://foundation.thechitty.com';
 
 // Example 1: Check system health
 async function checkHealth() {

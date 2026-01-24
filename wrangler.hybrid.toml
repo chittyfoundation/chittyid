@@ -8,16 +8,16 @@ account_id = "bbf9fcd845e78035b7a135c481e88541"  # ChittyCorp LLC main account
 
 # Routes for hybrid system endpoints
 [[routes]]
-pattern = "id.chitty.cc/ontology/*"
-zone_name = "chitty.cc"
+pattern = "foundation.thechitty.com/ontology/*"
+zone_name = "thechitty.com"
 
 [[routes]]
-pattern = "id.chitty.cc/translate/*"
-zone_name = "chitty.cc"
+pattern = "foundation.thechitty.com/translate/*"
+zone_name = "thechitty.com"
 
 [[routes]]
-pattern = "id.chitty.cc/governance/*"
-zone_name = "chitty.cc"
+pattern = "foundation.thechitty.com/governance/*"
+zone_name = "thechitty.com"
 
 # KV Namespaces - ChittyCorp MCP Portal
 [[kv_namespaces]]
@@ -75,16 +75,16 @@ PIPELINE_ENFORCEMENT = "STRICT"
 GENERATION_MODE = "SERVER_ONLY"
 
 [[env.production.routes]]
-pattern = "id.chitty.cc/ontology/*"
-zone_name = "chitty.cc"
+pattern = "foundation.thechitty.com/ontology/*"
+zone_name = "thechitty.com"
 
 [[env.production.routes]]
-pattern = "id.chitty.cc/translate/*"
-zone_name = "chitty.cc"
+pattern = "foundation.thechitty.com/translate/*"
+zone_name = "thechitty.com"
 
 [[env.production.routes]]
-pattern = "id.chitty.cc/governance/*"
-zone_name = "chitty.cc"
+pattern = "foundation.thechitty.com/governance/*"
+zone_name = "thechitty.com"
 
 [[env.production.kv_namespaces]]
 binding = "MCP_SESSIONS"

@@ -3,7 +3,7 @@ compatibility_date = "2025-01-16"
 pages_build_output_dir = "dist"
 
 [env.production]
-route = "id.chitty.cc/*"
+route = "foundation.thechitty.com/*"
 
 [[kv_namespaces]]
 binding = "CHITTY_IDS"

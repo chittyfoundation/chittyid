@@ -7,10 +7,10 @@ account_id = "0bc21e3a5a9de1a4cc843be9c3e98121"  # ChittyCorp LLC main account
 # Production environment
 [env.production]
 
-# Route configuration for id.chitty.cc
+# Route configuration for foundation.thechitty.com
 [[env.production.routes]]
-pattern = "id.chitty.cc/*"
-zone_name = "chitty.cc"
+pattern = "foundation.thechitty.com/*"
+zone_name = "thechitty.com"
 
 # MCP Portal KV Storage - Using proper namespaces for production
 [[env.production.kv_namespaces]]
@@ -146,8 +146,8 @@ binding = "AI"
 [vars]
 # ChittyID Foundation Configuration
 CHITTYID_SERVICE_VERSION = "2.0.0"
-CHITTYID_FOUNDATION_URL = "https://id.chitty.cc"
-CHITTYID_FALLBACK_URL = "https://fallback.id.chitty.cc"
+CHITTYID_FOUNDATION_URL = "https://foundation.thechitty.com"
+CHITTYID_FALLBACK_URL = "https://fallback.foundation.thechitty.com"
 
 # ChittyOS Gateway Integration
 CHITTYOS_GATEWAY_URL = "https://gateway.chitty.cc"
@@ -161,9 +161,9 @@ DRAND_BEACON_URL = "https://api.drand.sh/public/latest"
 [env.production.vars]
 AI_GATEWAY = "chittyrouter-ai-gateway"
 ENVIRONMENT = "production"
-CHITTYID_FOUNDATION_URL = "https://id.chitty.cc"
+CHITTYID_FOUNDATION_URL = "https://foundation.thechitty.com"
 CHITTYID_SERVICE_VERSION = "2.0.0"
-CHITTYID_FALLBACK_URL = "https://fallback.id.chitty.cc"
+CHITTYID_FALLBACK_URL = "https://fallback.foundation.thechitty.com"
 CHITTYOS_GATEWAY_URL = "https://gateway.chitty.cc"
 CHITTYOS_REGISTRY_URL = "https://registry.chitty.cc"
 CHITTYOS_SCHEMA_URL = "https://schema.chitty.cc"
@@ -172,7 +172,7 @@ DRAND_BEACON_URL = "https://api.drand.sh/public/latest"
 # Staging Environment Variables
 [env.staging.vars]
 ENVIRONMENT = "staging"
-CHITTYID_FOUNDATION_URL = "https://staging.id.chitty.cc"
+CHITTYID_FOUNDATION_URL = "https://staging.foundation.thechitty.com"
 
 # Secrets (set via wrangler secret put)
 # CHITTY_ID_TOKEN = "foundation-service-token"

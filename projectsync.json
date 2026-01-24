@@ -14,7 +14,7 @@
       ],
       "deployments": {
         "production": {
-          "url": "https://id.chitty.cc",
+          "url": "https://foundation.thechitty.com",
           "account": "0bc21e3a5a9de1a4cc843be9c3e98121",
           "worker": "chittyid-foundation"
         }
