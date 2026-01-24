@@ -27,7 +27,7 @@ class ChittyIDMCPHandler {
       OPENAI_API_KEY: process.env.OPENAI_API_KEY,
       ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
       CHITTY_SERVER_URL:
-        process.env.CHITTY_SERVER_URL || "https://id.chitty.cc",
+        process.env.CHITTY_SERVER_URL || "https://foundation.thechitty.com",
       CHITTY_API_KEY: process.env.CHITTY_API_KEY,
     });
 
@@ -36,7 +36,7 @@ class ChittyIDMCPHandler {
       OPENAI_API_KEY: process.env.OPENAI_API_KEY,
       ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
       CHITTY_SERVER_URL:
-        process.env.CHITTY_SERVER_URL || "https://id.chitty.cc",
+        process.env.CHITTY_SERVER_URL || "https://foundation.thechitty.com",
       CHITTY_API_KEY: process.env.CHITTY_API_KEY,
     });
   }
@@ -151,7 +151,7 @@ class ChittyIDMCPHandler {
         env: {
           ...process.env,
           CHITTY_BASE_URL:
-            process.env.CHITTY_BASE_URL || "https://id.chitty.cc",
+            process.env.CHITTY_BASE_URL || "https://foundation.thechitty.com",
           CHITTY_STORAGE:
             process.env.CHITTY_STORAGE ||
             join(process.env.HOME || ".", ".chitty"),
@@ -426,7 +426,7 @@ class ChittyIDMCPHandler {
           api_key_configured: !!process.env.CHITTY_API_KEY,
           openai_configured: !!process.env.OPENAI_API_KEY,
           anthropic_configured: !!process.env.ANTHROPIC_API_KEY,
-          base_url: process.env.CHITTY_BASE_URL || "https://id.chitty.cc",
+          base_url: process.env.CHITTY_BASE_URL || "https://foundation.thechitty.com",
           storage_dir:
             process.env.CHITTY_STORAGE ||
             join(process.env.HOME || ".", ".chitty"),

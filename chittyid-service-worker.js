@@ -284,7 +284,7 @@ export default {
             success: false,
             error:
               "SECURITY_VIOLATION: Local generation prohibited. All ChittyIDs must be requested from authorized servers only.",
-            policy: "https://id.chitty.cc - Server-only generation enforced",
+            policy: "https://foundation.thechitty.com - Server-only generation enforced",
             violation_code: "FALLBACK_GENERATION_DISABLED",
           },
           corsHeaders,
@@ -680,14 +680,14 @@ async function generateSimpleChecksum(data) {
  *
  * NO LOCAL GENERATION - NO FALLBACK GENERATION - NO EXCEPTIONS
  *
- * Use: https://id.chitty.cc for all ChittyID requests
+ * Use: https://foundation.thechitty.com for all ChittyID requests
  */
 // REMOVED: Local ID generation function completely removed for security
 
 // REMOVED: All local generation functions completely removed for security compliance
 // - Local official ID generation
 // - Local simple ID generation
-// All ChittyIDs must be requested from https://id.chitty.cc
+// All ChittyIDs must be requested from https://foundation.thechitty.com
 
 /**
  * Store audit record for fallback ChittyID (Unused - kept for reference)

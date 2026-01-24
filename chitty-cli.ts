@@ -3,7 +3,7 @@
 /**
  * ChittyID CLI - TypeScript Production Implementation
  *
- * CRITICAL: Only mints IDs from canonical service (id.chitty.cc)
+ * CRITICAL: Only mints IDs from canonical service (foundation.thechitty.com)
  * NO LOCAL GENERATION ALLOWED
  *
  * Usage (as Claude slash commands):
@@ -12,7 +12,7 @@
  *   /chitty validate 01-1-ABC-1234-1-2025A-1-0
  *
  * Environment:
- *   CHITTY_BASE_URL - Canonical service URL (default: https://id.chitty.cc)
+ *   CHITTY_BASE_URL - Canonical service URL (default: https://foundation.thechitty.com)
  *   CHITTY_API_KEY - Authentication key for API access
  *
  * Endpoints:
@@ -26,7 +26,7 @@ import * as path from 'path';
 import * as crypto from 'crypto';
 
 // Environment configuration
-const BASE = process.env.CHITTY_BASE_URL || 'https://id.chitty.cc';
+const BASE = process.env.CHITTY_BASE_URL || 'https://foundation.thechitty.com';
 const KEY = process.env.CHITTY_API_KEY;
 const STORAGE_DIR = process.env.CHITTY_STORAGE || path.join(process.env.HOME || '.', '.chitty');
 
