@@ -300,8 +300,8 @@
       "account_id": "0bc21e3a5a9de1a4cc843be9c3e98121",
       "routes": [
         {
-          "pattern": "mcp.chitty.cc/*",
-          "zone_name": "chitty.cc"
+          "pattern": "mcp.foundation.thechitty.com/*",
+          "zone_name": "thechitty.com"
         }
       ],
       "environment": "production"
@@ -353,12 +353,12 @@
   },
   "deployment": {
     "staging": {
-      "portal_url": "https://staging-mcp.chitty.cc",
+      "portal_url": "https://staging-mcp.foundation.thechitty.com",
       "chittyauth_url": "https://chittyauth-staging.workers.dev",
       "oauth_redirect": "https://portal-staging.cloudflare.com/oauth/callback/chittyauth"
     },
     "production": {
-      "portal_url": "https://mcp.chitty.cc",
+      "portal_url": "https://mcp.foundation.thechitty.com",
       "chittyauth_url": "https://chittyauth-prod.workers.dev",
       "oauth_redirect": "https://portal.cloudflare.com/oauth/callback/chittyauth"
     }

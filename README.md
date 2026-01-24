@@ -3,14 +3,14 @@
 **Official ChittyID Foundation Implementation** - Authoritative identity management for the ChittyOS ecosystem.
 
 [![Foundation Service](https://img.shields.io/badge/ChittyFoundation-Official-gold)](https://github.com/chittyfoundation)
-[![API Version](https://img.shields.io/badge/API-v2.0-blue)](https://id.chitty.cc/api/v2)
+[![API Version](https://img.shields.io/badge/API-v2.0-blue)](https://foundation.thechitty.com/api/v2)
 [![Charter Compliant](https://img.shields.io/badge/Charter-Compliant-green)](https://charter.chitty.cc)
 
 ## 🏛️ Foundation Authority
 
 This is the **authoritative ChittyID Foundation service** that defines HOW ChittyIDs are generated, validated, and managed across the entire ChittyOS ecosystem. All other services must REQUEST ChittyIDs from this Foundation service.
 
-**Production Service**: https://id.chitty.cc
+**Production Service**: https://foundation.thechitty.com
 
 ## 🎯 Architecture
 
@@ -41,7 +41,7 @@ Authorization: Bearer your_chitty_id_token
 
 ### Request a ChittyID
 ```javascript
-const response = await fetch('https://id.chitty.cc/api/v2/chittyid/mint', {
+const response = await fetch('https://foundation.thechitty.com/api/v2/chittyid/mint', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ console.log(result.chitty_id); // CP-A-001-1234-P-2509-I-82
 
 ### Verify a ChittyID
 ```javascript
-const response = await fetch('https://id.chitty.cc/api/v2/chittyid/verify', {
+const response = await fetch('https://foundation.thechitty.com/api/v2/chittyid/verify', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
