@@ -94,15 +94,22 @@ async function fetchWithCircuitBreaker(circuitBreaker, serviceName, operation, u
 }
 
 /**
+ * Initialize circuit breaker for the environment
+ */
+function getCircuitBreaker(env) {
+  if (!env._circuitBreaker) {
+    env._circuitBreaker = new PipelineCircuitBreaker(env);
+  }
+  return env._circuitBreaker;
+}
+
+/**
  * Request a fallback error ID from the central fallback service
  * This replaces local ID generation and ensures all IDs come from services
  */
 async function requestFallbackIdFromService(errorCode, entityType, originalRequest, env) {
   try {
-    // Initialize circuit breaker if not already done
-    if (!env._circuitBreaker) {
-      env._circuitBreaker = new PipelineCircuitBreaker(env);
-    }
+    const circuitBreaker = getCircuitBreaker(env);
 
     const fallbackRequest = {
       errorCode,
@@ -116,7 +123,7 @@ async function requestFallbackIdFromService(errorCode, entityType, originalReque
 
     // Call fallback service with circuit breaker and timeout
     const response = await fetchWithCircuitBreaker(
-      env._circuitBreaker,
+      circuitBreaker,
       'fallback-id-service',
       'request-fallback-id',
       `${FALLBACK_ID_SERVICE}/api/fallback`,
@@ -546,16 +553,12 @@ export default {
 
               // Attempt to mint a real ID via ChittyMint
               try {
-                // Initialize circuit breaker if not already done
-                if (!env._circuitBreaker) {
-                  env._circuitBreaker = new PipelineCircuitBreaker(env);
-                }
-
+                const circuitBreaker = getCircuitBreaker(env);
                 const authHeader = request?.headers?.get('Authorization');
                 
                 // Use circuit breaker and timeout wrapper for mint request
                 const mintResponse = await fetchWithCircuitBreaker(
-                  env._circuitBreaker,
+                  circuitBreaker,
                   'chittymint',
                   'remint-fallback-id',
                   `${CHITTYMINT_URL}/api/mint`,
