@@ -6,7 +6,7 @@
 
 import { createPipelineEnforcer } from "./src/middleware/pipeline-enforcer.js";
 import { createRequestInterceptor } from "./src/middleware/request-interceptor.js";
-import { PipelineIntegrityBreaker } from "./src/enforcement/circuit-breaker.js";
+import { PipelineIntegrityBreaker, PipelineCircuitBreaker } from "./src/enforcement/circuit-breaker.js";
 import { ComplianceMonitor } from "./src/enforcement/compliance-monitor.js";
 
 // Import the main API handler from Pages Functions
@@ -39,43 +39,112 @@ function mod97Checksum(str) {
 // ChittyMint service URL
 const CHITTYMINT_URL = process.env.CHITTYMINT_URL || 'https://mint.chitty.cc';
 
-// Error code mapping for fallback IDs
-// Encoded in SSSS field (0000-0099 reserved for error codes)
-const ERROR_CODES = {
-  MINT_UNAVAILABLE: '0001',    // ChittyMint service unreachable
-  MINT_TIMEOUT: '0002',        // ChittyMint request timed out
-  MINT_REJECTED: '0003',       // ChittyMint rejected the request
-  DRAND_UNAVAILABLE: '0004',   // drand beacon unavailable
-  CERT_UNAVAILABLE: '0005',    // ChittyCert unavailable
-  TRUST_UNAVAILABLE: '0006',   // ChittyTrust unavailable
-  RATE_LIMITED: '0007',        // Rate limit exceeded
-  INVALID_REQUEST: '0008',     // Invalid mint request
-  INTERNAL_ERROR: '0099'       // Unknown internal error
-};
+// Fallback ID service URL
+const FALLBACK_ID_SERVICE = process.env.FALLBACK_ID_SERVICE || 'https://fallback.id.chitty.cc';
 
-// Entity type codes
-const ENTITY_TYPES = { person: 'P', place: 'L', thing: 'T', event: 'E', authority: 'A' };
+// Request timeout (30 seconds)
+const REQUEST_TIMEOUT = 30000;
 
 /**
- * Generate a fallback error ID
- * Uses existing ChittyID format with error code encoded in SSSS field
- * These IDs are replaced with real IDs on next verification attempt
+ * Fetch with timeout
  */
-function generateFallbackErrorId(errorCode, entityType, originalRequest) {
-  const version = '03';
-  const region = '0';  // Region 0 = Error/Pending
-  const jurisdiction = 'ERR';  // Reserved jurisdiction for errors
-  const sequential = ERROR_CODES[errorCode] || ERROR_CODES.INTERNAL_ERROR;
-  const type = ENTITY_TYPES[entityType?.toLowerCase()] || 'T';
-  const now = new Date();
-  const yearMonth = now.getFullYear().toString().slice(-2) + (now.getMonth() + 1).toString().padStart(2, '0');
-  const trustLevel = '0';  // Trust 0 = Unverified/Error
+async function fetchWithTimeout(url, options, timeout = REQUEST_TIMEOUT) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-  // Calculate checksum
-  const baseId = `${version}${region}${jurisdiction}${sequential}${type}${yearMonth}${trustLevel}`;
-  const checksum = mod97Checksum(baseId).toString().padStart(2, '0');
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error('Request timeout');
+    }
+    throw error;
+  }
+}
 
-  return `${version}-${region}-${jurisdiction}-${sequential}-${type}-${yearMonth}-${trustLevel}-${checksum}`;
+/**
+ * Fetch with circuit breaker and timeout
+ */
+async function fetchWithCircuitBreaker(circuitBreaker, serviceName, operation, url, options, timeout = REQUEST_TIMEOUT) {
+  // Check circuit state
+  const circuitCheck = await circuitBreaker.checkCircuit(serviceName, operation);
+  
+  if (!circuitCheck.allowed) {
+    throw new Error(`Circuit breaker is open for ${serviceName}:${operation}. Time until retry: ${circuitCheck.timeUntilRetry}ms`);
+  }
+
+  try {
+    const response = await fetchWithTimeout(url, options, timeout);
+    
+    // Record success
+    await circuitBreaker.recordSuccess(serviceName, operation);
+    
+    return response;
+  } catch (error) {
+    // Record failure
+    await circuitBreaker.recordFailure(serviceName, operation, error);
+    throw error;
+  }
+}
+
+/**
+ * Request a fallback error ID from the central fallback service
+ * This replaces local ID generation and ensures all IDs come from services
+ */
+async function requestFallbackIdFromService(errorCode, entityType, originalRequest, env) {
+  try {
+    // Initialize circuit breaker if not already done
+    if (!env._circuitBreaker) {
+      env._circuitBreaker = new PipelineCircuitBreaker(env);
+    }
+
+    const fallbackRequest = {
+      errorCode,
+      entityType: entityType?.toLowerCase(),
+      context: {
+        originalRequest,
+        timestamp: new Date().toISOString(),
+        service: 'id.chitty.cc'
+      }
+    };
+
+    // Call fallback service with circuit breaker and timeout
+    const response = await fetchWithCircuitBreaker(
+      env._circuitBreaker,
+      'fallback-id-service',
+      'request-fallback-id',
+      `${FALLBACK_ID_SERVICE}/api/fallback`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(fallbackRequest)
+      },
+      REQUEST_TIMEOUT
+    );
+
+    if (!response.ok) {
+      throw new Error(`Fallback service returned ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result.chittyId;
+  } catch (error) {
+    console.error('Fallback service unavailable:', error.message);
+    // If fallback service itself is unavailable, return a structured error
+    return {
+      errorCode,
+      message: `Both ChittyMint and fallback service unavailable: ${error.message}`,
+      originalRequest
+    };
+  }
 }
 
 /**
@@ -104,14 +173,11 @@ function getErrorFromId(chittyId) {
   const parts = chittyId.split('-');
   const sequential = parts[3];
 
-  // Find the error code name
-  const errorName = Object.entries(ERROR_CODES).find(([, code]) => code === sequential)?.[0];
-
   return {
     isError: true,
     errorCode: sequential,
-    errorName: errorName || 'UNKNOWN_ERROR',
-    message: `This is a fallback error ID. Error: ${errorName || sequential}. Re-verify to attempt replacement with a valid ID.`,
+    errorName: `ERROR_${sequential}`,
+    message: `This is a fallback error ID. Error code: ${sequential}. Re-verify to attempt replacement with a valid ID.`,
     canReplace: true
   };
 }
@@ -177,11 +243,26 @@ async function handleDirectChittyIdGeneration(url, env, request) {
 }
 
 /**
- * Generate fallback response with error ID
+ * Generate fallback response with error ID from service
  * Stores the original request for later replacement
  */
 async function generateFallbackResponse(errorCode, entityType, originalRequest, env) {
-  const fallbackId = generateFallbackErrorId(errorCode, entityType, originalRequest);
+  const fallbackId = await requestFallbackIdFromService(errorCode, entityType, originalRequest, env);
+
+  // If fallback service itself failed, return error object
+  if (typeof fallbackId === 'object' && fallbackId.errorCode) {
+    return new Response(JSON.stringify({
+      success: false,
+      error: 'SERVICE_UNAVAILABLE',
+      message: fallbackId.message,
+      errorCode: fallbackId.errorCode,
+      timestamp: new Date().toISOString(),
+      service: 'id.chitty.cc'
+    }), {
+      status: 503,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+    });
+  }
 
   // Store the pending request for later replacement (if KV available)
   if (env?.CHITTYID_PENDING) {
@@ -193,6 +274,10 @@ async function generateFallbackResponse(errorCode, entityType, originalRequest, 
     }), { expirationTtl: 86400 * 7 }); // 7 day TTL
   }
 
+  // Parse the fallback ID components
+  const parts = fallbackId.split('-');
+  const [version, region, jurisdiction, sequential, type, yearMonth, trustLevel, checksum] = parts;
+
   return new Response(JSON.stringify({
     success: true,
     chittyId: fallbackId,
@@ -200,20 +285,20 @@ async function generateFallbackResponse(errorCode, entityType, originalRequest, 
     errorCode,
     message: `ChittyMint unavailable. Issued fallback ID with error code ${errorCode}. This ID will be replaced with a valid ID on next verification.`,
     components: {
-      version: '03',
-      region: '0',
-      jurisdiction: 'ERR',
-      sequential: ERROR_CODES[errorCode],
-      entityType: ENTITY_TYPES[entityType?.toLowerCase()] || 'T',
-      yearMonth: new Date().getFullYear().toString().slice(-2) + (new Date().getMonth() + 1).toString().padStart(2, '0'),
-      trustLevel: '0',
-      checksum: fallbackId.split('-')[7]
+      version,
+      region,
+      jurisdiction,
+      sequential,
+      entityType: type,
+      yearMonth,
+      trustLevel,
+      checksum
     },
-    geo: { region: '0', regionName: 'Error/Pending', jurisdiction: 'ERR', source: 'fallback' },
-    trust: { level: 0, source: 'fallback', verified: false },
+    geo: { region, regionName: 'Error/Pending', jurisdiction, source: 'fallback' },
+    trust: { level: parseInt(trustLevel), source: 'fallback', verified: false },
     timestamp: new Date().toISOString(),
     service: 'id.chitty.cc',
-    mintedBy: 'fallback'
+    mintedBy: 'fallback.id.chitty.cc'
   }), {
     status: 200, // Return 200 even for fallback (ID was issued)
     headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
@@ -461,15 +546,29 @@ export default {
 
               // Attempt to mint a real ID via ChittyMint
               try {
+                // Initialize circuit breaker if not already done
+                if (!env._circuitBreaker) {
+                  env._circuitBreaker = new PipelineCircuitBreaker(env);
+                }
+
                 const authHeader = request?.headers?.get('Authorization');
-                const mintResponse = await fetch(`${CHITTYMINT_URL}/api/mint`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    ...(authHeader ? { 'Authorization': authHeader } : {})
+                
+                // Use circuit breaker and timeout wrapper for mint request
+                const mintResponse = await fetchWithCircuitBreaker(
+                  env._circuitBreaker,
+                  'chittymint',
+                  'remint-fallback-id',
+                  `${CHITTYMINT_URL}/api/mint`,
+                  {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      ...(authHeader ? { 'Authorization': authHeader } : {})
+                    },
+                    body: JSON.stringify(pending.originalRequest)
                   },
-                  body: JSON.stringify(pending.originalRequest)
-                });
+                  REQUEST_TIMEOUT
+                );
 
                 if (mintResponse.ok) {
                   const mintResult = await mintResponse.json();
@@ -490,7 +589,7 @@ export default {
                   });
                 }
               } catch (e) {
-                // ChittyMint still unavailable - return error info
+                // ChittyMint still unavailable or circuit breaker open - return error info
                 pending.attempts = (pending.attempts || 0) + 1;
                 await env.CHITTYID_PENDING.put(body.id, JSON.stringify(pending), { expirationTtl: 86400 * 7 });
               }
