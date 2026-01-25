@@ -70,6 +70,14 @@ async function fetchWithTimeout(url, options, timeout = REQUEST_TIMEOUT) {
 
 /**
  * Fetch with circuit breaker and timeout
+ * @param {PipelineCircuitBreaker} circuitBreaker - The circuit breaker instance to use
+ * @param {string} serviceName - Name of the service being called
+ * @param {string} operation - Name of the operation being performed
+ * @param {string} url - URL to fetch
+ * @param {Object} options - Fetch options
+ * @param {number} [timeout=REQUEST_TIMEOUT] - Request timeout in milliseconds
+ * @returns {Promise<Response>} The fetch response
+ * @throws {Error} If circuit breaker is open or request fails
  */
 async function fetchWithCircuitBreaker(circuitBreaker, serviceName, operation, url, options, timeout = REQUEST_TIMEOUT) {
   // Check circuit state
@@ -106,6 +114,12 @@ function getCircuitBreaker(env) {
 /**
  * Request a fallback error ID from the central fallback service
  * This replaces local ID generation and ensures all IDs come from services
+ * @param {string} errorCode - Error code identifying the type of failure (e.g., 'MINT_UNAVAILABLE', 'MINT_TIMEOUT')
+ * @param {string} entityType - Type of entity the ID is for (person, place, thing, event, authority)
+ * @param {Object} originalRequest - The original mint request that failed
+ * @param {Object} env - Cloudflare Worker environment bindings
+ * @returns {Promise<string|Object>} The fallback ChittyID string, or an error object if fallback service is unavailable
+ * @throws Never throws - returns error object on failure
  */
 async function requestFallbackIdFromService(errorCode, entityType, originalRequest, env) {
   try {
