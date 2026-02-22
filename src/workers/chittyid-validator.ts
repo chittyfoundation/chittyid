@@ -12,7 +12,7 @@ interface ChittyID {
   region: string;
   jurisdiction: string;
   sequentialId: string;
-  entityType: "ChittyPerson" | "ChittyLocation" | "ChittyThing" | "ChittyEvent";
+  entityType: "ChittyPerson" | "ChittyLocation" | "ChittyThing" | "ChittyEvent" | "ChittyAuthority";
   yearMonth: string;
   trustLevel: string;
   checksum: string;
@@ -31,8 +31,9 @@ export class ChittyIDValidator {
 
   parseChittyID(chittyId: string): ChittyID | null {
     // Format: VV-G-LLL-SSSS-T-YM-C-X
+    // @canon: chittycanon://gov/governance#core-types
     const pattern =
-      /^(\d{2})-([A-Z])-([A-Z]{3})-(\d{4})-([PLTE])-(\d{4})-([L]\d)-(\d{2})$/;
+      /^(\d{2})-([A-Z])-([A-Z]{3})-(\d{4})-([PLTEA])-(\d{4})-([L]\d)-(\d{2})$/;
     const match = chittyId.match(pattern);
 
     if (!match) return null;
@@ -42,6 +43,7 @@ export class ChittyIDValidator {
       L: "ChittyLocation",
       T: "ChittyThing",
       E: "ChittyEvent",
+      A: "ChittyAuthority",
     };
 
     return {

@@ -340,8 +340,9 @@ async function validateChittyId(
     return JSON.parse(cached);
   }
 
+  // @canon: chittycanon://gov/governance#core-types
   const pattern =
-    /^(\d{2})-(\d)-([A-Z]{3})-(\d{4})-([PLTE])-(\d{2,3})-([0-5])-(\d{2})$/;
+    /^(\d{2})-(\d)-([A-Z]{3})-(\d{4})-([PLTEA])-(\d{2,3})-([0-5])-(\d{2})$/;
   const match = chittyId.match(pattern);
 
   if (!match) {
