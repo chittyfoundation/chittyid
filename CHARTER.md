@@ -62,7 +62,7 @@ VV-G-LLL-SSSS-T-YM-C-X
 │  │ │   │    │ │  │ └─ Checksum (Mod-97)
 │  │ │   │    │ │  └─── Trust Level (0-5)
 │  │ │   │    │ └────── Year-Month code
-│  │ │   │    └──────── Entity Type (P/L/T/E)
+│  │ │   │    └──────── Entity Type (P/L/T/E/A)
 │  │ │   └───────────── Sequential ID
 │  │ └────────────────── Legal Jurisdiction
 │  └──────────────────── Geographic Region

@@ -40,7 +40,8 @@ const CONFIG = {
   VALIDATION_INTERVAL: 3600000, // 1 hour
 
   // ChittyID format
-  ID_REGEX: /^(\d{2})-(\d)-([A-Z]{3})-(\d{4})-([PLTE])-(\d{3})-(\d)-(\d{2})$/,
+  // @canon: chittycanon://gov/governance#core-types
+  ID_REGEX: /^(\d{2})-(\d)-([A-Z]{3})-(\d{4})-([PLTEA])-(\d{3})-(\d)-(\d{2})$/,
 
   // Checksum constants
   CHECKSUM_MOD: 97

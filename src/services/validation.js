@@ -59,8 +59,8 @@ export default class ValidationService {
       {
         field: 'entityType',
         value: entityType,
-        pattern: /^[PLTE]$/,
-        error: 'Entity type must be P, L, T, or E'
+        pattern: /^[PLTEA]$/,
+        error: 'Entity type must be P, L, T, E, or A'
       },
       {
         field: 'yearMonth',
@@ -219,12 +219,14 @@ export default class ValidationService {
     return regions[region] || `Region ${region}`;
   }
 
+  // @canon: chittycanon://gov/governance#core-types
   getEntityTypeName(type) {
     const types = {
       'P': 'Person',
       'L': 'Location',
       'T': 'Thing',
-      'E': 'Event'
+      'E': 'Event',
+      'A': 'Authority'
     };
     return types[type] || type;
   }

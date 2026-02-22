@@ -43,8 +43,9 @@ class MockChittyIDAPI {
         }
 
         // Entity type validation
-        if (!/^[PLTE]$/.test(entityType)) {
-            return { valid: false, error: 'Entity type must be P, L, T, or E' };
+        // @canon: chittycanon://gov/governance#core-types
+        if (!/^[PLTEA]$/.test(entityType)) {
+            return { valid: false, error: 'Entity type must be P, L, T, E, or A' };
         }
 
         // Year-Month validation
@@ -116,12 +117,14 @@ class MockChittyIDAPI {
         return regions[region] || region;
     }
 
+    // @canon: chittycanon://gov/governance#core-types
     getEntityTypeName(type) {
         const types = {
             'P': 'ChittyPerson',
             'L': 'ChittyLocation',
             'T': 'ChittyThing',
-            'E': 'ChittyEvent'
+            'E': 'ChittyEvent',
+            'A': 'ChittyAuthority'
         };
         return types[type] || type;
     }
@@ -171,11 +174,16 @@ describe('ChittyID Validation', () => {
         });
 
         it('should validate different entity types', () => {
+            // Compute checksum for Authority type
+            const aBaseId = '011USA0001A2513';
+            const aChecksum = api.mod97Checksum(aBaseId).toString().padStart(2, '0');
+
             const testCases = [
                 { id: '01-1-USA-0001-P-251-3-15', type: 'P', name: 'ChittyPerson' },
                 { id: '01-1-USA-0001-L-251-3-59', type: 'L', name: 'ChittyLocation' },
                 { id: '01-1-USA-0001-T-251-3-03', type: 'T', name: 'ChittyThing' },
-                { id: '01-1-USA-0001-E-251-3-47', type: 'E', name: 'ChittyEvent' }
+                { id: '01-1-USA-0001-E-251-3-47', type: 'E', name: 'ChittyEvent' },
+                { id: `01-1-USA-0001-A-251-3-${aChecksum}`, type: 'A', name: 'ChittyAuthority' }
             ];
 
             testCases.forEach(({ id, type, name }) => {
@@ -355,7 +363,7 @@ describe('ChittyID Format Specification', () => {
     });
 
     it('should follow the VV-G-LLL-SSSS-T-YM-C-X format', () => {
-        const validFormat = /^[0-9]{2}-[1-9]-[A-Z]{3}-[0-9]{4}-[PLTE]-[0-9]{2,3}-[0-5]-[0-9]{2}$/;
+        const validFormat = /^[0-9]{2}-[1-9]-[A-Z]{3}-[0-9]{4}-[PLTEA]-[0-9]{2,3}-[0-5]-[0-9]{2}$/;
 
         const testIds = [
             '01-1-USA-0001-P-251-3-15',
@@ -391,7 +399,8 @@ describe('ChittyID Format Specification', () => {
             'P': 'ChittyPerson',
             'L': 'ChittyLocation',
             'T': 'ChittyThing',
-            'E': 'ChittyEvent'
+            'E': 'ChittyEvent',
+            'A': 'ChittyAuthority'
         };
 
         Object.keys(entityTypes).forEach(type => {

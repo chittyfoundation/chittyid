@@ -86,8 +86,9 @@ class ChittyIDAPI {
       throw new Error("Region must be a digit 1-9");
     }
 
-    if (!/^[PLTE]$/.test(entityType.toUpperCase())) {
-      throw new Error("Entity type must be P, L, T, or E");
+    // @canon: chittycanon://gov/governance#core-types
+    if (!/^[PLTEA]$/.test(entityType.toUpperCase())) {
+      throw new Error("Entity type must be P, L, T, E, or A");
     }
 
     if (!/^[0-5]$/.test(trustLevel)) {
@@ -150,8 +151,9 @@ class ChittyIDAPI {
       return { valid: false, error: "Sequential must be 4 digits" };
     }
 
-    if (!/^[PLTE]$/.test(entityType)) {
-      return { valid: false, error: "Entity type must be P, L, T, or E" };
+    // @canon: chittycanon://gov/governance#core-types
+    if (!/^[PLTEA]$/.test(entityType)) {
+      return { valid: false, error: "Entity type must be P, L, T, E, or A" };
     }
 
     if (!/^[0-9]{2,3}$/.test(yearMonth)) {
@@ -198,12 +200,14 @@ class ChittyIDAPI {
     };
   }
 
+  // @canon: chittycanon://gov/governance#core-types
   getEntityTypeName(type) {
     const types = {
       P: "ChittyPerson",
       L: "ChittyLocation",
       T: "ChittyThing",
       E: "ChittyEvent",
+      A: "ChittyAuthority",
     };
     return types[type] || type;
   }
@@ -334,12 +338,16 @@ class ChittyIDAPI {
     };
   }
 
+  // @canon: chittycanon://gov/governance#core-types
   mapPurposeToEntityType(purpose) {
     const mapping = {
       person: "P",
       location: "L",
       thing: "T",
       event: "E",
+      authority: "A",
+      claude: "P",
+      context: "P",
       "work-item": "T",
       document: "T",
       general: "T",
@@ -669,7 +677,7 @@ export async function onRequest(context) {
             <li><strong>G:</strong> Geographic region (1-9)</li>
             <li><strong>LLL:</strong> Legal jurisdiction (3 letters)</li>
             <li><strong>SSSS:</strong> Sequential ID (4 digits)</li>
-            <li><strong>T:</strong> Entity type (P/L/T/E)</li>
+            <li><strong>T:</strong> Entity type (P/L/T/E/A)</li>
             <li><strong>YM:</strong> Year-Month code</li>
             <li><strong>C:</strong> Trust level (0-5)</li>
             <li><strong>X:</strong> Mod-97 checksum (2 digits)</li>
@@ -987,7 +995,7 @@ export async function onRequest(context) {
               G: "Geographical region code (1 digit)",
               LLL: "Legal jurisdiction code (3 letters)",
               SSSS: "Sequential ID (4 digits)",
-              T: "Entity type identifier (P/L/T/E)",
+              T: "Entity type identifier (P/L/T/E/A)",
               YM: "Year-Month code (2-3 digits)",
               C: "Trust level (0-5)",
               X: "Mod-97 checksum (2 digits)",
@@ -997,6 +1005,7 @@ export async function onRequest(context) {
               L: "ChittyLocation",
               T: "ChittyThing",
               E: "ChittyEvent",
+              A: "ChittyAuthority",
             },
             trustLevels: {
               0: "L0 - Unverified",

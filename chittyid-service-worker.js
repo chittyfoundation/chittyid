@@ -65,11 +65,13 @@ export default {
         // Dual format approach: official vs simple
         if (requestedFormat === "official") {
           // Validate entity type for official format (VV field)
+          // @canon: chittycanon://gov/governance#core-types
           const validEntityTypes = {
             PERSON: "CP",
             LOCATION: "CL",
             THING: "CT",
             EVENT: "CE",
+            AUTHORITY: "CA",
           };
           if (!validEntityTypes[entityUpper]) {
             return jsonResponse(
@@ -99,6 +101,7 @@ export default {
             "LOCATION",
             "THING",
             "EVENT",
+            "AUTHORITY",
           ];
           if (!validSimpleEntities.includes(entityUpper)) {
             return jsonResponse(
@@ -365,11 +368,13 @@ async function generateChittyID(entity, name, metadata, format, env) {
  */
 async function generateOfficialChittyID(entity, name, metadata, env) {
   // VV = Vertical (CP=ChittyPerson, CL=ChittyLocation, CT=ChittyThing, CE=ChittyEvent)
+  // @canon: chittycanon://gov/governance#core-types
   const verticalMap = {
     PERSON: "CP",
     LOCATION: "CL",
     THING: "CT",
     EVENT: "CE",
+    AUTHORITY: "CA",
   };
   const vertical = verticalMap[entity];
 
@@ -447,11 +452,11 @@ async function verifyOfficialChittyID(chittyId, _env) {
 
   // Validate format components
   if (
-    !/^(CP|CL|CT|CE)$/.test(vertical) ||
+    !/^(CP|CL|CT|CE|CA)$/.test(vertical) ||
     !/^[A-Z0-9]$/.test(generation) ||
     !/^[A-Z0-9]{3}$/.test(locationCode) ||
     !/^\d{4}$/.test(sequence) ||
-    !/^[PLTE]$/.test(typeModifier) ||
+    !/^[PLTEA]$/.test(typeModifier) ||
     !/^\d{4}$/.test(yearMonth) ||
     !/^[A-Z]$/.test(category) ||
     !/^\d{2}$/.test(providedChecksum)

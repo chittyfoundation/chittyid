@@ -150,12 +150,16 @@ class RouterStage {
     }
   }
 
+  // @canon: chittycanon://gov/governance#core-types
   determineRoute(purpose) {
     const routes = {
       'person': { type: 'P', priority: 'high' },
       'location': { type: 'L', priority: 'medium' },
       'thing': { type: 'T', priority: 'medium' },
       'event': { type: 'E', priority: 'high' },
+      'authority': { type: 'A', priority: 'high' },
+      'claude': { type: 'P', priority: 'high' },
+      'context': { type: 'P', priority: 'high' },
       'work-item': { type: 'T', priority: 'low' },
       'document': { type: 'T', priority: 'low' },
       'general': { type: 'T', priority: 'low' }
@@ -432,6 +436,9 @@ class AuthorizationStage {
       'location': 2,    // L2 - Standard
       'thing': 1,       // L1 - Basic
       'event': 2,       // L2 - Standard
+      'authority': 4,   // L4 - Premium
+      'claude': 3,      // L3 - Verified
+      'context': 3,     // L3 - Verified
       'work-item': 1,   // L1 - Basic
       'document': 1,    // L1 - Basic
       'general': 0      // L0 - Unverified
