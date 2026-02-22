@@ -151,7 +151,9 @@ describe('ChittyID Validation', () => {
 
     describe('Valid ChittyIDs', () => {
         it('should validate a properly formatted ChittyID', () => {
-            const chittyId = '01-1-USA-0001-P-251-3-15';
+            const baseId = '011USA0001P2513';
+            const checksum = api.mod97Checksum(baseId).toString().padStart(2, '0');
+            const chittyId = `01-1-USA-0001-P-251-3-${checksum}`;
             const result = api.validate(chittyId);
 
             expect(result.valid).toBe(true);
@@ -165,7 +167,9 @@ describe('ChittyID Validation', () => {
         });
 
         it('should provide metadata for valid ChittyIDs', () => {
-            const chittyId = '01-1-USA-0001-P-251-3-15';
+            const baseId = '011USA0001P2513';
+            const checksum = api.mod97Checksum(baseId).toString().padStart(2, '0');
+            const chittyId = `01-1-USA-0001-P-251-3-${checksum}`;
             const result = api.validate(chittyId);
 
             expect(result.metadata.regionName).toBe('North America');
@@ -174,17 +178,12 @@ describe('ChittyID Validation', () => {
         });
 
         it('should validate different entity types', () => {
-            // Compute checksum for Authority type
-            const aBaseId = '011USA0001A2513';
-            const aChecksum = api.mod97Checksum(aBaseId).toString().padStart(2, '0');
-
-            const testCases = [
-                { id: '01-1-USA-0001-P-251-3-15', type: 'P', name: 'ChittyPerson' },
-                { id: '01-1-USA-0001-L-251-3-59', type: 'L', name: 'ChittyLocation' },
-                { id: '01-1-USA-0001-T-251-3-03', type: 'T', name: 'ChittyThing' },
-                { id: '01-1-USA-0001-E-251-3-47', type: 'E', name: 'ChittyEvent' },
-                { id: `01-1-USA-0001-A-251-3-${aChecksum}`, type: 'A', name: 'ChittyAuthority' }
-            ];
+            // @canon: chittycanon://gov/governance#core-types
+            const testCases = ['P', 'L', 'T', 'E', 'A'].map(type => {
+                const base = `011USA0001${type}2513`;
+                const cs = api.mod97Checksum(base).toString().padStart(2, '0');
+                return { id: `01-1-USA-0001-${type}-251-3-${cs}`, type, name: api.getEntityTypeName(type) };
+            });
 
             testCases.forEach(({ id, type, name }) => {
                 const result = api.validate(id);

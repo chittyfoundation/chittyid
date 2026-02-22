@@ -88,8 +88,8 @@ export class NotionSyncService {
       metrics: { ...this.metrics },
     };
 
-    // Handle empty facts array
-    if (!facts || facts.length === 0) {
+    // Handle empty facts array (but still allow DLQ processing)
+    if ((!facts || facts.length === 0) && !options.processDlq) {
       return {
         success: true,
         summary: {

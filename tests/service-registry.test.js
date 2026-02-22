@@ -242,15 +242,21 @@ describe("Service Registry", () => {
     });
 
     it("should check all services in parallel batches", async () => {
-      // Register multiple services
+      // Use real timers — healthCheckAll uses setTimeout for batch delays
+      vi.useRealTimers();
+
+      // Clear default services to isolate this test
+      registry.services.clear();
+
+      // Register exactly 12 test services
       for (let i = 1; i <= 12; i++) {
         registry.registerService(`service-${i}`, {
-          endpoint: `service${i}.chitty.cc`,
+          endpoint: `https://service${i}.chitty.cc`,
         });
       }
 
       // Mock responses
-      global.fetch.mockResolvedValue({
+      global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ status: "healthy" }),
       });
@@ -258,36 +264,51 @@ describe("Service Registry", () => {
       const results = await registry.healthCheckAll();
 
       expect(results.size).toBe(12);
-
-      // Should batch requests (default batch size is 5)
-      // With 12 services and batch size 5: 3 batches
       expect(global.fetch).toHaveBeenCalledTimes(12);
+
+      // Restore fake timers for remaining tests in this describe
+      vi.useFakeTimers();
     });
 
     it("should respect timeout settings", async () => {
+      // Use real timers — healthCheck uses setTimeout for AbortController
+      vi.useRealTimers();
+
+      // Clear defaults and register only the timeout test service
+      registry.services.clear();
       registry.registerService("timeout-service", {
-        endpoint: "timeout.chitty.cc",
-        timeout: 1000,
+        endpoint: "https://timeout.chitty.cc",
+        timeout: 500,
       });
 
-      global.fetch.mockImplementation(
-        () =>
-          new Promise((resolve) =>
-            setTimeout(
+      // Mock fetch that respects AbortSignal — delays longer than timeout
+      global.fetch = vi.fn().mockImplementation(
+        (_url, options) =>
+          new Promise((resolve, reject) => {
+            const timer = setTimeout(
               () =>
                 resolve({
                   ok: true,
                   json: () => Promise.resolve({}),
                 }),
-              2000,
-            ),
-          ),
+              3000,
+            );
+            if (options?.signal) {
+              options.signal.addEventListener("abort", () => {
+                clearTimeout(timer);
+                reject(new DOMException("The operation was aborted", "AbortError"));
+              });
+            }
+          }),
       );
 
       const result = await registry.healthCheck("timeout-service");
 
       expect(result.healthy).toBe(false);
       expect(result.error).toContain("timeout");
+
+      // Restore fake timers for remaining tests in this describe
+      vi.useFakeTimers();
     });
 
     it("should start and stop automatic health monitoring", async () => {
@@ -340,6 +361,7 @@ describe("Service Registry", () => {
       registry.registerService("high-priority", {
         endpoint: "high.chitty.cc",
         priority: 0,
+        status: "active",
         healthStatus: "healthy",
         responseTime: 100,
       });
@@ -347,6 +369,7 @@ describe("Service Registry", () => {
       registry.registerService("medium-priority", {
         endpoint: "medium.chitty.cc",
         priority: 1,
+        status: "active",
         healthStatus: "healthy",
         responseTime: 200,
       });
@@ -354,6 +377,7 @@ describe("Service Registry", () => {
       registry.registerService("low-priority", {
         endpoint: "low.chitty.cc",
         priority: 2,
+        status: "active",
         healthStatus: "healthy",
         responseTime: 50,
       });
@@ -361,6 +385,7 @@ describe("Service Registry", () => {
       registry.registerService("unhealthy-service", {
         endpoint: "unhealthy.chitty.cc",
         priority: 0,
+        status: "active",
         healthStatus: "unhealthy",
       });
     });
@@ -385,12 +410,14 @@ describe("Service Registry", () => {
     it("should filter by service type", () => {
       registry.registerService("chittyauth-primary", {
         endpoint: "auth1.chitty.cc",
+        status: "active",
         healthStatus: "healthy",
         metadata: { type: "authentication" },
       });
 
       registry.registerService("chittyauth-secondary", {
         endpoint: "auth2.chitty.cc",
+        status: "active",
         healthStatus: "healthy",
         metadata: { type: "authentication" },
       });
@@ -406,6 +433,7 @@ describe("Service Registry", () => {
     it("should filter by capability", () => {
       registry.registerService("capable-service", {
         endpoint: "capable.chitty.cc",
+        status: "active",
         healthStatus: "healthy",
         metadata: {
           capabilities: ["validate", "generate", "search"],
