@@ -1,7 +1,7 @@
 ---
 uri: chittycanon://docs/ops/architecture/chitty-id
 namespace: chittycanon://docs/ops
-type: summary
+type: architecture
 version: 1.0.0
 status: DRAFT
 registered_with: chittycanon://core/services/canon
