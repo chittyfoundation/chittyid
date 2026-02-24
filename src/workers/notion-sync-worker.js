@@ -464,23 +464,9 @@ export class NotionSyncWorker {
      * Fetch AtomicFacts from upstream
      */
     async fetchAtomicFacts(since, limit) {
-        // In production, this would fetch from ChittyLedger/ChittyAssets
-        // For now, return mock data for testing
-        return [
-            {
-                factId: `FACT-${Date.now()}-001`,
-                parentArtifactId: 'DOC-2024-001',
-                factText: 'The defendant was present at the location on January 15, 2024.',
-                factType: 'DATE',
-                locationRef: 'Page 3, Paragraph 2',
-                classification: 'FACT',
-                weight: 0.95,
-                credibility: ['Direct Evidence', 'Documentary'],
-                chainStatus: 'Minted',
-                verifiedAt: new Date().toISOString(),
-                verificationMethod: 'ChittyRouter AI Analysis'
-            }
-        ];
+        // TODO: Fetch from ChittyLedger/ChittyAssets when available
+        console.warn('fetchAtomicFacts not yet implemented — requires ChittyLedger integration');
+        return [];
     }
 
     /**
