@@ -430,6 +430,39 @@ export default {
         return await OntologyControllerWorker.fetch(ontologyRequest, env, ctx);
       }
 
+      // CORS preflight
+      if (request.method === "OPTIONS") {
+        return new Response(null, {
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+          }
+        });
+      }
+
+      // Top-level health endpoint (ChittyOS convention)
+      if (url.pathname === "/health" && request.method === "GET") {
+        return new Response(JSON.stringify({
+          status: "ok",
+          service: "chittyid-mothership",
+          version: "2.0.0",
+          timestamp: new Date().toISOString()
+        }), {
+          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+        });
+      }
+
+      // Generate endpoint - delegates to ChittyMint
+      if (url.pathname === "/generate" && request.method === "GET") {
+        return await handleDirectChittyIdGeneration(url, env, request);
+      }
+
+      // VRF mint endpoint - delegates to ChittyMint
+      if (url.pathname === "/v1/mint" && request.method === "POST") {
+        return await handleDirectChittyIdGeneration(url, env, request);
+      }
+
       // Direct API handlers (bypassing Pages Functions import issues)
       if (url.pathname === "/api/get-chittyid" && request.method === "GET") {
         return await handleDirectChittyIdGeneration(url, env, request);
