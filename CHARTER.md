@@ -1,7 +1,20 @@
+---
+uri: chittycanon://docs/ops/policy/chitty-id-charter
+namespace: chittycanon://docs/ops
+type: policy
+version: 1.0.0
+status: DRAFT
+registered_with: chittycanon://core/services/canon
+title: "ChittyID Charter"
+certifier: chittycanon://core/services/chittycertify
+visibility: PUBLIC
+---
+
 # ChittyID Charter
 
 ## Classification
-- **Tier**: 1 (Foundation)
+- **Canonical URI**: `chittycanon://core/services/chitty-id`
+- **Tier**: 0 (Trust Anchors)
 - **Organization**: CHITTYFOUNDATION
 - **Domain**: id.chitty.cc
 
@@ -102,5 +115,20 @@ Authorization: Bearer {CHITTY_ID_TOKEN}
 - **Error-Coded Fallbacks**: Domain 'E' (error) vs 'C' (standard) for traceability
 - **Automatic Reconciliation**: Fallback IDs replaced with permanent IDs when main server returns
 
+## Document Triad
+
+This charter is part of a synchronized documentation triad. Changes to shared fields must propagate.
+
+| Field | Canonical Source | Also In |
+|-------|-----------------|---------|
+| Canonical URI | CHARTER.md (Classification) | CHITTY.md (blockquote) |
+| Tier | CHARTER.md (Classification) | CHITTY.md (blockquote) |
+| Domain | CHARTER.md (Classification) | CHITTY.md (blockquote), CLAUDE.md (header) |
+| Endpoints | CHARTER.md (API Contract) | CHITTY.md (Endpoints table), CLAUDE.md (API section) |
+| Dependencies | CHARTER.md (Dependencies) | CHITTY.md (Dependencies table), CLAUDE.md (Architecture) |
+| Certification badge | CHITTY.md (Certification) | CHARTER.md frontmatter `status` |
+
+**Related docs**: [CHITTY.md](CHITTY.md) (badge/one-pager) | [CLAUDE.md](CLAUDE.md) (developer guide)
+
 ---
-*Charter Version: 1.0.0 | Last Updated: 2026-01-12*
+*Charter Version: 1.0.0 | Last Updated: 2026-02-23*
