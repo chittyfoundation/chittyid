@@ -4,15 +4,6 @@
  * Enhanced with MCP Portal Integration and LangChain AI Routing
  */
 
-import { createPipelineEnforcer } from "./src/middleware/pipeline-enforcer.js";
-import { createRequestInterceptor } from "./src/middleware/request-interceptor.js";
-import { PipelineIntegrityBreaker } from "./src/enforcement/circuit-breaker.js";
-import { ComplianceMonitor } from "./src/enforcement/compliance-monitor.js";
-
-// Import the main API handler from Pages Functions
-// NOTE: Disabled - [[route]] syntax doesn't bundle correctly in Workers
-// import { onRequest } from "./functions/api/[[route]].js";
-
 // Import MCP Portal Handler for enhanced routing
 import { ChittyOSMCPPortalHandler } from "./mcp-cloudflare-portal-handler.js";
 
