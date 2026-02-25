@@ -44,8 +44,12 @@ const ERROR_CODES = {
   INTERNAL_ERROR: '0099'       // Unknown internal error
 };
 
-// Entity type codes
+// Entity type codes (word → code)
 const ENTITY_TYPES = { person: 'P', place: 'L', thing: 'T', event: 'E', authority: 'A' };
+
+// Reverse lookup: accept code-form types (P/L/T/E/A) as well as words
+// @canon: chittycanon://gov/governance#core-types
+const CODE_TO_WORD = { p: 'person', l: 'place', t: 'thing', e: 'event', a: 'authority' };
 
 /**
  * Generate a fallback error ID
@@ -109,7 +113,9 @@ function getErrorFromId(chittyId) {
 
 // Direct ChittyID generation handler - delegates to ChittyMint with fallback
 async function handleDirectChittyIdGeneration(url, env, request) {
-  const entityTypeParam = (url.searchParams.get('type') || url.searchParams.get('for') || 'thing').toLowerCase();
+  const rawType = (url.searchParams.get('type') || url.searchParams.get('for') || 'thing').toLowerCase();
+  // Accept both code-form (P/L/T/E/A) and word-form (person/place/thing/event/authority)
+  const entityTypeParam = CODE_TO_WORD[rawType] || rawType;
 
   // Extract auth token if present (forward to ChittyMint)
   const authHeader = request?.headers?.get('Authorization');
