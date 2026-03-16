@@ -2,80 +2,21 @@
 {
   "name": "chittyid",
   "main": "worker.js",
-  "compatibility_date": "2024-09-23",
+  "compatibility_date": "2026-03-16",
   "compatibility_flags": [
     "nodejs_compat"
   ],
   "account_id": "0bc21e3a5a9de1a4cc843be9c3e98121",
-  "env": {
-    "production": {
-      "routes": [
-        {
-          "pattern": "id.chitty.cc/*",
-          "zone_name": "chitty.cc"
-        }
-      ],
-      "kv_namespaces": [
-        {
-          "binding": "MCP_SESSIONS",
-          "id": "dd1dff525a27431aa47844eb364e6606"
-        },
-        {
-          "binding": "OAUTH_TOKENS",
-          "id": "0189885179514d639776ec3bfe8f8274"
-        },
-        {
-          "binding": "API_KEYS",
-          "id": "41593bb3096745c0b59e0bf6d5cbae20"
-        },
-        {
-          "binding": "PLATFORM_CACHE",
-          "id": "d66c1e709c72456fa21aaa0d02f2db5e"
-        },
-        {
-          "binding": "PLATFORM_KV",
-          "id": "d52d89c1eebd402b95719161d311e7df"
-        },
-        {
-          "binding": "CHITTYID_KV",
-          "id": "ec782932b5f54c359d9aef2e28898bf9"
-        },
-        {
-          "binding": "CHITTYID_PENDING",
-          "id": "ec782932b5f54c359d9aef2e28898bf9"
-        },
-        {
-          "binding": "SERVICE_REGISTRY",
-          "id": "d52d89c1eebd402b95719161d311e7df"
-        },
-        {
-          "binding": "SCHEMA_KV",
-          "id": "d52d89c1eebd402b95719161d311e7df"
-        }
-      ],
-      "ai": {
-        "binding": "AI"
-      },
-      "vars": {
-        "AI_GATEWAY": "chittyrouter-ai-gateway",
-        "ENVIRONMENT": "production",
-        "CHITTYMINT_URL": "https://mint.chitty.cc",
-        "CHITTYID_FOUNDATION_URL": "https://id.chitty.cc",
-        "CHITTYID_SERVICE_VERSION": "2.0.0",
-        "CHITTYID_FALLBACK_URL": "https://fallback.id.chitty.cc",
-        "CHITTYOS_GATEWAY_URL": "https://gateway.chitty.cc",
-        "CHITTYOS_REGISTRY_URL": "https://registry.chitty.cc",
-        "CHITTYOS_SCHEMA_URL": "https://schema.chitty.cc",
-        "DRAND_BEACON_URL": "https://api.drand.sh/public/latest"
-      }
-    },
-    "staging": {
-      "vars": {
-        "ENVIRONMENT": "staging",
-        "CHITTYID_FOUNDATION_URL": "https://staging.id.chitty.cc"
-      }
-    }
+  "workers_dev": false,
+  "observability": {
+    "enabled": true
   },
+  "routes": [
+    {
+      "pattern": "id.chitty.cc/*",
+      "zone_name": "chitty.cc"
+    }
+  ],
   "kv_namespaces": [
     {
       "binding": "MCP_SESSIONS",
@@ -104,12 +45,22 @@
     {
       "binding": "CHITTYID_PENDING",
       "id": "ec782932b5f54c359d9aef2e28898bf9"
+    },
+    {
+      "binding": "SERVICE_REGISTRY",
+      "id": "d52d89c1eebd402b95719161d311e7df"
+    },
+    {
+      "binding": "SCHEMA_KV",
+      "id": "d52d89c1eebd402b95719161d311e7df"
     }
   ],
   "ai": {
     "binding": "AI"
   },
   "vars": {
+    "AI_GATEWAY": "chittyrouter-ai-gateway",
+    "ENVIRONMENT": "production",
     "CHITTYID_SERVICE_VERSION": "2.0.0",
     "CHITTYID_FOUNDATION_URL": "https://id.chitty.cc",
     "CHITTYID_FALLBACK_URL": "https://fallback.id.chitty.cc",
