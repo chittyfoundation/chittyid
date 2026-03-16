@@ -21,10 +21,11 @@ export class ChittyPipeline {
    * @param {string} purpose - Purpose of ID request (e.g., 'work-item', 'document')
    * @returns {Promise<PipelineResult>}
    */
-  async process(request, purpose = "general") {
+  async process(request, purpose = "general", entityTypeOverride = null) {
     const context = {
       request,
       purpose,
+      entityTypeOverride,
       timestamp: new Date().toISOString(),
       stages: {},
     };
@@ -306,10 +307,16 @@ class GenerationStage {
 
     try {
       // Prepare parameters for id.chitty.cc service
+      // Explicit entity_type override takes precedence over purpose-based mapping
+      const validEntityTypes = ["P", "L", "T", "E", "A"];
+      const override = context.entityTypeOverride;
+      const entityType = (override && validEntityTypes.includes(override.toUpperCase()))
+        ? override.toUpperCase()
+        : this.mapPurposeToEntityType(purpose);
       const params = {
         region: this.determineRegion(user),
         jurisdiction: this.determineJurisdiction(user),
-        entityType: this.mapPurposeToEntityType(purpose),
+        entityType,
         trustLevel: trustLevel.toString(),
         metadata: {
           userId: user.id,
@@ -399,12 +406,16 @@ class GenerationStage {
     return jurisdictionMap[user.country] || "INT";
   }
 
+  // @canon: chittycanon://gov/governance#core-types
   mapPurposeToEntityType(purpose) {
     const mapping = {
       person: "P",
       location: "L",
       thing: "T",
       event: "E",
+      authority: "A",
+      context: "P",    // Contexts are Person (P, Synthetic) — actors with agency
+      agent: "P",      // Agents are Person (P, Synthetic) — actors with agency
       "work-item": "T",
       document: "T",
       asset: "T",

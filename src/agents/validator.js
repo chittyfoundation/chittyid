@@ -81,8 +81,8 @@ export class ValidatorAgent {
       return { valid: false, reason: "Invalid sequential ID" };
     }
 
-    // Type: valid entity types (single letters)
-    const validTypes = ["P", "L", "T", "E"];
+    // @canon: chittycanon://gov/governance#core-types
+    const validTypes = ["P", "L", "T", "E", "A"];
     if (!validTypes.includes(type)) {
       return { valid: false, reason: "Invalid entity type" };
     }
