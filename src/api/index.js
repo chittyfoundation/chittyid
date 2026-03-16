@@ -65,7 +65,8 @@ export class ChittyAPI {
         method: 'GET',
         handler: async (request, url) => {
           const purpose = url.searchParams.get('for') || 'general';
-          return await this.pipeline.process(request, purpose);
+          const entityTypeOverride = url.searchParams.get('entity_type') || null;
+          return await this.pipeline.process(request, purpose, entityTypeOverride);
         }
       },
 
@@ -244,7 +245,8 @@ export class ChittyAPI {
             'P': 'Person',
             'L': 'Location',
             'T': 'Thing',
-            'E': 'Event'
+            'E': 'Event',
+            'A': 'Authority'
           }
         },
         YM: {

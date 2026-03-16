@@ -188,8 +188,9 @@ export class VRFGenerator {
       throw new Error("Namespace must be exactly 3 letters");
     }
 
-    if (!["P", "L", "T", "E"].includes(entityType)) {
-      throw new Error("Entity type must be P, L, T, or E");
+    // @canon: chittycanon://gov/governance#core-types
+    if (!["P", "L", "T", "E", "A"].includes(entityType)) {
+      throw new Error("Entity type must be P, L, T, E, or A");
     }
 
     if (!region || region < "1" || region > "9") {

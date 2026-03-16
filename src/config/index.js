@@ -75,11 +75,13 @@ export const ChittyConfig = {
       '8': 'International Waters',
       '9': 'Digital/Virtual'
     },
+    // @canon: chittycanon://gov/governance#core-types
     entityTypes: {
       'P': 'Person',
       'L': 'Location',
       'T': 'Thing',
-      'E': 'Event'
+      'E': 'Event',
+      'A': 'Authority'
     },
     trustLevels: {
       '0': 'L0 - Unverified',
