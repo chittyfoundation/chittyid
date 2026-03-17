@@ -111,11 +111,17 @@ function getErrorFromId(chittyId) {
   };
 }
 
+// Purpose-to-entity-type mapping for non-type values passed via ?for=
+// @canon: chittycanon://gov/governance#core-types
+const PURPOSE_ENTITY_MAP = { context: 'person', claude: 'person', 'work-item': 'thing', document: 'thing', general: 'thing' };
+
 // Direct ChittyID generation handler - delegates to ChittyMint with fallback
 async function handleDirectChittyIdGeneration(url, env, request) {
-  const rawType = (url.searchParams.get('type') || url.searchParams.get('for') || 'thing').toLowerCase();
-  // Accept both code-form (P/L/T/E/A) and word-form (person/place/thing/event/authority)
-  const entityTypeParam = CODE_TO_WORD[rawType] || rawType;
+  // Priority: explicit entity_type > type > for (with purpose mapping) > default 'thing'
+  const explicitType = url.searchParams.get('entity_type');
+  const rawType = (explicitType || url.searchParams.get('type') || url.searchParams.get('for') || 'thing').toLowerCase();
+  // Accept code-form (P/L/T/E/A), word-form (person/place/thing/event/authority), or purpose (context/claude)
+  const entityTypeParam = CODE_TO_WORD[rawType] || PURPOSE_ENTITY_MAP[rawType] || rawType;
 
   // Extract auth token if present (forward to ChittyMint)
   const authHeader = request?.headers?.get('Authorization');
