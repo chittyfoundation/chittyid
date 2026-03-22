@@ -42,8 +42,10 @@ export const MasterEntitySchema = {
     // Metadata for classification and governance
     metadata: {
       entity_type: {
-        type: 'varchar(64)',
-        enum: ['services', 'domains', 'infrastructure', 'legal_data', 'version_control', 'unstructured_data']
+        type: 'varchar(1)',
+        // @canon: chittycanon://gov/governance#core-types
+        enum: ['P', 'L', 'T', 'E', 'A'],
+        description: 'Person / Location / Thing / Event / Authority'
       },
       classification: {
         type: 'varchar(32)',
@@ -135,7 +137,8 @@ CREATE TABLE IF NOT EXISTS master_entities (
   internal_id UUID UNIQUE DEFAULT uuid_generate_v4(),
 
   -- Entity classification
-  entity_type VARCHAR(64) NOT NULL CHECK (entity_type IN ('services', 'domains', 'infrastructure', 'legal_data', 'version_control', 'unstructured_data')),
+  -- @canon: chittycanon://gov/governance#core-types
+  entity_type VARCHAR(1) NOT NULL CHECK (entity_type IN ('P', 'L', 'T', 'E', 'A')),
   classification VARCHAR(32) NOT NULL CHECK (classification IN ('public', 'internal', 'confidential', 'restricted')),
 
   -- Content and integrity
@@ -233,27 +236,33 @@ export const GovernanceRules = {
     }
   },
 
-  // Classification-based access controls
+  // @canon: chittycanon://gov/governance#core-types
+  // Access controls by canonical entity type (P/L/T/E/A)
   access_control: {
-    'services': {
-      stewardship: 'technical',
-      compliance_level: 'internal',
-      retention: 'operational'
-    },
-    'legal_data': {
+    'P': { // Person — actors with agency (natural, synthetic, legal)
       stewardship: 'legal',
       compliance_level: 'confidential',
       retention: 'legal_hold'
     },
-    'infrastructure': {
+    'L': { // Location — context in space (jurisdiction, venue)
       stewardship: 'technical',
       compliance_level: 'internal',
-      retention: 'infrastructure'
+      retention: 'operational'
     },
-    'version_control': {
+    'T': { // Thing — objects without agency (document, asset, artifact)
       stewardship: 'technical',
       compliance_level: 'internal',
-      retention: 'development'
+      retention: 'standard'
+    },
+    'E': { // Event — occurrences in time (transaction, decision, action)
+      stewardship: 'technical',
+      compliance_level: 'internal',
+      retention: 'operational'
+    },
+    'A': { // Authority — sources of weight (credential, certification)
+      stewardship: 'legal',
+      compliance_level: 'confidential',
+      retention: 'legal_hold'
     }
   }
 };
@@ -392,10 +401,11 @@ export class MasterEntityFactory {
   }
 
   // Utility methods
+  // @canon: chittycanon://gov/governance#core-types
   validateEntityType(entityType) {
-    const validTypes = ['services', 'domains', 'infrastructure', 'legal_data', 'version_control', 'unstructured_data'];
+    const validTypes = ['P', 'L', 'T', 'E', 'A'];
     if (!validTypes.includes(entityType)) {
-      throw new Error(`Invalid entity type: ${entityType}`);
+      throw new Error(`Invalid entity type: ${entityType}. Must be one of P (Person), L (Location), T (Thing), E (Event), A (Authority)`);
     }
   }
 
@@ -406,28 +416,21 @@ export class MasterEntityFactory {
     }
   }
 
+  // @canon: chittycanon://gov/governance#core-types
   mapEntityTypeToNamespace(entityType) {
     const namespaceMap = {
-      'services': 'SVC',
-      'domains': 'DOM',
-      'infrastructure': 'INF',
-      'legal_data': 'LEG',
-      'version_control': 'VCS',
-      'unstructured_data': 'DOC'
+      'P': 'PER', // Person — actors with agency
+      'L': 'LOC', // Location — context in space
+      'T': 'THG', // Thing — objects without agency
+      'E': 'EVT', // Event — occurrences in time
+      'A': 'AUT'  // Authority — sources of weight
     };
-    return namespaceMap[entityType] || 'DOC';
+    return namespaceMap[entityType] || 'THG';
   }
 
+  // Entity type IS the legal type — no mapping needed, pass through
   mapEntityTypeToLegalType(entityType) {
-    const legalTypeMap = {
-      'services': 'T', // Thing
-      'domains': 'L', // Location
-      'infrastructure': 'T', // Thing
-      'legal_data': 'P', // Person (legal entity)
-      'version_control': 'T', // Thing
-      'unstructured_data': 'T' // Thing
-    };
-    return legalTypeMap[entityType] || 'T';
+    return entityType; // P, L, T, E, or A directly
   }
 
   getRegionForJurisdiction(jurisdiction) {
@@ -447,44 +450,47 @@ export class MasterEntityFactory {
     return `${year}${month.toString().padStart(2, '0')}`;
   }
 
+  // @canon: chittycanon://gov/governance#core-types
   getDefaultTechnicalSteward(entityType) {
     const stewardMap = {
-      'services': 'platform-team',
-      'infrastructure': 'devops-team',
-      'version_control': 'development-team',
-      'legal_data': 'legal-team',
-      'unstructured_data': 'data-team'
+      'P': 'identity-team',
+      'L': 'platform-team',
+      'T': 'platform-team',
+      'E': 'platform-team',
+      'A': 'security-team'
     };
     return stewardMap[entityType] || 'platform-team';
   }
 
   getDefaultLegalSteward(entityType) {
     const legalStewardMap = {
-      'legal_data': 'legal-team',
-      'services': 'compliance-team',
-      'infrastructure': 'security-team'
+      'P': 'legal-team',
+      'L': 'compliance-team',
+      'T': 'compliance-team',
+      'E': 'compliance-team',
+      'A': 'legal-team'
     };
     return legalStewardMap[entityType] || 'compliance-team';
   }
 
   getComplianceLevel(entityType) {
     const complianceMap = {
-      'services': 'internal',
-      'legal_data': 'confidential',
-      'infrastructure': 'internal',
-      'version_control': 'internal',
-      'unstructured_data': 'internal'
+      'P': 'confidential',
+      'L': 'internal',
+      'T': 'internal',
+      'E': 'internal',
+      'A': 'confidential'
     };
     return complianceMap[entityType] || 'internal';
   }
 
   getRetentionPolicy(entityType) {
     const retentionMap = {
-      'services': 'operational',
-      'legal_data': 'legal_hold',
-      'infrastructure': 'infrastructure',
-      'version_control': 'development',
-      'unstructured_data': 'standard'
+      'P': 'legal_hold',
+      'L': 'operational',
+      'T': 'standard',
+      'E': 'operational',
+      'A': 'legal_hold'
     };
     return retentionMap[entityType] || 'standard';
   }
