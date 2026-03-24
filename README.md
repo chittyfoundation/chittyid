@@ -1,3 +1,6 @@
+![Foundation](https://img.shields.io/badge/Foundation-service-8B5CF6?style=flat-square)
+![Tier](https://img.shields.io/badge/tier-0%20Trust%20Anchors-6366F1?style=flat-square)
+
 # ChittyID Foundation Service
 
 **Official ChittyID Foundation Implementation** - Authoritative identity management for the ChittyOS ecosystem.
