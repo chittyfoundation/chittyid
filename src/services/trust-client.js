@@ -2,7 +2,7 @@
  * ChittyTrust Client for Trust Level Resolution
  *
  * Integrates with ChittyTrust (trust.chitty.cc) for certificate policy trust levels
- * and ChittyScore (score.chitty.cc) for 6D behavioral trust scoring.
+ * and ChittyScore (score.chitty.cc) for TY/VY/RY DRL reckoning.
  *
  * Trust Level Mapping:
  *   L0 (0) - Anonymous: No identity verification
@@ -127,46 +127,47 @@ export class TrustClient {
   }
 
   /**
-   * Get trust level from ChittyScore 6D behavioral scoring
+   * Get trust level from ChittyScore DRL reckoning (TY/VY/RY model)
    *
-   * ChittyScore dimensions (6D):
-   * - Identity verification score
-   * - Transaction history score
-   * - Governance participation score
-   * - Network reputation score
-   * - Compliance record score
-   * - Time-based trust decay/growth
+   * Per TY-VY-RY White Paper v2.1:
+   * - TY: idenTitY / ontological identity (0-1)
+   * - VY: connectiVitY / behavioral record and network experience (0-1)
+   * - RY: authoRitY / earned, revocable authority (0-1)
+   * - Trust level derived: floor((ty + vy + ry) / 3 * 5)
    */
   async getScoreTrustLevel(chittyId) {
     try {
-      const response = await fetch(`${this.scoreUrl}/api/v1/score/${chittyId}`, {
-        method: 'GET',
+      const response = await fetch(`${this.scoreUrl}/v1/reckon/${encodeURIComponent(chittyId)}`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Service-Token': this.serviceToken || ''
+          'X-Source-Service': 'chittyid'
         }
       });
 
       if (!response.ok) {
-        // ChittyScore not deployed yet - return null to use fallback
         return null;
       }
 
       const data = await response.json();
-      if (data.success && data.data?.trustLevel !== undefined) {
+      if (data.ty !== undefined) {
+        const composite = (data.ty + data.vy + data.ry) / 3;
+        const trustLevel = Math.min(5, Math.floor(composite * 5));
         return {
-          level: data.data.trustLevel,
+          level: trustLevel,
           source: 'chittyscore',
-          score: data.data.compositeScore,
-          dimensions: data.data.dimensions,
-          reason: `6D composite score: ${data.data.compositeScore}`,
-          verified: true
+          score: composite,
+          ty: data.ty,
+          vy: data.vy,
+          ry: data.ry,
+          reason: `TY/VY/RY reckoning: ${data.ty.toFixed(2)}/${data.vy.toFixed(2)}/${data.ry.toFixed(2)}`,
+          verified: data.confidence > 0.5
         };
       }
 
       return null;
     } catch (error) {
-      // ChittyScore not available - this is expected until it's deployed
+      // ChittyScore not available
       return null;
     }
   }
@@ -197,5 +198,7 @@ export class TrustClient {
  * @property {boolean} verified - Whether trust was actively verified
  * @property {string} [policyOid] - Certificate policy OID (if from ChittyTrust)
  * @property {number} [score] - Composite score (if from ChittyScore)
- * @property {Object} [dimensions] - 6D score breakdown (if from ChittyScore)
+ * @property {number} [ty] - TY idenTitY (0-1, if from ChittyScore)
+ * @property {number} [vy] - VY connectiVitY (0-1, if from ChittyScore)
+ * @property {number} [ry] - RY authoRitY (0-1, if from ChittyScore)
  */
