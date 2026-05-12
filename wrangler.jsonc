@@ -1,4 +1,3 @@
-// chittyid — Cloudflare Workers configuration
 {
   "name": "chittyid",
   "main": "worker.js",
@@ -9,7 +8,23 @@
   "account_id": "0bc21e3a5a9de1a4cc843be9c3e98121",
   "workers_dev": false,
   "observability": {
-    "enabled": true
+    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "invocation_logs": true,
+      "destinations": [
+        "chittytrack-logs"
+      ]
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "destinations": [
+        "chittytrack-traces"
+      ],
+      "persist": false
+    }
   },
   "routes": [
     {
@@ -70,6 +85,9 @@
     "CHITTYOS_SCHEMA_URL": "https://schema.chitty.cc",
     "DRAND_BEACON_URL": "https://api.drand.sh/public/latest"
   },
-  "observability": { "enabled": true },
-  "tail_consumers": [{ "service": "chittytrack" }]
+  "tail_consumers": [
+    {
+      "service": "chittytrack"
+    }
+  ]
 }
