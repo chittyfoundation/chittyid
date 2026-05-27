@@ -238,7 +238,7 @@ class ChittyOSMCPPortalHandler {
         success: true,
         chitty_id: result.chitty_id,
         entity_type: entity_type,
-        format: "VV-G-LLL-SSSS-T-YM-C-X",
+        format: "VV-G-LLL-SSSS-T-YYMM-C-XX",
         generated_at: new Date().toISOString(),
         source: "oauth_managed_mcp",
       };
@@ -618,7 +618,7 @@ class MCPCloudflarePortalServer {
                     chitty_id: {
                       type: "string",
                       description:
-                        "ChittyID to validate (format: VV-G-LLL-SSSS-T-YM-C-X)",
+                        "ChittyID to validate (format: VV-G-LLL-SSSS-T-YYMM-C-XX)",
                     },
                   },
                   required: ["chitty_id"],

@@ -19,7 +19,7 @@ This is the **ChittyID Mothership** - a Cloudflare Worker-based management syste
 
 ### ChittyID Format
 
-ChittyIDs follow the structured format: `VV-G-LLL-SSSS-T-YM-C-X`
+ChittyIDs follow the structured format: `VV-G-LLL-SSSS-T-YYMM-C-XX`
 - VV: Version (2 digits)
 - G: Geographic region (1-9)
 - LLL: Legal jurisdiction (3 letters)

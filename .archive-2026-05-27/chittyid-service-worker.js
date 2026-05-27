@@ -31,7 +31,7 @@ export default {
             service: "chittyid-service",
             version: "1.0.0",
             purpose:
-              "ChittyID Generation, Verification & Audit (Official Format: VV-G-LLL-SSSS-T-YM-C-X)",
+              "ChittyID Generation, Verification & Audit (Official Format: VV-G-LLL-SSSS-T-YYMM-C-XX)",
             endpoints: [
               "/api/v2/chittyid/mint",
               "/api/v2/chittyid/verify",
@@ -156,7 +156,7 @@ export default {
             status_block: statusBlock,
             format:
               requestedFormat === "official"
-                ? "VV-G-LLL-SSSS-T-YM-C-X"
+                ? "VV-G-LLL-SSSS-T-YYMM-C-XX"
                 : "CHITTY-{ENTITY}-{SEQUENCE}-{CHECKSUM}",
           },
           corsHeaders,
@@ -345,7 +345,7 @@ function jsonResponse(data, headers = {}, status = 200) {
 
 /**
  * Generate ChittyID following Foundation protocol
- * Official Format: VV-G-LLL-SSSS-T-YM-C-X
+ * Official Format: VV-G-LLL-SSSS-T-YYMM-C-XX
  */
 async function generateChittyID(entity, name, metadata, format, env) {
   if (format === "simple") {
@@ -356,7 +356,7 @@ async function generateChittyID(entity, name, metadata, format, env) {
 }
 
 /**
- * Generate Official ChittyID Format: VV-G-LLL-SSSS-T-YM-C-X
+ * Generate Official ChittyID Format: VV-G-LLL-SSSS-T-YYMM-C-XX
  * VV: Version (2 digits)
  * G: Geographic region (1-9)
  * LLL: Legal jurisdiction (3 letters)
@@ -426,7 +426,7 @@ async function verifyChittyID(chittyId, env) {
 }
 
 /**
- * Verify Official ChittyID Format: VV-G-LLL-SSSS-T-YM-C-X
+ * Verify Official ChittyID Format: VV-G-LLL-SSSS-T-YYMM-C-XX
  */
 async function verifyOfficialChittyID(chittyId, _env) {
   const parts = chittyId.split("-");
@@ -435,7 +435,7 @@ async function verifyOfficialChittyID(chittyId, _env) {
     return {
       valid: false,
       format: false,
-      reason: "Invalid official format - must be VV-G-LLL-SSSS-T-YM-C-X",
+      reason: "Invalid official format - must be VV-G-LLL-SSSS-T-YYMM-C-XX",
     };
   }
 

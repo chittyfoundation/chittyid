@@ -5,7 +5,7 @@ export class ValidatorAgent {
   }
 
   async validate(chittyId) {
-    // ChittyID format: VV-G-LLL-SSSS-T-YM-C-X
+    // ChittyID format: VV-G-LLL-SSSS-T-YYMM-C-XX
     const parts = chittyId.split("-");
 
     if (parts.length !== 8) {

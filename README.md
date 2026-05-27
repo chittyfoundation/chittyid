@@ -23,7 +23,7 @@ This is the **authoritative ChittyID Foundation service** that defines HOW Chitt
 - **NO LOCAL GENERATION** - All IDs must be requested from Foundation service
 
 ### Official Format
-- **Official Format**: `VV-G-LLL-SSSS-T-YM-C-X` (e.g., `CP-A-001-1234-P-2509-I-82`)
+- **Official Format**: `VV-G-LLL-SSSS-T-YYMM-C-XX` (e.g., `CP-A-001-1234-P-2509-I-82`)
 
 ## 🚀 API Endpoints
 

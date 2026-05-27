@@ -28,7 +28,7 @@ export class ChittyRouterGateway {
           name: "identity_validator",
           model: "@cf/meta/llama-3.1-8b-instruct",
           task: "Validate ChittyID format and components",
-          input: { chittyId, format: "VV-G-LLL-SSSS-T-YM-C-X" },
+          input: { chittyId, format: "VV-G-LLL-SSSS-T-YYMM-C-XX" },
         },
         {
           name: "trust_scorer",

@@ -361,7 +361,7 @@ describe('ChittyID Format Specification', () => {
         api = new MockChittyIDAPI();
     });
 
-    it('should follow the VV-G-LLL-SSSS-T-YM-C-X format', () => {
+    it('should follow the VV-G-LLL-SSSS-T-YYMM-C-XX format', () => {
         const validFormat = /^[0-9]{2}-[1-9]-[A-Z]{3}-[0-9]{4}-[PLTEA]-[0-9]{2,3}-[0-5]-[0-9]{2}$/;
 
         const testIds = [

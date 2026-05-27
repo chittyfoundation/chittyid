@@ -61,7 +61,7 @@ export const ChittyConfig = {
 
   // ChittyID Format Configuration
   chittyId: {
-    format: 'VV-G-LLL-SSSS-T-YM-C-X',
+    format: 'VV-G-LLL-SSSS-T-YYMM-C-XX',
     currentVersion: '03',
     supportedVersions: ['01', '02', '03', '04', '05'],
     regions: {
