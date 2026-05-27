@@ -464,19 +464,37 @@ export default {
         });
       }
 
-      // Generate endpoint - delegates to ChittyMint
-      if (url.pathname === "/generate" && request.method === "GET") {
+      // E1 canonical mint endpoint: POST /mint (short, logical, id.chitty.cc as primary)
+      if (url.pathname === "/mint" && request.method === "POST") {
         return await handleDirectChittyIdGeneration(url, env, request);
       }
 
-      // VRF mint endpoint - delegates to ChittyMint
+      // E1 deprecated aliases — 308 to canonical /mint with deprecation headers.
+      // 308 preserves method+body. Includes Deprecation, Sunset, Link, Warning headers
+      // so clients see migration hint regardless of how they handle redirects.
+      const deprecationHeaders = {
+        "Location": "https://id.chitty.cc/mint",
+        "Deprecation": "true",
+        "Sunset": "2027-05-27",
+        "Link": "<https://id.chitty.cc/mint>; rel=\"successor-version\", <chittycanon://gov/sops/012-chittyid-format>; rel=\"deprecation\"",
+        "Warning": "299 - \"Deprecated endpoint. POST https://id.chitty.cc/mint is the canonical mint route. Sunset 2027-05-27.\"",
+        "Access-Control-Allow-Origin": "*"
+      };
+
       if (url.pathname === "/v1/mint" && request.method === "POST") {
-        return await handleDirectChittyIdGeneration(url, env, request);
+        return new Response(JSON.stringify({
+          _deprecation: { canonical: "https://id.chitty.cc/mint", sunset: "2027-05-27", note: "POST /v1/mint is deprecated. Use POST /mint." }
+        }), { status: 308, headers: deprecationHeaders });
       }
-
-      // Direct API handlers (bypassing Pages Functions import issues)
       if (url.pathname === "/api/get-chittyid" && request.method === "GET") {
-        return await handleDirectChittyIdGeneration(url, env, request);
+        return new Response(JSON.stringify({
+          _deprecation: { canonical: "https://id.chitty.cc/mint", sunset: "2027-05-27", note: "GET /api/get-chittyid is deprecated. POST https://id.chitty.cc/mint with {entityType:\"P\"} body." }
+        }), { status: 308, headers: deprecationHeaders });
+      }
+      if (url.pathname === "/generate" && request.method === "GET") {
+        return new Response(JSON.stringify({
+          _deprecation: { canonical: "https://id.chitty.cc/mint", sunset: "2027-05-27", note: "GET /generate is deprecated. POST https://id.chitty.cc/mint with {entityType:\"P\"} body." }
+        }), { status: 308, headers: deprecationHeaders });
       }
 
       if (url.pathname === "/api/health" && request.method === "GET") {
