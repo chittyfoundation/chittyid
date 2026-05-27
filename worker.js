@@ -117,8 +117,16 @@ const PURPOSE_ENTITY_MAP = { context: 'person', claude: 'person', 'work-item': '
 
 // Direct ChittyID generation handler - delegates to ChittyMint with fallback
 async function handleDirectChittyIdGeneration(url, env, request) {
-  // Priority: explicit entity_type > type > for (with purpose mapping) > default 'thing'
-  const explicitType = url.searchParams.get('entity_type');
+  // F-067 fix: POST body parameters take precedence over query-string defaults.
+  // Previously this function only read URL query params, so POST /v1/mint with
+  // JSON body silently defaulted to 'thing'.
+  let body = {};
+  if (request?.method === 'POST') {
+    try { body = await request.clone().json(); } catch (e) { body = {}; }
+  }
+
+  // Priority: body.entityType > query entity_type > query type > query for > default 'thing'
+  const explicitType = body.entityType || body.entity_type || url.searchParams.get('entity_type');
   const rawType = (explicitType || url.searchParams.get('type') || url.searchParams.get('for') || 'thing').toLowerCase();
   // Accept code-form (P/L/T/E/A), word-form (person/place/thing/event/authority), or purpose (context/claude)
   const entityTypeParam = CODE_TO_WORD[rawType] || PURPOSE_ENTITY_MAP[rawType] || rawType;
