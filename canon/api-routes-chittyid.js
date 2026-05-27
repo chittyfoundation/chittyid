@@ -540,7 +540,7 @@ export async function onRequest(context) {
         </div>
 
         <h2>ChittyID Format</h2>
-        <p>Official format: <code>VV-G-LLL-SSSS-T-YM-C-X</code></p>
+        <p>Official format: <code>VV-G-LLL-SSSS-T-YYMM-C-XX</code></p>
         <ul>
             <li><strong>VV:</strong> Version (2 digits)</li>
             <li><strong>G:</strong> Geographic region (1-9)</li>
@@ -641,7 +641,7 @@ export async function onRequest(context) {
             what_is_chittyid: {
               purpose:
                 "Universal identity for people, places, things, and events",
-              format: "VV-G-LLL-SSSS-T-YM-C-X",
+              format: "VV-G-LLL-SSSS-T-YYMM-C-XX",
               trust_levels: "0 (Unverified) to 5 (Official)",
               ecosystem: "51+ integrated ChittyOS services",
             },
@@ -850,7 +850,7 @@ export async function onRequest(context) {
         JSON.stringify({
           success: true,
           specification: {
-            format: "VV-G-LLL-SSSS-T-YM-C-X",
+            format: "VV-G-LLL-SSSS-T-YYMM-C-XX",
             components: {
               VV: "Version (2 digits)",
               G: "Geographical region code (1 digit)",

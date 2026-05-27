@@ -24,7 +24,7 @@ export default class ValidationService {
       return {
         valid: false,
         error: 'Invalid format: must have 8 parts separated by hyphens',
-        format: 'Expected: VV-G-LLL-SSSS-T-YM-C-X'
+        format: 'Expected: VV-G-LLL-SSSS-T-YYMM-C-XX'
       };
     }
 

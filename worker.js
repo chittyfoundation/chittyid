@@ -567,7 +567,7 @@ export default {
         return new Response(JSON.stringify({
           success: true,
           specification: {
-            format: "VV-G-LLL-SSSS-T-YM-C-X",
+            format: "VV-G-LLL-SSSS-T-YYMM-C-XX",
             entityTypes: { P: "Person", L: "Place", T: "Thing", E: "Event", A: "Authority" },
             trustLevels: { 0: "Unverified", 1: "Basic", 2: "Standard", 3: "Verified", 4: "Premium", 5: "Official" }
           },

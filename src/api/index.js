@@ -199,7 +199,7 @@ export class ChittyAPI {
    */
   getSpecification() {
     return {
-      format: 'VV-G-LLL-SSSS-T-YM-C-X',
+      format: 'VV-G-LLL-SSSS-T-YYMM-C-XX',
       components: {
         VV: {
           name: 'Version',

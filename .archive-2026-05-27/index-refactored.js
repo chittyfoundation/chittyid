@@ -268,7 +268,7 @@ async function handleHealth(request, env) {
 
 async function handleSpec() {
   return successResponse({
-    format: 'VV-G-LLL-SSSS-T-YM-C-X',
+    format: 'VV-G-LLL-SSSS-T-YYMM-C-XX',
     components: {
       VV: 'Version (2 digits): 01-05',
       G: 'Geographic region (1 digit): 1-9',

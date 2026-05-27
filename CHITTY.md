@@ -37,7 +37,7 @@ Cloudflare Worker deployed at id.chitty.cc with AI agent routing, mandatory secu
 
 ### ChittyID Format
 ```
-VV-G-LLL-SSSS-T-YM-C-X
+VV-G-LLL-SSSS-T-YYMM-C-XX
 ```
 Version, Geographic region, Jurisdiction, Sequential ID, Entity Type (P/L/T/E/A), Year-Month, Trust Level (0-5), Checksum.
 

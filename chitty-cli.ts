@@ -47,7 +47,7 @@ const headers = {
  * ChittyID validation patterns
  */
 const CHITTYID_PATTERNS = {
-  // Canonical structured format: VV-G-LLL-SSSS-T-YM-C-X
+  // Canonical structured format: VV-G-LLL-SSSS-T-YYMM-C-XX
   structured: /^[A-Z0-9]{2}-\d-[A-Z]{3}-\d{4}-[PLTE]-\d{2,4}-\d-\d{2}$/,
 
   // Legacy UUID format: chitty_<uuid>

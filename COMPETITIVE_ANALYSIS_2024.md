@@ -23,7 +23,7 @@ ChittyOS represents a comprehensive ecosystem combining identity management, ser
 | **EBSI** | European blockchain | - Government backing<br>- Cross-border focus | - Europe-centric<br>- Slow rollout |
 
 ### ChittyOS Identity Advantages
-- **Unified ChittyID System**: Single identity across all services (VV-G-LLL-SSSS-T-YM-C-X format)
+- **Unified ChittyID System**: Single identity across all services (VV-G-LLL-SSSS-T-YYMM-C-XX format)
 - **Server-Only Architecture**: Prevents local generation vulnerabilities
 - **5-Minute Cache TTL**: Optimized validation framework
 - **Trust Levels**: Built-in reputation system (0-5 scale)

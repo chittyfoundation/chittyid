@@ -30,7 +30,7 @@ export class ChittyIDValidator {
   }
 
   parseChittyID(chittyId: string): ChittyID | null {
-    // Format: VV-G-LLL-SSSS-T-YM-C-X
+    // Format: VV-G-LLL-SSSS-T-YYMM-C-XX
     // @canon: chittycanon://gov/governance#core-types
     const pattern =
       /^(\d{2})-([A-Z])-([A-Z]{3})-(\d{4})-([PLTEA])-(\d{4})-([L]\d)-(\d{2})$/;

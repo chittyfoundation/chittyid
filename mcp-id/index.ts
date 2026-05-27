@@ -87,7 +87,7 @@ const tools: MCPTool[] = [
       properties: {
         chittyId: {
           type: 'string',
-          description: 'The ChittyID to validate (format: VV-G-LLL-SSSS-T-YM-C-X)',
+          description: 'The ChittyID to validate (format: VV-G-LLL-SSSS-T-YYMM-C-XX)',
         },
       },
       required: ['chittyId'],
@@ -275,7 +275,7 @@ app.post('/message', async (c) => {
               content: [{
                 type: 'text',
                 text: JSON.stringify({
-                  format: 'VV-G-LLL-SSSS-T-YM-C-X',
+                  format: 'VV-G-LLL-SSSS-T-YYMM-C-XX',
                   totalLength: 32,
                   components: {
                     VV: 'Version (2 digits)',

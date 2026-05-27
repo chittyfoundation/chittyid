@@ -26,7 +26,7 @@ ChittyID is the **authoritative identity management foundation** for the ChittyO
 
 ### IS Responsible For
 - Authoritative ChittyID generation and minting
-- Identity format definition and standardization (`VV-G-LLL-SSSS-T-YM-C-X`)
+- Identity format definition and standardization (`VV-G-LLL-SSSS-T-YYMM-C-XX`)
 - ChittyID validation and verification
 - Audit trail generation for identity operations
 - Fallback ID system with error-coded prefixes (EP/EL/ET/EE)
@@ -71,7 +71,7 @@ ChittyID is the **authoritative identity management foundation** for the ChittyO
 
 ### ChittyID Format
 ```
-VV-G-LLL-SSSS-T-YM-C-X
+VV-G-LLL-SSSS-T-YYMM-C-XX
 │  │ │   │    │ │  │ └─ Checksum (Mod-97)
 │  │ │   │    │ │  └─── Trust Level (0-5)
 │  │ │   │    │ └────── Year-Month code

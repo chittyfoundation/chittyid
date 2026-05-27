@@ -70,7 +70,7 @@ export default {
         </div>
 
         <h2>ChittyID Format</h2>
-        <p>Official format: <code>VV-G-LLL-SSSS-T-YM-C-X</code></p>
+        <p>Official format: <code>VV-G-LLL-SSSS-T-YYMM-C-XX</code></p>
         <ul>
             <li><strong>VV:</strong> Version (2 digits)</li>
             <li><strong>G:</strong> Geographic region</li>

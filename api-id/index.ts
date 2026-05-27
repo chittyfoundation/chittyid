@@ -341,7 +341,7 @@ app.get('/spec', (c) => {
   return c.json({
     success: true,
     specification: {
-      format: 'VV-G-LLL-SSSS-T-YM-C-X',
+      format: 'VV-G-LLL-SSSS-T-YYMM-C-XX',
       totalLength: 32,
       components: {
         VV: { description: 'Version', length: 2, type: 'numeric' },

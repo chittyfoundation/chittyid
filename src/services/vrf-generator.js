@@ -7,7 +7,7 @@
  * NO Math.random() - ALL randomness comes from drand beacon.
  * NO local generation - service-only architecture.
  *
- * ChittyID Format: VV-G-LLL-SSSS-T-YM-C-X
+ * ChittyID Format: VV-G-LLL-SSSS-T-YYMM-C-XX
  * - VV: Version (03)
  * - G: Domain (C=ChittyCorp, E=Error, F=Fallback)
  * - LLL: Namespace (3 letters)
