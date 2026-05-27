@@ -30,6 +30,37 @@ function mod97Checksum(str) {
 // ChittyMint service URL
 const CHITTYMINT_URL = process.env.CHITTYMINT_URL || 'https://mint.chitty.cc';
 
+/**
+ * F-068 Phase 3 — anchor mint events into ChittyLedger substrate.
+ * No-op until env.LEDGER_TOKEN is set (default state). Fire-and-forget;
+ * mint response is never blocked by ledger latency.
+ *
+ * env.LEDGER_BASE_URL defaults to https://ledger.chitty.cc if unset.
+ * env.LEDGER_TOKEN is the LEDGER_KV service token (per FOUNDATION/chittyledger CHARTER auth).
+ *
+ * Ref: state/ecosystem-discovery/chittyledger-phase-classifications.md
+ */
+async function postToLedger(env, entry) {
+  if (!env?.LEDGER_TOKEN) return; // wire-up inactive until secret set
+  const url = (env.LEDGER_BASE_URL || "https://ledger.chitty.cc") + "/entries";
+  try {
+    const r = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${env.LEDGER_TOKEN}`
+      },
+      body: JSON.stringify(entry)
+    });
+    if (!r.ok) {
+      // Best-effort; do not throw
+      console.error("ChittyLedger anchor failed", r.status);
+    }
+  } catch (err) {
+    console.error("ChittyLedger anchor exception", err?.message || err);
+  }
+}
+
 // Error code mapping for fallback IDs
 // Encoded in SSSS field (0000-0099 reserved for error codes)
 const ERROR_CODES = {
@@ -170,6 +201,26 @@ async function handleDirectChittyIdGeneration(url, env, request) {
     }
 
     const result = await mintResponse.json();
+
+    // F-068 Phase 3 — anchor successful mint into ChittyLedger substrate (no-op until LEDGER_TOKEN set)
+    if (result?.chittyId) {
+      postToLedger(env, {
+        entityType: "audit",
+        entityId: result.chittyId,
+        action: "ChittyIDMinted",
+        actor: "id.chitty.cc",
+        actorType: "service",
+        metadata: {
+          minted_entity_type: entityTypeParam,
+          mint_proof_signature: result?.mintProof?.signature || null,
+          drand_round: result?.mintProof?.drand_round || null,
+          minted_at: result?.mintedAt || new Date().toISOString(),
+          mint_route: "/mint",
+          source: "handleDirectChittyIdGeneration"
+        },
+        signature: result?.mintProof?.signature || null
+      }).catch(() => {});
+    }
 
     // Pass through the ChittyMint response
     return new Response(JSON.stringify({
