@@ -9,7 +9,7 @@ export default [
       "_worker.js",
       "node_modules/**",
       "research/**",
-      "chitty-cli.js",
+      ".archive-2026-05-27/**",
       "coverage/**",
       ".nyc_output/**",
     ],
