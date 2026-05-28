@@ -27,12 +27,16 @@ This is the **authoritative ChittyID Foundation service** that defines HOW Chitt
 
 ## 🚀 API Endpoints
 
-### v2 API (Current)
-- `POST /api/v2/chittyid/mint` - Generate new ChittyID
-- `POST /api/v2/chittyid/verify` - Verify ChittyID validity
-- `POST /api/v2/chittyid/audit` - Get audit trail
-- `POST /api/v2/chittyid/mint/batch` - Batch generation
-- `POST /api/v2/fallback/request` - Fallback service
+### Canonical API
+- `POST /mint` - Generate a new ChittyID (body: `{entityType:"P"|"L"|"T"|"E"|"A"}`)
+- `POST /api/validate` - Verify ChittyID validity
+- `GET /api/spec` - OpenAPI specification
+- `GET /health` - Service health
+
+### Deprecated Aliases (sunset 2027-05-27)
+- `POST /v1/mint` → use `POST /mint`
+- `GET /generate` → use `POST /mint` with `{entityType:"P"}`
+- `GET /api/get-chittyid` → use `POST /mint`
 
 ### Authentication
 All endpoints require Bearer token authentication:
@@ -44,17 +48,13 @@ Authorization: Bearer your_chitty_id_token
 
 ### Request a ChittyID
 ```javascript
-const response = await fetch('https://id.chitty.cc/api/v2/chittyid/mint', {
+const response = await fetch('https://id.chitty.cc/mint', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer your_chitty_id_token'
   },
-  body: JSON.stringify({
-    entity: 'PERSON',
-    name: 'John Doe',
-    format: 'official'
-  })
+  body: JSON.stringify({ entityType: 'P' })
 });
 
 const result = await response.json();
@@ -63,15 +63,13 @@ console.log(result.chitty_id); // CP-A-001-1234-P-2509-I-82
 
 ### Verify a ChittyID
 ```javascript
-const response = await fetch('https://id.chitty.cc/api/v2/chittyid/verify', {
+const response = await fetch('https://id.chitty.cc/api/validate', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer your_chitty_id_token'
   },
-  body: JSON.stringify({
-    chittyId: 'CP-A-001-1234-P-2509-I-82'
-  })
+  body: JSON.stringify({ id: 'CP-A-001-1234-P-2509-I-82' })
 });
 
 const result = await response.json();

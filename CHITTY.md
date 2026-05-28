@@ -64,11 +64,10 @@ Version, Geographic region, Jurisdiction, Sequential ID, Entity Type (P/L/T/E/A)
 | Path | Method | Auth | Purpose |
 |------|--------|------|---------|
 | `/health` | GET | No | Health check |
-| `/api/v2/chittyid/mint` | POST | Yes | Generate new ChittyID |
-| `/api/v2/chittyid/verify` | POST | Yes | Verify ChittyID validity |
-| `/api/v2/chittyid/audit` | POST | Yes | Get audit trail |
-| `/api/v2/chittyid/mint/batch` | POST | Yes | Batch generation |
-| `/api/v2/fallback/request` | POST | Yes | Fallback service |
+| `/mint` | POST | Yes | **Canonical** — generate a new ChittyID |
+| `/api/validate` | POST | Yes | Verify ChittyID validity |
+| `/api/spec` | GET | No | OpenAPI specification |
+| `/v1/mint`, `/generate`, `/api/get-chittyid` | — | — | Deprecated aliases → `POST /mint` (sunset 2027-05-27) |
 
 ## Document Triad
 

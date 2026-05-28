@@ -2,7 +2,7 @@
   "name": "@chittyfoundation/chittyid",
   "version": "2.0.0",
   "description": "Official ChittyID Foundation Service - Authoritative identity management for ChittyOS ecosystem",
-  "main": "chittyid-service-worker.js",
+  "main": "worker.js",
   "type": "module",
   "repository": {
     "type": "git",

@@ -62,12 +62,19 @@ ChittyID is the **authoritative identity management foundation** for the ChittyO
 ### Core Endpoints
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
-| `/api/v2/chittyid/mint` | POST | Generate new ChittyID |
-| `/api/v2/chittyid/verify` | POST | Verify ChittyID validity |
-| `/api/v2/chittyid/audit` | POST | Get audit trail |
-| `/api/v2/chittyid/mint/batch` | POST | Batch generation |
-| `/api/v2/fallback/request` | POST | Fallback service |
+| `/mint` | POST | **Canonical** — generate a new ChittyID (body: `{entityType:"P"\|"L"\|"T"\|"E"\|"A"}`) |
+| `/api/validate` | POST | Verify ChittyID validity (body: `{id}`) |
+| `/api/spec` | GET | OpenAPI specification |
 | `/health` | GET | Service health |
+
+### Deprecated Aliases (sunset 2027-05-27)
+These remain for backward compatibility and 308-redirect / proxy to the canonical `POST /mint`. Do not build new integrations against them.
+
+| Endpoint | Method | Replacement |
+|----------|--------|-------------|
+| `/v1/mint` | POST | `POST /mint` |
+| `/generate` | GET | `POST /mint` with `{entityType:"P"}` |
+| `/api/get-chittyid` | GET | `POST /mint` |
 
 ### ChittyID Format
 ```
@@ -131,4 +138,4 @@ This charter is part of a synchronized documentation triad. Changes to shared fi
 **Related docs**: [CHITTY.md](CHITTY.md) (badge/one-pager) | [CLAUDE.md](CLAUDE.md) (developer guide)
 
 ---
-*Charter Version: 1.0.0 | Last Updated: 2026-02-23*
+*Charter Version: 1.0.1 | Last Updated: 2026-05-28*

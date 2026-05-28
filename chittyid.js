@@ -47,7 +47,7 @@ class ChittyIDClient {
     }
 
     try {
-      const response = await fetch(`${this.serverUrl}/api/v2/chittyid/mint`, {
+      const response = await fetch(`${this.serverUrl}/mint`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,11 +55,10 @@ class ChittyIDClient {
           "X-ChittyOS-Pipeline": "Router→Intake→Trust→Authorization→Generation",
         },
         body: JSON.stringify({
+          entityType,
           region,
           jurisdiction,
-          entity: entityType,
           trustLevel,
-          format: "official",
         }),
       });
 
@@ -94,13 +93,13 @@ class ChittyIDClient {
     }
 
     try {
-      const response = await fetch(`${this.serverUrl}/api/v2/chittyid/verify`, {
+      const response = await fetch(`${this.serverUrl}/api/validate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${this.apiKey}`,
         },
-        body: JSON.stringify({ chittyId }),
+        body: JSON.stringify({ id: chittyId }),
       });
 
       if (!response.ok) {
