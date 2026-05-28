@@ -395,7 +395,7 @@ print_summary() {
     echo "5. Test endpoints and monitor health"
     echo
     echo "📚 Documentation:"
-    echo "- Deployment: ./scripts/deploy.sh --help"
+    echo "- Deployment: npm run deploy (Workers, worker.js via wrangler.jsonc)"
     echo "- Monitoring: ./monitoring/"
     echo "- API Docs: Visit /api/spec after deployment"
     echo

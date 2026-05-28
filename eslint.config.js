@@ -6,7 +6,6 @@ export default [
     ignores: [
       ".wrangler/**",
       "dist/**",
-      "_worker.js",
       "node_modules/**",
       "research/**",
       ".archive-2026-05-27/**",

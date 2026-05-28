@@ -39,11 +39,8 @@ npm run dev
 # Build for production
 npm run build
 
-# Deploy to Cloudflare
+# Deploy to Cloudflare Workers (canonical — worker.js via wrangler.jsonc)
 npm run deploy
-
-# Deploy to Pages
-npm run deploy:pages
 ```
 
 ### Testing
@@ -71,12 +68,6 @@ npm run setup:vectorize
 
 # Complete environment setup
 npm run setup
-
-# Deploy with health checks
-./scripts/deploy.sh
-
-# Run comprehensive security tests
-./scripts/run-security-tests.sh
 ```
 
 ### Environment Variables Required
