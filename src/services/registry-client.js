@@ -18,12 +18,16 @@ export class RegistryClient {
    * Build service information for registration
    */
   buildServiceInfo() {
+    const publicUrl =
+      this.env?.CHITTYID_SERVICE_URL ||
+      this.env?.SERVICE_PUBLIC_URL ||
+      'https://id.chitty.cc';
     return {
       service: 'chittyid',
       name: 'ChittyID',
       version: '2.0.0',
       description: 'Identity management system with hardened security pipeline',
-      endpoint: 'https://chittyid.chitty.workers.dev',
+      endpoint: publicUrl,
       domain: 'https://id.chitty.cc',
       health: '/api/health',
       priority: 1,
