@@ -5,7 +5,13 @@
  * Monitors sync health and alerts on failures
  */
 
-const WORKER_URL = process.env.NOTION_SYNC_WORKER_URL || 'https://notion-sync.chittyid.workers.dev';
+const WORKER_URL = process.env.NOTION_SYNC_WORKER_URL;
+if (!WORKER_URL) {
+    console.error('ERROR: NOTION_SYNC_WORKER_URL is not set.');
+    console.error('Set it to the deployed notion-sync worker URL, e.g.:');
+    console.error('  export NOTION_SYNC_WORKER_URL=https://notion-sync.chitty.cc');
+    process.exit(1);
+}
 const ALERT_THRESHOLD = {
     schema_mismatch: 0,
     rate_limit_percentage: 2,
