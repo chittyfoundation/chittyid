@@ -656,7 +656,7 @@ export class RequestInterceptor {
           "X-Security-Block": "true",
           "X-Block-Reason": reason,
           "X-Pipeline-Required": "true",
-          "X-ChittyOS-Service": "chittyid-mothership",
+          "X-ChittyOS-Service": "chittyid",
         },
       },
     );

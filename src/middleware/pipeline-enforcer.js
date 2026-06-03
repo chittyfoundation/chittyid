@@ -124,7 +124,7 @@ export class PipelineEnforcer {
           headers: {
             'Content-Type': 'application/json',
             'X-Pipeline-Required': 'true',
-            'X-ChittyOS-Service': 'chittyid-mothership'
+            'X-ChittyOS-Service': 'chittyid'
           }
         }
       );
@@ -347,7 +347,7 @@ export class PipelineEnforcer {
           'Content-Type': 'application/json',
           'X-Pipeline-Required': 'true',
           'X-Pipeline-Enforcement': 'MANDATORY',
-          'X-ChittyOS-Service': 'chittyid-mothership',
+          'X-ChittyOS-Service': 'chittyid',
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Expose-Headers': 'X-Pipeline-Required,X-Pipeline-Enforcement'
         }
@@ -361,7 +361,7 @@ export class PipelineEnforcer {
   addEnforcementHeaders(response) {
     const headers = new Headers(response.headers);
     headers.set('X-Pipeline-Enforcement', 'ACTIVE');
-    headers.set('X-ChittyOS-Service', 'chittyid-mothership');
+    headers.set('X-ChittyOS-Service', 'chittyid');
     headers.set('X-Pipeline-Info', 'Generation requires pipeline completion');
 
     return new Response(response.body, {
@@ -379,7 +379,7 @@ export class PipelineEnforcer {
     headers.set('X-Pipeline-Completed', 'true');
     headers.set('X-Pipeline-Stages', pipelineContext.stages.join(','));
     headers.set('X-Pipeline-Trust-Level', pipelineContext.trustLevel.toString());
-    headers.set('X-ChittyOS-Service', 'chittyid-mothership');
+    headers.set('X-ChittyOS-Service', 'chittyid');
 
     return new Response(response.body, {
       status: response.status,

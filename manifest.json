@@ -98,7 +98,7 @@
   },
   "metadata": {
     "chittyos": {
-      "service": "chittyid-mothership",
+      "service": "chittyid",
       "enforcement_level": "MAXIMUM",
       "pipeline_required": true,
       "bypassable": false

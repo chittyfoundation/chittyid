@@ -229,7 +229,7 @@ async function validate(id: string): Promise<void> {
 
     if (!res.ok) {
       // Fallback to worker validation
-      const workerRes = await fetch(`https://chittyid-mothership.chitty.workers.dev/api/validate`, {
+      const workerRes = await fetch(`https://chittyid.chitty.workers.dev/api/validate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

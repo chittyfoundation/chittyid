@@ -484,7 +484,7 @@ export class NotionSyncWorker {
                     this.metrics.upsert_skipped,
                     this.metrics.dlq_pushed
                 ],
-                indexes: ['chittyid-mothership']
+                indexes: ['chittyid']
             });
         }
     }

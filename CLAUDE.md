@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is the **ChittyID Mothership** - a Cloudflare Worker-based management system for ChittyIDs from the id.chitty.cc service. ChittyID is a universal identity system for people, places, things, and events, implemented as part of the broader ChittyOS ecosystem.
+This is the **ChittyID** - a Cloudflare Worker-based management system for ChittyIDs from the id.chitty.cc service. ChittyID is a universal identity system for people, places, things, and events, implemented as part of the broader ChittyOS ecosystem.
 
 ### Key Architecture Components
 

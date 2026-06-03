@@ -1,5 +1,5 @@
 /**
- * ChittyID Mothership - Cloudflare Worker Entry Point
+ * ChittyID - Cloudflare Worker Entry Point
  * Hardened Security Configuration with Pipeline Enforcement
  * Enhanced with MCP Portal Integration and LangChain AI Routing
  */
@@ -456,7 +456,7 @@ export default {
       if (url.pathname === "/health" && request.method === "GET") {
         return new Response(JSON.stringify({
           status: "ok",
-          service: "chittyid-mothership",
+          service: "chittyid",
           version: "2.0.0",
           timestamp: new Date().toISOString()
         }), {
@@ -502,7 +502,7 @@ export default {
           status: "healthy",
           version: "2.0.0",
           timestamp: new Date().toISOString(),
-          service: "chittyid-mothership"
+          service: "chittyid"
         }), {
           headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
         });
@@ -601,7 +601,7 @@ export default {
         error: "NOT_FOUND",
         message: `Route not found: ${url.pathname}`,
         timestamp: new Date().toISOString(),
-        service: "chittyid-mothership"
+        service: "chittyid"
       }), {
         status: 404,
         headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
@@ -630,7 +630,7 @@ export default {
             "Content-Type": "application/json",
             "X-Security-Error": "true",
             "X-Pipeline-Required": "true",
-            "X-ChittyOS-Service": "chittyid-mothership",
+            "X-ChittyOS-Service": "chittyid",
             "X-MCP-Portal": "enabled",
             "X-LangChain-AI": "integrated",
           },

@@ -1,7 +1,7 @@
 {
   "dashboard": {
     "id": null,
-    "title": "ChittyID Mothership - Production Dashboard",
+    "title": "ChittyID - Production Dashboard",
     "tags": ["chittyos", "identity", "production"],
     "timezone": "UTC",
     "refresh": "30s",

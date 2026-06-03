@@ -5,7 +5,7 @@
  * Monitors sync health and alerts on failures
  */
 
-const WORKER_URL = process.env.NOTION_SYNC_WORKER_URL || 'https://notion-sync.chittyid-mothership.workers.dev';
+const WORKER_URL = process.env.NOTION_SYNC_WORKER_URL || 'https://notion-sync.chittyid.workers.dev';
 const ALERT_THRESHOLD = {
     schema_mismatch: 0,
     rate_limit_percentage: 2,

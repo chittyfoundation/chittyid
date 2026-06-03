@@ -13,8 +13,8 @@ alerting:
           - alertmanager:9093
 
 scrape_configs:
-  # ChittyID Mothership - Main Service
-  - job_name: 'chittyid-mothership'
+  # ChittyID - Main Service
+  - job_name: 'chittyid'
     static_configs:
       - targets: ['id.chitty.cc:443']
     scheme: https

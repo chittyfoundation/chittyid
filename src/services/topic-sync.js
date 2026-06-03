@@ -102,7 +102,7 @@ export class TopicSync {
         },
 
         metadata: {
-          createdBy: "chittyid-mothership",
+          createdBy: "chittyid",
           version: "1.0.0",
           embedding: null,
           keywords: [],
@@ -262,7 +262,7 @@ export class TopicSync {
       sender: {
         type: message.senderType || "user",
         id: message.senderId,
-        service: message.service || "chittyid-mothership",
+        service: message.service || "chittyid",
       },
       content: {
         text: message.text,
