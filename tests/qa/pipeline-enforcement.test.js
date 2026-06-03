@@ -423,7 +423,7 @@ describe('Pipeline Enforcement QA Tests', () => {
 
       expect(result.headers.get('X-Pipeline-Required')).toBe('true');
       expect(result.headers.get('X-Pipeline-Enforcement')).toBe('MANDATORY');
-      expect(result.headers.get('X-ChittyOS-Service')).toBe('chittyid-mothership');
+      expect(result.headers.get('X-ChittyOS-Service')).toBe('chittyid');
     });
   });
 

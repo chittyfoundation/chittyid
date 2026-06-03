@@ -1,5 +1,5 @@
 /**
- * ChittyID Mothership - Cloudflare Worker Entry Point
+ * ChittyID - Cloudflare Worker Entry Point
  * Hardened Security Configuration with Pipeline Enforcement
  * Enhanced with MCP Portal Integration and LangChain AI Routing
  */
@@ -215,7 +215,7 @@ export default {
             "Content-Type": "application/json",
             "X-Security-Error": "true",
             "X-Pipeline-Required": "true",
-            "X-ChittyOS-Service": "chittyid-mothership",
+            "X-ChittyOS-Service": "chittyid",
             "X-MCP-Portal": "enabled",
             "X-LangChain-AI": "integrated",
           },

@@ -11,7 +11,7 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 BUILD_DIR="$PROJECT_ROOT/dist"
 LOG_FILE="$PROJECT_ROOT/deployment.log"
 CLOUDFLARE_ACCOUNT_ID="${CLOUDFLARE_ACCOUNT_ID:-84f0f32886f1d6196380fe6cbe9656a8}"
-PROJECT_NAME="chittyid-mothership"
+PROJECT_NAME="chittyid"
 
 # Colors for output
 RED='\033[0;31m'
@@ -169,7 +169,7 @@ deploy_worker() {
 
     # Deploy worker
     log "Deploying worker..."
-    if ! wrangler deploy --name chittyid-mothership; then
+    if ! wrangler deploy --name chittyid; then
         error "Worker deployment failed"
     fi
 
@@ -184,7 +184,7 @@ deploy_pages() {
 
     # Deploy to Pages
     log "Deploying to Pages..."
-    if ! wrangler pages deploy dist --project-name=chittyid-mothership --compatibility-date=2025-01-16; then
+    if ! wrangler pages deploy dist --project-name=chittyid --compatibility-date=2025-01-16; then
         error "Pages deployment failed"
     fi
 
@@ -232,7 +232,7 @@ setup_monitoring() {
     # Create basic monitoring configuration
     cat > "$PROJECT_ROOT/monitoring-config.json" << EOF
 {
-  "service": "chittyid-mothership",
+  "service": "chittyid",
   "version": "2.0.0",
   "endpoints": {
     "health": "/api/health",
@@ -358,7 +358,7 @@ generate_report() {
 ## Rollback Plan
 
 If issues arise:
-1. \`wrangler rollback chittyid-mothership\` - Rollback worker
+1. \`wrangler rollback chittyid\` - Rollback worker
 2. \`git revert <commit>\` - Revert code changes
 3. Deploy previous version with \`npm run deploy\`
 

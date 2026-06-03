@@ -4,7 +4,7 @@ echo "🔒 COMPREHENSIVE SECURITY TEST BATTERY"
 echo "======================================"
 echo ""
 
-ENDPOINT="https://chittyid-mothership.chitty.workers.dev"
+ENDPOINT="https://chittyid.chitty.workers.dev"
 
 # Test 1: Legacy Endpoints
 echo "1️⃣  Testing Legacy Endpoint Blocking..."

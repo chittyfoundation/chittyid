@@ -193,7 +193,7 @@ create_wrangler_config() {
         warn "wrangler.toml not found. Creating basic configuration..."
 
         cat > wrangler.toml << 'EOF'
-name = "chittyid-mothership"
+name = "chittyid"
 compatibility_date = "2025-01-16"
 pages_build_output_dir = "dist"
 
@@ -270,7 +270,7 @@ create_monitoring_config() {
 {
   "dashboard": {
     "id": null,
-    "title": "ChittyID Mothership",
+    "title": "ChittyID",
     "tags": ["chittyos", "identity"],
     "timezone": "browser",
     "panels": [

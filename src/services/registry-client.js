@@ -19,11 +19,11 @@ export class RegistryClient {
    */
   buildServiceInfo() {
     return {
-      service: 'chittyid-mothership',
-      name: 'ChittyID Mothership',
+      service: 'chittyid',
+      name: 'ChittyID',
       version: '2.0.0',
       description: 'Identity management system with hardened security pipeline',
-      endpoint: 'https://chittyid-mothership.chitty.workers.dev',
+      endpoint: 'https://chittyid.chitty.workers.dev',
       domain: 'https://id.chitty.cc',
       health: '/api/health',
       priority: 1,
@@ -50,7 +50,7 @@ export class RegistryClient {
         ]
       },
       registeredAt: new Date().toISOString(),
-      registeredBy: 'chittyid-mothership-deployment'
+      registeredBy: 'chittyid-deployment'
     };
   }
 
@@ -104,7 +104,7 @@ export class RegistryClient {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-ChittyOS-Service': 'chittyid-mothership',
+        'X-ChittyOS-Service': 'chittyid',
         'X-ChittyOS-Version': '2.0.0'
       },
       body: JSON.stringify(this.serviceInfo)
@@ -166,7 +166,7 @@ export class RegistryClient {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
-              'X-ChittyOS-Service': 'chittyid-mothership'
+              'X-ChittyOS-Service': 'chittyid'
             },
             body: JSON.stringify({
               status,
@@ -198,7 +198,7 @@ export class RegistryClient {
    */
   async getHealthStatus() {
     try {
-      const response = await fetch('https://chittyid-mothership.chitty.workers.dev/api/health');
+      const response = await fetch('https://chittyid.chitty.workers.dev/api/health');
       if (response.ok) {
         return await response.json();
       }
@@ -239,7 +239,7 @@ export class RegistryClient {
           const response = await fetch(`${registration.registry}/api/services/${registration.registrationId}`, {
             method: 'DELETE',
             headers: {
-              'X-ChittyOS-Service': 'chittyid-mothership'
+              'X-ChittyOS-Service': 'chittyid'
             }
           });
 

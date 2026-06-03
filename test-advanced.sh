@@ -4,7 +4,7 @@ echo "🔐 ADVANCED SECURITY TESTING"
 echo "============================"
 echo ""
 
-ENDPOINT="https://chittyid-mothership.chitty.workers.dev"
+ENDPOINT="https://chittyid.chitty.workers.dev"
 
 # Test Rate Limiting
 echo "⚡ Testing Rate Limiting..."

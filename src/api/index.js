@@ -159,7 +159,7 @@ export class ChittyAPI {
         method: 'GET',
         handler: async () => {
           return {
-            name: 'ChittyID Mothership API',
+            name: 'ChittyID API',
             version: '2.0.0',
             description: 'ChittyID management system for IDs from id.chitty.cc',
             endpoints: {

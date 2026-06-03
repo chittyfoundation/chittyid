@@ -225,7 +225,7 @@ export default function ChittyDashboard() {
       {/* Footer */}
       <div className="text-xs text-black/60 flex items-center gap-3">
         <Save className="h-4 w-4" /> Layout auto-saves to localStorage. Drag to reorder. Resize corners. Import/Export JSON to version.
-        <span className="ml-auto">ChittyID Mothership • id.chitty.cc • Powered by ChittyRouter AI Gateway</span>
+        <span className="ml-auto">ChittyID • id.chitty.cc • Powered by ChittyRouter AI Gateway</span>
       </div>
     </div>
   );

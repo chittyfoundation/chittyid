@@ -410,7 +410,7 @@ async function handleGetChittyId(request, env, circuitBreaker, api) {
         headers: {
           ...corsHeaders(),
           "X-Pipeline-Completed": "true",
-          "X-ChittyOS-Service": "chittyid-mothership",
+          "X-ChittyOS-Service": "chittyid",
         },
       },
     );
@@ -501,7 +501,7 @@ export async function onRequest(context) {
       const html = `<!DOCTYPE html>
 <html>
 <head>
-    <title>ChittyID Mothership</title>
+    <title>ChittyID</title>
     <meta charset="utf-8">
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
@@ -514,7 +514,7 @@ export async function onRequest(context) {
 </head>
 <body>
     <div class="container">
-        <h1>🚀 ChittyID Mothership</h1>
+        <h1>🚀 ChittyID</h1>
         <div class="status">
             <strong>Status:</strong> AI Agent System Active<br>
             <strong>Version:</strong> 2.0.0<br>

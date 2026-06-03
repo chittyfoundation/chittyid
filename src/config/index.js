@@ -7,7 +7,7 @@ export const ChittyConfig = {
   // API Configuration
   api: {
     version: '2.0.0',
-    name: 'ChittyID Mothership',
+    name: 'ChittyID',
     description: 'Identity management system for ChittyIDs from id.chitty.cc service',
     baseUrl: 'https://id.chitty.cc',
     timeout: 30000, // 30 seconds
