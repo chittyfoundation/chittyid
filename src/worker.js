@@ -13,6 +13,19 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
 
+    // Redirect direct agent access to the front door
+    const userAgent = request.headers.get("user-agent") || "";
+    if (userAgent.toLowerCase().includes("curl") || userAgent.toLowerCase().includes("python") || userAgent.toLowerCase().includes("claude")) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: "Direct synthetic agent access prohibited. Route through the canonical front door via `can chitty whoami`.",
+        timestamp: new Date().toISOString()
+      }), {
+        status: 403,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     // Initialize services
     const sessionMiddleware = new SessionMiddleware(env);
 
