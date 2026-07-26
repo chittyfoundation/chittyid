@@ -21,7 +21,8 @@
       "session:sync",
       "ai:langchain",
       "cases:read",
-      "cases:write"
+      "cases:write",
+      "google:workspace"
     ],
     "client_configuration": {
       "client_id": "${CHITTYAUTH_CLIENT_ID}",
@@ -223,6 +224,30 @@
               }
             },
             "required": ["project_name"]
+          }
+        },
+        {
+          "name": "google_workspace_access",
+          "description": "Access Google Workspace accounts (Drive, Mail, Calendar, Chat, Docs) via MCP",
+          "oauth_scopes": ["google:workspace"],
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "service": {
+                "type": "string",
+                "enum": ["drive", "mail", "calendar", "chat", "docs"],
+                "description": "Google Workspace service to access"
+              },
+              "operation": {
+                "type": "string",
+                "description": "Operation to perform (e.g., read, write, search)"
+              },
+              "target_account": {
+                "type": "string",
+                "description": "Target account ID or email (requires F-L10 compliance for specific accounts)"
+              }
+            },
+            "required": ["service", "operation"]
           }
         }
       ]
