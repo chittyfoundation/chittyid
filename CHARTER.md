@@ -91,6 +91,10 @@ VV-G-LLL-SSSS-T-YYMM-C-XX
 
 Example: `CP-A-001-1234-P-2509-I-82`
 
+#### Entity type and identity notes
+- **Characterization is derived, not stored.** "Natural / synthetic / legal" are sub-kinds of the `P` (Person) entity type (see `chittycanon://gov/governance#core-types`). There is no characterization segment in the ChittyID format and no characterization column anywhere; `T` is the entity type and `C` is the trust level.
+- **Service registration is not identity registration.** ChittyRegistry (`registry.chitty.cc`) is a read-only directory of certified services, tools, and agents (`entity_type:"T"`); it never stores person ChittyIDs. Person/entity identity persistence lives in ChittyAuth (`identities`, keyed by `did:chitty:<ChittyID>`). Submitting a service manifest to `register.chitty.cc` registers a service, not a ChittyID.
+
 ### Authentication
 All endpoints require Bearer token:
 ```
