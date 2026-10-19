@@ -24,7 +24,7 @@ ChittyIDs follow the structured format: `VV-G-LLL-SSSS-T-YYMM-C-XX`
 - G: Geographic region (1-9)
 - LLL: Legal jurisdiction (3 letters)
 - SSSS: Sequential ID (4 digits)
-- T: Entity type (P/L/T/E for Person/Location/Thing/Event)
+- T: Entity type (P/L/T/E/A for Person/Location/Thing/Event/Authority)
 - YM: Year-Month code
 - C: Trust level (0-5)
 - X: Mod-97 checksum (2 digits)
