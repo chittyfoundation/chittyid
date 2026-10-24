@@ -48,13 +48,23 @@ const headers = {
  */
 const CHITTYID_PATTERNS = {
   // Canonical structured format: VV-G-LLL-SSSS-T-YYMM-C-XX
-  structured: /^[A-Z0-9]{2}-\d-[A-Z]{3}-\d{4}-[PLTE]-\d{2,4}-\d-\d{2}$/,
+  // @canon: chittycanon://gov/governance#core-types
+  // T is the full P/L/T/E/A set — omitting A (Authority) rejects every
+  // Authority-type ID. Segment 6 is YYMM (exactly 4); segments 7 and 8 are
+  // alphanumeric, matching both live-minted and documented IDs.
+  // LLL is alphanumeric: live IDs use 'USA', the documented example uses '001'.
+  structured: /^[A-Z0-9]{2}-[A-Z0-9]-[A-Z0-9]{3}-\d{4}-[PLTEA]-\d{4}-[A-Z0-9]-[A-Z0-9]{2}$/,
 
   // Legacy UUID format: chitty_<uuid>
   uuid: /^chitty_[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
 
   // Extended format for compatibility
-  extended: /^[A-Z0-9]{2}-[A-Z0-9]-[A-Z0-9]{3}-[A-Z0-9]{4}-[A-Z0-9]-[A-Z0-9]{4}-[A-Z0-9]-[A-Z0-9]$/
+  // Segment 8 is XX (two chars), not one — a single-char class rejects every
+  // real ID and made `extended` dead weight behind `structured`.
+  // "Compatibility" relaxes segment *shape*, never the entity-type set:
+  // isChittyId() ORs these patterns, so a permissive T here would let a
+  // non-canonical entity type pass the whole check.
+  extended: /^[A-Z0-9]{2}-[A-Z0-9]-[A-Z0-9]{3}-[A-Z0-9]{4}-[PLTEA]-[A-Z0-9]{4}-[A-Z0-9]-[A-Z0-9]{2}$/
 };
 
 /**
