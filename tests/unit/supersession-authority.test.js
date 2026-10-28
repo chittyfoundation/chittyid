@@ -154,6 +154,70 @@ describe("ChittyID supersession authority", () => {
     expect(second.calls.filter((call) => call.url.endsWith("/api/verify-supersession"))).toHaveLength(1);
   });
 
+  it("converges when concurrent first requests both reach predecessor-idempotent ChittyMint", async () => {
+    const e = env();
+    let releaseMint;
+    const gate = new Promise((resolve) => {
+      releaseMint = resolve;
+    });
+    let mintCalls = 0;
+
+    const fetcher = async (url, options) => {
+      if (url.endsWith("/api/mint")) {
+        mintCalls += 1;
+        await gate;
+        // This fixture models the live ChittyMint contract after #20:
+        // repeated/concurrent requests for metadata.supersedes return the same
+        // successor and proof from the predecessor-keyed Durable Object.
+        return Response.json({
+          success: true,
+          chittyId: successor,
+          supersessionProof: proof,
+          idempotent: mintCalls > 1,
+        });
+      }
+      if (url.endsWith("/api/verify-supersession")) {
+        return Response.json({
+          success: true,
+          valid: true,
+          supersedes: predecessor,
+          successor,
+          auditId: proof.auditId,
+        });
+      }
+      throw new Error("unexpected URL " + url);
+    };
+
+    const first = mintSupersession(
+      request("/api/supersession/mint", { supersedes: predecessor }),
+      e,
+      fetcher,
+    );
+    const second = mintSupersession(
+      request("/api/supersession/mint", { supersedes: predecessor }),
+      e,
+      fetcher,
+    );
+
+    await Promise.resolve();
+    releaseMint();
+
+    const [firstResponse, secondResponse] = await Promise.all([first, second]);
+    const [firstBody, secondBody] = await Promise.all([
+      firstResponse.json(),
+      secondResponse.json(),
+    ]);
+
+    expect(firstBody.manifest.successor).toBe(successor);
+    expect(secondBody.manifest.successor).toBe(successor);
+    expect(firstBody.manifest.auditId).toBe(proof.auditId);
+    expect(secondBody.manifest.auditId).toBe(proof.auditId);
+    expect(
+      await e.CHITTYID_KV.get(supersessionKeys.fromKey(predecessor)),
+    ).toBe(proof.auditId);
+    expect(mintCalls).toBe(2);
+  });
+
   it("verifies only the currently indexed authority relation", async () => {
     const e = env();
     const { fetcher } = fetcherFactory();
