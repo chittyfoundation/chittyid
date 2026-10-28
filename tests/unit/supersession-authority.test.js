@@ -162,7 +162,7 @@ describe("ChittyID supersession authority", () => {
     });
     let mintCalls = 0;
 
-    const fetcher = async (url, options) => {
+    const fetcher = async (url, _options) => {
       if (url.endsWith("/api/mint")) {
         mintCalls += 1;
         await gate;
