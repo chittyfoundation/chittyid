@@ -1,7 +1,7 @@
 ---
 service_chittyid: "TBD-pending-canonical-mint"
 service_name: "chittyid"
-canonical_uri: "chittycanon://core/services/chittyid"
+canonical_uri: "chittycanon://core/services/chitty-id"
 pentad_version: "0.1.0"
 ---
 
@@ -24,6 +24,8 @@ Every agent call to ChittyID MUST present:
 | `GET /api/v1/validate/{id}` | yes | basic | no |
 | `GET /api/v1/resolve/{id}` | yes | trusted | no |
 | `POST /api/v1/admin/revoke` | no | governance | YES — ledger + audit |
+| `POST /api/supersession/mint` | no | service principal | YES — canonical identity-continuity manifest |
+| `POST /api/supersession/verify` | yes | public | no mutation; authority verification only |
 
 ## 3. Evidence routing
 
@@ -35,18 +37,28 @@ Mint operations are inherently evidence-grade:
 ## 4. Identity-first rules
 
 - No mint without verified agent ChittyID (no anonymous minting)
-- No mint of a `T` (Authority) type without governance-class claim
+- Entity codes are canonical `P/L/T/E/A`; `T` means Thing and `A` means Authority
 - Cannot self-mint (an agent cannot mint its own ChittyID; bootstrapped by governance)
 - All resolve queries logged at sample rate; full resolve of P/Natural records requires evidence-grade
 
-## 5. Disallowed actions
+## 5. Supersession continuity invariants
+
+- ChittyID owns the canonical predecessor→successor identity relation.
+- ChittyMint signs/verifies the cryptographic proof; its HMAC key is never shared with ChittyID or callers.
+- `POST /api/supersession/mint` is service-authenticated and currently restricted to governed legacy `T → P` continuity migration.
+- `POST /api/supersession/verify` is public/read-only and must re-verify the stored proof through ChittyMint.
+- Canonical manifests are indexed by predecessor, successor, and audit ID in existing ChittyID KV; no new schema or identity table is introduced.
+- Never rewrite the predecessor ChittyID in place. A proof authorizes the relation; downstream record migration is a separate controlled action.
+- Retries for an already-canonical predecessor are idempotent and return the same relation rather than minting another successor.
+
+## 6. Disallowed actions
 
 - Direct DB writes to identity tables (must go through API)
 - Editing `chitty_id` of any existing row (immutable per SOP-040)
 - Issuing ChittyAuth tokens (ChittyID is consumer, not issuer)
 - Backdating ledger entries
 
-## 6. Rate limits / quotas
+## 7. Rate limits / quotas
 
 | Tier | Mints/hour | Resolves/min | Notes |
 |---|---|---|---|
