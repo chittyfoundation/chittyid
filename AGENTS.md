@@ -24,19 +24,21 @@ Every agent call to ChittyID MUST present:
 | `GET /api/v1/validate/{id}` | yes | basic | no |
 | `GET /api/v1/resolve/{id}` | yes | trusted | no |
 | `POST /api/v1/admin/revoke` | no | governance | YES — ledger + audit |
-| `POST /api/supersession/mint` | no | service principal | YES — canonical identity-continuity manifest |
+| `POST /api/supersession/mint` | no | service principal | KV authority manifest only; ChittyMint emits the cryptographic mint audit |
 | `POST /api/supersession/verify` | yes | public | no mutation; authority verification only |
 
 ## 3. Evidence routing
 
-Mint operations are inherently evidence-grade:
-- Agent ChittyID logged as `mint_requester` field
-- ChittyLedger entry `E/ChittyIDMinted` records action + agent + minted ID
-- Per SOP-110, applies to all chittyid mints regardless of caller
+Ordinary `/api/v1/mint` operations are evidence-grade under the existing mint contract:
+- Agent ChittyID is logged as the `mint_requester` field.
+- ChittyLedger entry `E/ChittyIDMinted` records action + agent + minted ID.
+- Per SOP-110, this applies to the ordinary ChittyID mint surface.
+
+Supersession is a service-to-service continuity exception. `/api/supersession/mint` authenticates the canonical service principal, records the canonical relation in existing ChittyID KV, and re-verifies the cryptographic proof through ChittyMint. It does not currently add a second ChittyLedger write or a requester-agent field; ChittyMint records the underlying supersession mint/reuse audit.
 
 ## 4. Identity-first rules
 
-- No mint without verified agent ChittyID (no anonymous minting)
+- Ordinary `/api/v1/mint` requires verified agent identity. `/api/supersession/mint` is the explicit service-principal exception for governed legacy continuity; it is not anonymous.
 - Entity codes are canonical `P/L/T/E/A`; `T` means Thing and `A` means Authority
 - Cannot self-mint (an agent cannot mint its own ChittyID; bootstrapped by governance)
 - All resolve queries logged at sample rate; full resolve of P/Natural records requires evidence-grade
@@ -49,7 +51,7 @@ Mint operations are inherently evidence-grade:
 - `POST /api/supersession/verify` is public/read-only and must re-verify the stored proof through ChittyMint.
 - Canonical manifests are indexed by predecessor, successor, and audit ID in existing ChittyID KV; no new schema or identity table is introduced.
 - Never rewrite the predecessor ChittyID in place. A proof authorizes the relation; downstream record migration is a separate controlled action.
-- Retries for an already-canonical predecessor are idempotent and return the same relation rather than minting another successor.
+- ChittyMint is the predecessor-scoped exactly-once birth authority: retries/concurrent requests for the same predecessor return the same successor/proof. ChittyID projects that proof into its canonical KV relation indexes; it does not implement a second mint lock.
 
 ## 6. Disallowed actions
 
