@@ -44,6 +44,22 @@ function bearer(request) {
   return header.startsWith("Bearer ") ? header.slice(7) : null;
 }
 
+async function tokensMatch(presented, expected) {
+  if (typeof presented !== "string" || typeof expected !== "string") return false;
+  const encoder = new TextEncoder();
+  const [aBuffer, bBuffer] = await Promise.all([
+    crypto.subtle.digest("SHA-256", encoder.encode(presented)),
+    crypto.subtle.digest("SHA-256", encoder.encode(expected)),
+  ]);
+  const a = new Uint8Array(aBuffer);
+  const b = new Uint8Array(bBuffer);
+  let diff = 0;
+  for (let i = 0; i < a.length; i += 1) {
+    diff |= a[i] ^ b[i];
+  }
+  return diff === 0;
+}
+
 function auditKey(auditId) {
   return `supersession:audit:${auditId}`;
 }
@@ -164,7 +180,7 @@ export async function mintSupersession(request, env, fetcher = fetch) {
       503,
     );
   }
-  if (!presented || presented !== expected) {
+  if (!presented || !(await tokensMatch(presented, expected))) {
     return json({ success: false, error: "Unauthorized" }, 401);
   }
 
