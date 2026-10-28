@@ -10,7 +10,7 @@ jobs:
     name: CI Pipeline
     uses: chittyfoundation/.github/.github/workflows/reusable-ci-pipeline.yml@main
     with:
-      node-version: '20'
+      node-version: '22'
       run-tests: true
       run-lint: true
       run-ai-review: true
