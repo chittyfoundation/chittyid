@@ -72,8 +72,8 @@ Rotation policy per SOP-080 (TBD).
 
 ## 6. Audit logging
 
-- **Every mint** → ChittyLedger entry `E/ChittyIDMinted` with: chitty_id minted, type, jurisdiction, requester ChittyID, timestamp, signature
+- **Ordinary `/api/v1/mint`** → ChittyLedger entry `E/ChittyIDMinted` with: chitty_id minted, type, jurisdiction, requester ChittyID, timestamp, signature
 - **Failed mint attempts** → `E/ChittyIDMintFailed`
-- **Supersession mint/verification** → preserve predecessor, successor, audit ID, authority, and proof-verification outcome; predecessor is never rewritten in place
+- **Supersession mint** → ChittyID KV preserves predecessor, successor, audit ID, authority, and the signed ChittyMint proof; predecessor is never rewritten in place. ChittyMint separately records mint/reuse audit events. Public verification is read-only and is not itself persisted as a new audit event.
 - **Resolve queries** (sampled 1%) → `E/ChittyIDResolved`
 - Retention: forever (ledger append-only)
