@@ -9,6 +9,10 @@ import { ChittyOSMCPPortalHandler } from "./mcp-cloudflare-portal-handler.js";
 
 // Import Ontology Controller for entity classification and hybrid ID generation
 import OntologyControllerWorker from "./src/hybrid/ontology-controller.js";
+import {
+  mintSupersession,
+  verifySupersession,
+} from "./src/services/supersession-authority.js";
 
 // Note: Minting is now delegated to ChittyMint (mint.chitty.cc)
 // ChittyID serves as the API layer for ID operations
@@ -462,6 +466,16 @@ export default {
         }), {
           headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
         });
+      }
+
+      // Privileged continuity mint: ChittyID owns the canonical predecessor→successor relation.
+      if (url.pathname === "/api/supersession/mint" && request.method === "POST") {
+        return await mintSupersession(request, env);
+      }
+
+      // Public/read-only verification of a stored canonical supersession relation.
+      if (url.pathname === "/api/supersession/verify" && request.method === "POST") {
+        return await verifySupersession(request, env);
       }
 
       // E1 canonical mint endpoint: POST /mint (short, logical, id.chitty.cc as primary)
