@@ -32,6 +32,13 @@
       "zone_name": "chitty.cc"
     }
   ],
+  "secrets_store_secrets": [
+    {
+      "binding": "CHITTY_AUTH_SERVICE_TOKEN",
+      "store_id": "e914522471964c3c8cf1e601770edcc3",
+      "secret_name": "chitty_auth_service_token"
+    }
+  ],
   "kv_namespaces": [
     {
       "binding": "MCP_SESSIONS",

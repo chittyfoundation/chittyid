@@ -33,7 +33,7 @@ Cloudflare Worker deployed at id.chitty.cc with AI agent routing, mandatory secu
 - `functions/api/[[route]].js` — API router with pipeline enforcement
 - `src/agents/` — AI agents (routing, security, validation, performance, dedup)
 - `src/middleware/` — Request interception and pipeline enforcement
-- `src/services/` — Notion sync, session management, registry client
+- `src/services/` — Notion sync, session management, registry client, supersession authority projection
 
 ### ChittyID Format
 ```
@@ -59,6 +59,7 @@ Version, Geographic region, Jurisdiction, Sequential ID, Entity Type (P/L/T/E/A)
 | drand | Cryptographic randomness beacon |
 | ChittyAuth | Token validation for API access |
 | ChittyTrust | Trust level policy definitions |
+| ChittyMint | Signs/verifies supersession proofs; ChittyID owns the canonical relation |
 
 ### Endpoints
 | Path | Method | Auth | Purpose |
@@ -66,6 +67,8 @@ Version, Geographic region, Jurisdiction, Sequential ID, Entity Type (P/L/T/E/A)
 | `/health` | GET | No | Health check |
 | `/mint` | POST | Yes | **Canonical** — generate a new ChittyID |
 | `/api/validate` | POST | Yes | Verify ChittyID validity |
+| `/api/supersession/mint` | POST | Service principal | Mint + record governed legacy `T → P` continuity relation |
+| `/api/supersession/verify` | POST | No | Verify current canonical stored supersession relation |
 | `/api/spec` | GET | No | OpenAPI specification |
 | `/v1/mint`, `/generate`, `/api/get-chittyid` | — | — | Deprecated aliases → `POST /mint` (sunset 2027-05-27) |
 
