@@ -93,7 +93,7 @@ async function verifyWithMint(manifest, env, fetcher = fetch) {
     };
   }
 
-  let payload = null;
+  let payload;
   try {
     payload = await response.json();
   } catch {
@@ -347,7 +347,7 @@ export async function verifySupersession(request, env, fetcher = fetch) {
     return json({ success: false, error: "Invalid JSON" }, 400);
   }
 
-  let manifest = null;
+  let manifest;
   if (body?.auditId) {
     manifest = await loadManifestByAuditId(env, body.auditId);
   } else if (body?.supersedes) {
