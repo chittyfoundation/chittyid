@@ -34,6 +34,7 @@ ChittyID is the **authoritative identity management foundation** for the ChittyO
 - Mod-97 checksum enforcement (ISO 7064)
 - drand beacon integration for cryptographic randomness
 - Batch minting operations
+- Canonical predecessor→successor supersession manifests for governed identity-continuity migrations
 
 ### IS NOT Responsible For
 - Authentication tokens (ChittyAuth)
@@ -50,6 +51,7 @@ ChittyID is the **authoritative identity management foundation** for the ChittyO
 | Upstream | drand | Cryptographic randomness beacon |
 | Peer | ChittyAuth | Token validation for API access |
 | Peer | ChittyTrust | Trust level policy definitions |
+| Peer | ChittyMint | Signs and verifies privileged supersession proofs; ChittyID remains relation authority |
 | Downstream | ChittyRegister | Consumes IDs for service registration |
 | Downstream | ChittyVerify | Links verification to identities |
 | Downstream | ChittyChronicle | Receives audit events |
@@ -64,6 +66,8 @@ ChittyID is the **authoritative identity management foundation** for the ChittyO
 |----------|--------|---------|
 | `/mint` | POST | **Canonical** — generate a new ChittyID (body: `{entityType:"P"\|"L"\|"T"\|"E"\|"A"}`) |
 | `/api/validate` | POST | Verify ChittyID validity (body: `{id}`) |
+| `/api/supersession/mint` | POST | Privileged legacy `T → P` continuity mint; records canonical predecessor→successor manifest |
+| `/api/supersession/verify` | POST | Public/read-only verification of the current canonical supersession relation |
 | `/api/spec` | GET | OpenAPI specification |
 | `/health` | GET | Service health |
 
@@ -92,10 +96,9 @@ VV-G-LLL-SSSS-T-YYMM-C-XX
 Example: `CP-A-001-1234-P-2509-I-82`
 
 ### Authentication
-All endpoints require Bearer token:
-```
-Authorization: Bearer {CHITTY_ID_TOKEN}
-```
+- `POST /api/supersession/mint` requires the canonical ChittyOS service principal via `Authorization: Bearer ...`, matched to `CHITTY_AUTH_SERVICE_TOKEN` from Cloudflare Secrets Store.
+- `POST /api/supersession/verify` is public/read-only and performs no mutation.
+- Existing endpoint-specific authentication remains governed by the current ChittyID pipeline; this change does not broaden mint authority.
 
 ## Ownership
 
